@@ -1,0 +1,16 @@
+# policy/exceptions.yaml
+# Plane: desired state. Terraform may create these from Phase 6.
+# Names use EX-. Required metadata: ticket, owner, expiry.
+# Phase 2 linter rejects missing fields and dates in the past.
+
+exceptions: []
+  # - name: EX-vendor-wired-temp
+  #   state: enabled
+  #   policy_set: PS-global-wired-mab
+  #   ticket: CHG0001234
+  #   owner: lab
+  #   bu: lab
+  #   expires_on: "2026-12-31"
+  #   description: Temporary vendor printer access while profiling is tuned.
+  #   profiles:
+  #     - PR-wired-quarantine

@@ -1,58 +1,41 @@
-# ISE Policy-as-Code
+# ISE policy-as-code
 
-Migrating an existing, in-production Cisco ISE deployment to policy-as-code —
-without ever putting that production deployment at risk.
+Git-reviewed Network Access policy for Cisco ISE 3.3. YAML is the review surface. Terraform becomes the writer later, and only against the home-lab ISE.
 
-## How to read this repo right now
+## Current increment
 
-This is **Phase 0: Foundations & Guardrails**. Nothing in here talks to ISE
-yet — there is no Terraform provider config, no working scripts, no CI
-pipeline. This phase is scaffolding and decisions only, so that every phase
-after it has a clear place to land.
+**Phase 0 — repo skeleton.** Desired policy, inventory, and lab environment wiring. No ISE session. No Terraform provider.
 
-Start here:
+## Planes
 
-1. [`docs/ROADMAP.md`](docs/ROADMAP.md) — the full phased plan, in order,
-   with an exit criteria for each phase. **We build one phase at a time.**
-   This repo currently implements Phase 0 only.
-2. [`docs/adr/`](docs/adr/) — architecture decision records: the *why*
-   behind each significant choice (tech stack, workflow), not just the
-   *what*. Read `0001` first (why we keep ADRs at all), then `0002` (why
-   this tech stack).
-3. [`docs/naming-standards.md`](docs/naming-standards.md) — placeholder for
-   your naming convention. This gets filled in before Phase 2 (the linter)
-   is built.
+| Folder | Meaning | Applied? |
+| --- | --- | --- |
+| `policy/` | What ISE should look like | Yes, from Phase 3+ |
+| `inventory/` | Nodes, VLANs, curated NADs | No |
+| `exports/` | What ISE actually returned | No (generated) |
+| `environments/lab/` | This checkout's only ISE | Wiring |
 
-## Layout
+`environments/stage/` does not exist. Add it only if a second eval ISE is built. There is no `prod/` folder.
 
-| Path | Purpose | Populated in |
-|---|---|---|
-| `environments/lab/` | Sandbox/CML ISE — safe to break, first target for everything | Phase 3+ |
-| `environments/nonprod/` | Non-production ISE — real-ish data, still not production | Phase 7 |
-| `environments/prod/` | Your production ISE — **inert until Phase 8**, and even then one object type at a time | Phase 8+ |
-| `modules/` | Reusable Terraform modules (or wrappers around Cisco's `nac-ise` module) | Phase 3+ |
-| `policies/` | Policy objects as data (YAML), the thing you'll actually edit day to day | Phase 5+ |
-| `scripts/export/` | Read-only export tooling (Python/Ansible) that pulls current ISE state into version control | Phase 1 |
-| `scripts/lint/` | The naming-standard linter | Phase 2 |
-| `docs/` | Roadmap, ADRs, naming standards, and anything else durable | ongoing |
+## What this is not
 
-## Guardrails baked into this structure
+- Not a node installer
+- Not Device Admin / TACACS
+- Not a remote-production apply pipeline
+- Not Terraform-managed NADs
 
-- **Environment separation is physical, not just logical.** `environments/prod/`
-  exists as an empty, documented placeholder specifically so that later
-  phases have to deliberately opt in to touching it — there's no shared
-  "default" environment a mistake could fall into.
-- **Data lives apart from code.** Policy objects will be described as YAML
-  in `policies/`, consumed by Terraform modules in `modules/` — not
-  hand-written HCL per object. This is what makes the naming-standard
-  linter possible: it lints the YAML *before* Terraform ever runs.
-- **Nothing merges without review.** This repo assumes branch protection +
-  required PR approval on `main` (configured in your Git host's settings,
-  not in code) from the start, per your existing workflow.
+## Git flow
 
-## What's next
+One branch per phase. PR + approval. Merge to `main` when `docs/phases.md` exit criteria are met.
 
-Once you've cloned this locally and reviewed the roadmap and ADRs, the next
-step (Phase 1) is a read-only export of your current ISE configuration —
-no writes, nothing that can affect production. We'll build that as its own
-single step when you're ready.
+## Start here
+
+- `docs/decisions.md` — scope locked in Phase 0
+- `docs/naming.md` — prefixes and ranks
+- `docs/file-map.md` — which file owns which object
+- `docs/phases.md` — milestones
+- `docs/blog-stops.md` — when to write it up
+
+## Next increment
+
+Phase 1 — read-only Python export from the lab ISE to `exports/*.csv`. First socket to ISE. GET only.

@@ -1,0 +1,24 @@
+# inventory/nads.yaml
+# Plane: reference. Terraform does not manage NADs in this PoC.
+# Intent: curated lab NAD list for humans. Use exports/nads.csv for a live dump.
+#
+# Why not Terraform: RADIUS shared secrets sit on the object, and a full
+# inventory is a report problem, not an apply problem.
+# Revisit after Phase 4 if lab-only NAD management is useful.
+
+nads: []
+  # - name: lab-sw-01
+  #   ip: 192.0.2.20
+  #   mask: 32
+  #   description: Home-lab access switch
+  #   ndg:
+  #     location: USA
+  #     device_type: switch
+  #     business_unit: lab
+  #     stage: monitor
+  #     function: lab
+  #   radius: true
+  #   owner: lab
+  #   bu: lab
+  #   state: enabled
+  #   managed_by: inventory   # inventory | terraform | gui

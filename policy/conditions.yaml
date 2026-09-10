@@ -1,0 +1,16 @@
+# policy/conditions.yaml
+# Plane: desired state. Terraform may create these from Phase 4.
+# Reusable library conditions. Names use CND-.
+# Prefer library conditions over one-off rule conditions.
+
+conditions: []
+  # - name: CND-wired-dot1x
+  #   state: enabled
+  #   description: Wired 802.1X via NAS-Port-Type.
+  #   owner: lab
+  #   type: LibraryConditionAttributes
+  #   is_negate: false
+  #   dictionary_name: Radius
+  #   attribute_name: NAS-Port-Type
+  #   operator: equals
+  #   attribute_value: Ethernet

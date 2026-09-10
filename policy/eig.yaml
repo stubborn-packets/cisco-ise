@@ -1,0 +1,11 @@
+# policy/eig.yaml
+# Plane: desired state. Terraform may create these from Phase 4.
+# Approved static Endpoint Identity Groups. Names use EIG-.
+
+endpoint_identity_groups: []
+  # - name: EIG-printers
+  #   description: Statically classified printers.
+  #   owner: lab
+  #   bu: lab
+  #   parent: Endpoint Identity Groups
+  #   state: enabled

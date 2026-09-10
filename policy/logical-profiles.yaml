@@ -1,0 +1,10 @@
+# policy/logical-profiles.yaml
+# Plane: desired state (documentation until an API write path is proven).
+# Names use LP-. Do not assume Terraform can manage these yet.
+
+logical_profiles: []
+  # - name: LP-printers
+  #   description: Logical profile grouping printer profiles.
+  #   owner: lab
+  #   state: enabled
+  #   profiles: []

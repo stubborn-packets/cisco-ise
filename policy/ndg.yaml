@@ -1,0 +1,59 @@
+# policy/ndg.yaml
+# Plane: desired state. Terraform may create these from Phase 4.
+# Intent: allowed Network Device Group roots and values.
+# ISE NDG names are hierarchical: Root#All <Root>#Leaf
+#
+# Roots (locked 2026-09-10):
+#   All Locations    — ISO 3166-1 alpha-3 country code
+#   All Device Types — controlled allow-list
+#   BusinessUnit     — BU that owns / hosts the NAD
+#   Stage            — enforcement mode of the NAD
+#   Function         — role or project when Device Type + BU is not enough
+#
+# Phase 2 linter will reject values not listed (or not matching a pattern).
+# Allow-lists start empty. Fill them before Phase 4 writes NDGs.
+
+roots:
+  - name: All Locations
+    ise_root: Location
+    value_type: iso-3166-1-alpha-3
+    description: Country where the NAD lives. Use 3-letter ISO codes.
+    # examples: USA, CAN, GBR
+    allowed_values: []
+
+  - name: All Device Types
+    ise_root: Device Type
+    value_type: allow-list
+    description: Controlled list of NAD platforms / form factors.
+    allowed_values: []
+    # - switch
+    # - wlc
+    # - firewall
+    # - vpn-concentrator
+
+  - name: BusinessUnit
+    ise_root: BusinessUnit
+    value_type: allow-list
+    description: Business unit that owns or hosts the NAD.
+    allowed_values: []
+    # - lab
+    # - corp
+    # - guest
+
+  - name: Stage
+    ise_root: Stage
+    value_type: allow-list
+    description: NAD enforcement type (monitor, low-impact, closed, etc.).
+    allowed_values: []
+    # - monitor
+    # - low-impact
+    # - closed
+
+  - name: Function
+    ise_root: Function
+    value_type: allow-list
+    description: Role or project when Device Type + BusinessUnit cannot describe the NAD.
+    allowed_values: []
+    # - lab
+    # - ot
+    # - building-mgmt

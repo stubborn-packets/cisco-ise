@@ -1,0 +1,31 @@
+# inventory/nodes.yaml
+# Plane: reference. Terraform never builds ISE nodes from this file.
+# Intent: document the ISE this repo is allowed to talk to.
+#
+# This checkout targets a single home-lab eval.
+# A second environment named "stage" is a future option, not created.
+
+deployment:
+  name: lab
+  environment: lab
+  ise_version: "3.3"
+  ise_patch: "1"
+  notes: >
+    Single eval node. Personas and scale will not match a distributed
+    deployment. Enable ERS and OpenAPI before Phase 1 export.
+
+nodes: []
+  # - name: ise-lab-1
+  #   fqdn: ise-lab.example.local
+  #   personas:
+  #     - administration
+  #     - monitoring
+  #     - policy-service
+  #   version: "3.3.0.430"
+  #   patch: "1"
+
+vips: []
+  # - name: VIP-lab-psn
+  #   address: 192.0.2.10
+  #   purpose: radius-vip
+  #   state: enabled

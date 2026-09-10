@@ -1,33 +1,35 @@
-# --- Terraform ---
+# Local secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Terraform
 .terraform/
 .terraform.lock.hcl
 *.tfstate
 *.tfstate.*
-*.tfvars
-!*.tfvars.example
 crash.log
 override.tf
 override.tf.json
+*_override.tf
+*_override.tf.json
+tfplan
+*.tfplan
 
-# --- Python ---
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
 .venv/
 venv/
-*.egg-info/
+.pytest_cache/
 
-# --- Ansible ---
-*.retry
-
-# --- Secrets / local config (Vault handles real secrets — nothing sensitive should ever land here) ---
-.env
-.env.*
-!.env.example
-*.pem
-*.key
-
-# --- Exported ISE data that hasn't been reviewed yet ---
-scripts/export/output/
-
-# --- OS junk ---
+# Editor / OS
 .DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Generated extracts (Phase 1 will produce these)
+exports/*.csv
+!exports/.gitkeep
+!exports/README.md

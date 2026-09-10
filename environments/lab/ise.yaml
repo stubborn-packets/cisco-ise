@@ -1,0 +1,17 @@
+# environments/lab/ise.yaml
+# Plane: environment wiring. Not policy. Safe to commit.
+# Secrets stay in .env — never here.
+#
+# Phase 3 will add providers.tf / backend.tf next to this file.
+# A sibling folder environments/stage/ is only created if a second
+# ISE eval is stood up later. Do not invent it empty.
+
+name: lab
+write_enabled: true
+ise_version: "3.3"
+ise_patch: "1"
+policy_root: policy
+inventory_root: inventory
+notes: >
+  Only ISE this repo may write to. Provider URL comes from ISE_URL
+  in the local environment, not from this file.

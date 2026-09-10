@@ -1,0 +1,34 @@
+# policy/policy-sets.yaml
+# Plane: desired state. Terraform may create these from Phase 5.
+# Intent: Network Access policy set order and desired names.
+# TACACS / Device Admin is out of scope on every environment.
+#
+# Evaluation order (locked 2026-09-10). Lower rank = evaluated first.
+#   1-9    PS-infra-health-checks
+#   10     PS-global-vpn
+#   20     PS-global-wireless-8021x
+#   30     PS-global-wireless-mab
+#   40     PS-global-wired-8021x
+#   50     PS-global-wired-mab
+#   60+    PS-<business-unit>-vpn
+#   70+    PS-<business-unit>-wireless
+#   80+    PS-<business-unit>-wired
+#   99     Default   (ISE built-in — do not rename)
+#
+# Lab already has non-standard GUI policy sets. Cutover rule:
+#   1. Create NEW standard policy sets at the ranks above.
+#   2. Leave the old GUI objects in place below them.
+#   3. Cut traffic over, then disable, then delete the old objects.
+# Do not import non-standard names into Terraform as desired state.
+
+policy_sets: []
+  # - name: PS-infra-health-checks
+  #   rank: 1
+  #   state: enabled
+  #   service: AP-default-network-access
+  #   description: Synthetic probes and ISE health RADIUS.
+  #   owner: lab
+  #   bu: lab
+  #   condition: {}
+  #   authentication_rules: []
+  #   authorization_rules: []

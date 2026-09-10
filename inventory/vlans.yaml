@@ -1,0 +1,11 @@
+# inventory/vlans.yaml
+# Plane: reference. VLANs are not ISE objects.
+# Authorization profiles in policy/authz-profiles.yaml reference these names.
+# The SVI / L2 VLAN lives on the NAD.
+
+vlans: []
+  # - name: VLAN-lab-data
+  #   vlan_id: 20
+  #   bu: lab
+  #   description: Lab user data VLAN.
+  #   owner: lab

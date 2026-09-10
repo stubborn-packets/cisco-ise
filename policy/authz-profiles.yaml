@@ -1,0 +1,21 @@
+# policy/authz-profiles.yaml
+# Plane: desired state. Terraform may create these from Phase 4.
+# PR- = authorization profiles. ACL- = downloadable ACLs.
+# VLAN names come from inventory/vlans.yaml — VLANs are not ISE objects.
+
+authorization_profiles: []
+  # - name: PR-wired-corp-access
+  #   state: enabled
+  #   description: Corporate wired access. VLAN from inventory/vlans.yaml.
+  #   owner: lab
+  #   bu: lab
+  #   access_type: ACCESS_ACCEPT
+  #   vlan: VLAN-lab-data
+  #   dacl: ACL-permit-all
+  #   sgt: SGT-lab-users
+
+downloadable_acls: []
+  # - name: ACL-permit-all
+  #   state: enabled
+  #   description: Temporary wide-open DACL for lab bring-up only.
+  #   dacl: "permit ip any any"
