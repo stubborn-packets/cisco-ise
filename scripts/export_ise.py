@@ -84,6 +84,25 @@ SECRET_KEYS = {
     "password",
 }
 
+NDG_ROOT_COLUMNS = {
+    "location": "ndg_location",
+    "device type": "ndg_device_type",
+    "devicetype": "ndg_device_type",
+    "businessunit": "ndg_business_unit",
+    "business unit": "ndg_business_unit",
+    "stage": "ndg_stage",
+    "function": "ndg_function",
+}
+
+NAD_NDG_FIELDS = [
+    "ndg_location",
+    "ndg_device_type",
+    "ndg_business_unit",
+    "ndg_stage",
+    "ndg_function",
+    "ndg_other",
+    "ndg_raw",
+]
 
 class IseClient:
     """Thin GET-only client. Lab URL and basic auth come from the environment."""
@@ -233,15 +252,42 @@ def first_ip(detail: dict[str, Any]) -> str:
     return f"{address}/{mask}" if mask != "" else str(address)
 
 
-def nad_groups(detail: dict[str, Any]) -> str:
-    groups = (
-        detail.get("NetworkDeviceGroupList")
-        or detail.get("networkDeviceGroupList")
-        or []
-    )
-    if isinstance(groups, list):
-        return "|".join(str(g) for g in groups)
-    return flatten(groups)
+def parse_ndg_list(groups: Any) -> dict[str, str]:
+    """Split ISE NDG paths onto one column per locked root."""
+    columns = {name: "" for name in NAD_NDG_FIELDS}
+    if not groups:
+        return columns
+    if isinstance(groups, str):
+        items = [groups]
+    elif isinstance(groups, list):
+        items = groups
+    else:
+        items = [groups]
+
+    raw_paths: list[str] = []
+    for item in items:
+        if isinstance(item, dict):
+            path = str(item.get("name") or item.get("NetworkDeviceGroup") or item)
+        else:
+            path = str(item)
+        path = path.strip()
+        if not path:
+            continue
+        raw_paths.append(path)
+        head, sep, tail = path.partition("#")
+        root = head.strip().lower()
+        column = NDG_ROOT_COLUMNS.get(root)
+        if column is None:
+            column = "ndg_other"
+            value = path
+        else:
+            value = tail if sep else path
+        if columns[column]:
+            columns[column] = f"{columns[column]}|{value}"
+        else:
+            columns[column] = value
+    columns["ndg_raw"] = "|".join(raw_paths)
+    return columns
 
 
 def export_nads(client: IseClient, details: bool) -> list[dict[str, Any]]:
@@ -253,7 +299,13 @@ def export_nads(client: IseClient, details: bool) -> list[dict[str, Any]]:
             "name": item.get("name", ""),
             "description": item.get("description", ""),
             "ip": "",
-            "ndg": "",
+            "ndg_location": "",
+            "ndg_device_type": "",
+            "ndg_business_unit": "",
+            "ndg_stage": "",
+            "ndg_function": "",
+            "ndg_other": "",
+            "ndg_raw": "",
             "source": "ers",
         }
         if details and item.get("id"):
@@ -268,7 +320,13 @@ def export_nads(client: IseClient, details: bool) -> list[dict[str, Any]]:
                 for secret in SECRET_KEYS:
                     body["authenticationSettings"].pop(secret, None)
             row["ip"] = first_ip(body)
-            row["ndg"] = nad_groups(body)
+            row.update(
+                parse_ndg_list(
+                    body.get("NetworkDeviceGroupList")
+                    or body.get("networkDeviceGroupList")
+                    or []
+                )
+            )
             row["description"] = body.get("description") or row["description"]
         rows.append(row)
     return rows
@@ -495,7 +553,12 @@ def main() -> int:
         writers.append(
             (
                 "nads.csv",
-                ["id", "name", "description", "ip", "ndg", "source"],
+                [
+                    "id", "name", "description", "ip",
+                    "ndg_location", "ndg_device_type", "ndg_business_unit",
+                    "ndg_stage", "ndg_function", "ndg_other", "ndg_raw",
+                    "source",
+                ],
                 export_nads(client, details),
             )
         )
