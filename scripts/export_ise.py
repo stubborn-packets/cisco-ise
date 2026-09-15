@@ -104,6 +104,11 @@ NAD_NDG_FIELDS = [
     "ndg_raw",
 ]
 
+NDG_SYSTEM_PREFIXES = {
+    "ndg_location": "All Locations#",
+    "ndg_device_type": "All Device Types#",
+}
+
 class IseClient:
     """Thin GET-only client. Lab URL and basic auth come from the environment."""
 
@@ -282,6 +287,9 @@ def parse_ndg_list(groups: Any) -> dict[str, str]:
             value = path
         else:
             value = tail if sep else path
+            prefix = NDG_SYSTEM_PREFIXES.get(column)
+            if prefix and value.lower().startswith(prefix.lower()):
+                value = value[len(prefix):]
         if columns[column]:
             columns[column] = f"{columns[column]}|{value}"
         else:
