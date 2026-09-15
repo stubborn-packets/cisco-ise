@@ -243,18 +243,33 @@ def export_ers_list(client: IseClient, key: str) -> list[dict[str, Any]]:
     return ers_summary_rows(items, "ers")
 
 
-def first_ip(detail: dict[str, Any]) -> str:
+def format_ip_entry(entry: Any) -> str:
+    if isinstance(entry, dict):
+        address = entry.get("ipaddress") or entry.get("ipAddress") or ""
+        mask = entry.get("mask", "")
+        if not address:
+            return ""
+        return f"{address}/{mask}" if mask != "" else str(address)
+    return str(entry) if entry else ""
+
+
+def format_ips(detail: dict[str, Any]) -> str:
+    """All NAD IPs, joined with |. Mask stays on each entry (32 = host)."""
     ip_list = (
         detail.get("NetworkDeviceIPList")
         or detail.get("networkDeviceIPList")
         or []
     )
+    if isinstance(ip_list, dict):
+        ip_list = [ip_list]
     if not ip_list:
         return ""
-    first = ip_list[0]
-    address = first.get("ipaddress") or first.get("ipAddress") or ""
-    mask = first.get("mask", "")
-    return f"{address}/{mask}" if mask != "" else str(address)
+    parts = []
+    for entry in ip_list:
+        formatted = format_ip_entry(entry)
+        if formatted:
+            parts.append(formatted)
+    return "|".join(parts)
 
 
 def parse_ndg_list(groups: Any) -> dict[str, str]:
@@ -327,7 +342,7 @@ def export_nads(client: IseClient, details: bool) -> list[dict[str, Any]]:
             if isinstance(body.get("authenticationSettings"), dict):
                 for secret in SECRET_KEYS:
                     body["authenticationSettings"].pop(secret, None)
-            row["ip"] = first_ip(body)
+            row["ip"] = format_ips(body)
             row.update(
                 parse_ndg_list(
                     body.get("NetworkDeviceGroupList")
