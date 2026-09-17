@@ -4,7 +4,7 @@ One phase per branch. Merge to `main` when that phase is closed.
 
 The only ISE this repo may write to is `environments/lab`.
 
-## Phase 0 — Repo skeleton (this increment)
+## Phase 0 — Repo skeleton (done)
 
 - `policy/`, `inventory/`, `environments/lab/`
 - Naming, file map, phase, and blog-stop docs
@@ -13,7 +13,7 @@ The only ISE this repo may write to is `environments/lab`.
 
 Exit: repo clones, files open, nothing talks to ISE.
 
-## Phase 1 — Read-only discovery
+## Phase 1 — Read-only discovery (done)
 
 - Python 3.12 export against **lab** ISE (ERS + OpenAPI)
 - CSV under `exports/`
