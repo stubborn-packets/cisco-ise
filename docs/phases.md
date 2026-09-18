@@ -21,7 +21,7 @@ Exit: repo clones, files open, nothing talks to ISE.
 
 Exit: CSVs generated from the lab ISE, including non-standard GUI objects.
 
-## Phase 2 — Naming linter
+## Phase 2 — Naming linter (done)
 
 - Linter reads `lint/prefixes.yaml` + `policy/` + `inventory/`
 - Fails bad names, missing `state`, missing exception metadata, unknown NDG roots

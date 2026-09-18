@@ -4,7 +4,7 @@ Write after a phase is merged to `main`. Each stop should have a cloneable artif
 
 Skip a post if the phase was small. Combining 0+1+2 into one foundations article is fine. Do not combine a read-only phase with the first write.
 
-## Post 1 — after Phase 0 (now)
+## Post 1 — after Phase 0 (done)
 
 Starting ISE policy-as-code without touching a live change window.
 
@@ -13,11 +13,11 @@ Starting ISE policy-as-code without touching a live change window.
 - Prefix table and rank bands
 - Why there is no provider block yet
 
-## Post 2 — after Phase 1
+## Post 2 — after Phase 1 (done)
 
 Inventory first. Export ISE so the non-standard names are visible.
 
-## Post 3 — after Phase 2
+## Post 3 — after Phase 2 (done)
 
 Lint the name before the API ever sees it.
 
