@@ -38,6 +38,14 @@ Three planes. Do not mix them.
 | `lab/` | Home-lab eval. Only write target. |
 | `stage/` | Not created. Add only if a second eval exists. |
 
+## lint/
+
+| File | Owns |
+| --- | --- |
+| `lint/prefixes.yaml` | PREFIX- table and rejected scopes |
+| `lint/builtins.yaml` | ISE built-in names and locked NDG roots |
+| `scripts/lint_ise.py` | Phase 2 naming linter (policy/ + inventory/ only) |
+
 ## YAML conventions
 
 - kebab-case object names inside the prefix table

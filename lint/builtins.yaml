@@ -1,0 +1,52 @@
+# ISE system names the Phase 2 linter will pass without a PREFIX-.
+# Add a name here when we decide a built-in may be referenced from
+# policy/ or inventory/. Do not put lab GUI leftovers on this list.
+
+names:
+  - Default
+  - Default Network Access
+  - Unknown
+  - Any
+  - All Locations
+  - All Device Types
+  - Location
+  - Device Type
+  - BusinessUnit
+  - Stage
+  - Function
+  - Endpoint Identity Groups
+  - Profiled
+  - Blacklist
+  - GuestEndpoints
+  - RegisteredDevices
+  - PermitAccess
+  - DenyAccess
+
+# Locked NDG roots (docs/decisions.md). Any other root in policy/ndg.yaml
+# is an unknown NDG root and fails.
+ndg_roots:
+  - All Locations
+  - All Device Types
+  - BusinessUnit
+  - Stage
+  - Function
+
+# ISE's own name for each locked root.
+ndg_ise_roots:
+  All Locations: Location
+  All Device Types: Device Type
+  BusinessUnit: BusinessUnit
+  Stage: Stage
+  Function: Function
+
+# NAD ndg: block keys in inventory/nads.yaml → locked root name.
+ndg_nad_keys:
+  location: All Locations
+  device_type: All Device Types
+  business_unit: BusinessUnit
+  stage: Stage
+  function: Function
+
+# Inventory-only prefixes not in the ISE object table.
+inventory_prefixes:
+  VLAN: { object: named-vlan, scope: documentation-only }

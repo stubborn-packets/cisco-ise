@@ -36,7 +36,7 @@ Machine-readable copy: lint/prefixes.yaml.
 
 ## Names that do not get a prefix
 
-ISE built-ins stay as ISE named them: Default, Default Network Access, Unknown, and other system groups. The Phase 2 linter will allow-list these.
+ISE built-ins stay as ISE named them: Default, Default Network Access, Unknown, and other system groups. The Phase 2 linter allow-lists these in `lint/builtins.yaml`.
 
 ## Policy set name pattern
 

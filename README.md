@@ -69,6 +69,19 @@ python scripts/export_ise.py --resource policy-sets
 python scripts/export_ise.py --resource nads --no-details
 ```
 
+## Phase 2 lint
+
+Reads `lint/prefixes.yaml`, `lint/builtins.yaml`, `policy/`, and `inventory/`. Does not read `exports/`. Does not connect to ISE.
+
+```bash
+python3.12 scripts/lint_ise.py
+python3.12 -m unittest tests.lint.test_lint_ise
+```
+
+A bad name, missing `state`, missing exception metadata (`ticket`, `owner`, `expires_on`), or an unknown NDG root fails. ISE built-ins (`Default`, `Default Network Access`, `Unknown`, plus `lint/builtins.yaml`) pass. Empty scaffolds pass.
+
 ## Next increment
 
-Phase 2 — naming linter against `lint/prefixes.yaml`, `policy/`, and `inventory/`. Still no ISE writes.
+Phase 3 — pin `CiscoDevNet/ise` under `environments/lab/` and apply one low-risk lab object. 
+
+Still no `prod/`.
