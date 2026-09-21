@@ -188,7 +188,7 @@ class IseClient:
 
 def load_settings() -> tuple[IseClient, bool]:
     load_dotenv(REPO_ROOT / ".env")
-    url = os.getenv("ISE_BASE_URL", "").strip()
+    url = os.getenv("ISE_URL", "").strip()
     user = os.getenv("ISE_USERNAME", "").strip()
     password = os.getenv("ISE_PASSWORD", "")
     insecure = os.getenv("ISE_INSECURE", "true").strip().lower() in {"1", "true", "yes"}
