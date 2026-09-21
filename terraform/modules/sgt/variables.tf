@@ -4,11 +4,14 @@
 
 variable "name" {
   type        = string
-  description = "SGT name. PREFIX- + kebab-case, e.g. SGT-lab-bootstrap."
+  description = "ISE SGT name. ERS allows [A-Za-z0-9_], max 32. Hyphens are rejected."
 
   validation {
-    condition     = can(regex("^SGT-[a-z0-9]+(-[a-z0-9]+)*$", var.name))
-    error_message = "name must match SGT- + kebab-case (docs/naming.md)."
+    condition = (
+      can(regex("^SGT_[a-z0-9]+(_[a-z0-9]+)*$", var.name)) &&
+      length(var.name) <= 32
+    )
+    error_message = "SGT name must be SGT_ + snake_case, max 32 characters. ISE rejects hyphens."
   }
 }
 
