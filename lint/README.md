@@ -13,12 +13,12 @@ This folder is the machine-readable half of `docs/naming.md`. Use it when adapti
 
 | File | Owns | Does not own |
 | --- | --- | --- |
-| `prefixes.yaml` | Valid `PREFIX` tokens and rejected scopes (`tacacs`, `device-admin`) | Rank bands, kebab-case grammar, which file maps to which prefix |
+| `prefixes.yaml` | Valid `PREFIX` tokens and rejected scopes (`tacacs`, `device-admin`) | Rank bands, kebab vs snake separator, which file maps to which prefix |
 | `builtins.yaml` | ISE system names that skip `PREFIX-`; locked NDG roots; NAD `ndg:` key map; inventory-only `VLAN-` | User object names |
 | `scripts/lint_ise.py` | Grammar regex, file → prefix map, policy-set rank → name, state / exception / UUID rules | Desired-state objects |
 | `policy/*.yaml` | Objects you want ISE to have | The grammar those names must follow |
 
-`lint/prefixes.yaml` answers: is `PS-` a known prefix?
+`lint/prefixes.yaml` answers: is `PS` / `SGT` a known prefix token?
 
 `scripts/lint_ise.py` answers: does this policy set’s name match the rank band we locked?
 
@@ -39,7 +39,9 @@ Grammar enforced in code:
 
 ```text
 NAME_RE  = PREFIX- + kebab-case [a-z0-9] tokens
+SGT_RE   = SGT_ + snake_case [a-z0-9] tokens, length <= 32
 KEBAB_RE = [a-z0-9]+(?:-[a-z0-9]+)*
+SNAKE_RE = [a-z0-9]+(?:_[a-z0-9]+)*
 ```
 
 That is why `PS-global-wired-8021x` passes and `PS-Global-Wired` fails.
@@ -90,6 +92,18 @@ Example: allow any `PS-global-*` at rank 40.
 2. Add the YAML file (or list key) to `POLICY_COLLECTIONS` in `scripts/lint_ise.py`.
 3. Add a good-name / wrong-prefix test.
 4. Add objects under `policy/` only after the linter accepts the name.
+
+Do not assume a new prefix uses a hyphen. SGT is `SGT_` + snake_case because ERS rejects `-`. Any other family that 400s on hyphen gets its own documented exception the same way. Do not add a mapper.
+
+### Change SGT grammar
+
+Today user SGTs must be `SGT_` + snake_case, max 32. To change that:
+
+1. Edit the SGT exception in `docs/naming.md`.
+2. Change `SGT_RE` in `scripts/lint_ise.py` (and the module regex only if ISE’s rule changed).
+3. Update the SGT tests in `tests/lint/test_lint_ise.py`.
+4. Run `python3.12 -m unittest tests.lint.test_lint_ise`.
+5. Do not put the separator in `prefixes.yaml`. That file has tokens, not `-` vs `_`.
 
 ### Add an ISE built-in
 

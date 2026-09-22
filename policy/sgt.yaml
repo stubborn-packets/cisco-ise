@@ -1,10 +1,11 @@
 # policy/sgt.yaml
 # Plane: desired state. Terraform may create these from Phase 4.
-# Names use SGT-. Tag value is explicit.
+# Names use SGT_ + snake_case [a-z0-9], max 32. ISE ERS rejects hyphens.
+# YAML name equals the ISE name. Tag value is explicit.
 
 sgts: []
-  # - name: SGT-lab-users
-  #   value: 1001
+  # - name: SGT_lab_users
+  #   value: 1010
   #   description: Lab user endpoints.
   #   owner: lab
   #   bu: lab

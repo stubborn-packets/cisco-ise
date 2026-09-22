@@ -1,6 +1,6 @@
 # Naming standard
 
-User-created ISE names:
+User-created ISE names, except SGTs:
 
 {PREFIX}- + kebab-case tokens
 
@@ -13,6 +13,20 @@ Pass: PS-global-wired-8021x, AN-dot1x-ad, PR-wired-corp-access
 
 Fail: Corp Users VLAN, ps-global-wired-8021x, PS_global_wired, PS-Global-Wired
 
+SGTs are the one exception. ISE ERS stores `[A-Za-z0-9_]` only, max 32.
+Hyphens return HTTP 400. YAML name equals the ISE name. No mapper.
+
+SGT_ + snake_case tokens
+
+- Prefix stays `SGT_`.
+- Tokens after the first underscore are [a-z0-9] separated by a single underscore.
+- No hyphens, spaces, or extra punctuation. Do not Title-Case tokens (`SGT_Lab_Users`).
+- Max 32 characters.
+
+Pass: SGT_lab_users, SGT_lab_bootstrap
+
+Fail: SGT-lab-users, SGT_Lab_Users, SGT_lab-users
+
 ## Prefix table
 
 | Prefix | Object | In scope |
@@ -24,7 +38,7 @@ Fail: Corp Users VLAN, ps-global-wired-8021x, PS_global_wired, PS-Global-Wired
 | AP- | Allowed protocols | Yes |
 | PR- | Authorization profile | Yes |
 | ACL- | Downloadable ACL | Yes |
-| SGT- | Security group tag | Yes |
+| SGT_ | Security group tag | Yes (snake_case; ISE rejects hyphen) |
 | CND- | Library condition | Yes |
 | ISS- | Identity source sequence | Yes |
 | CAP- | Certificate authentication profile | Yes |
@@ -54,6 +68,8 @@ ISE built-ins stay as ISE named them: Default, Default Network Access, Unknown, 
 | 99 | Default (built-in) |
 
 <business-unit> is a kebab-case token from the BusinessUnit NDG allow-list.
+
+The Phase 2 linter checks that token is kebab-case. It does not yet require it to appear in `policy/ndg.yaml` BusinessUnit `allowed_values`. NAD `ndg.business_unit` values *are* checked against that list once it is non-empty. How to turn the policy-set join on, and how to change ranks or prefixes, is in `lint/README.md`.
 
 ## NDG values
 

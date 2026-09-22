@@ -12,7 +12,7 @@ authorization_profiles: []
   #   access_type: ACCESS_ACCEPT
   #   vlan: VLAN-lab-data
   #   dacl: ACL-permit-all
-  #   sgt: SGT-lab-users
+  #   sgt: SGT_lab_users
 
 downloadable_acls: []
   # - name: ACL-permit-all

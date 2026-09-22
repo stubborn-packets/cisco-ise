@@ -1,5 +1,7 @@
 # Prefix table used by the Phase 2 linter.
-# Prefix stays uppercase. Object token after the hyphen is kebab-case [a-z0-9].
+# Keys are PREFIX tokens only. This file does not own the separator.
+# Default grammar (docs/naming.md): PREFIX- + kebab-case [a-z0-9] tokens.
+# SGT exception: SGT_ + snake_case [a-z0-9] tokens, max 32. ISE rejects '-'.
 #
 # System / built-in ISE names (Unknown, Default, Default Network Access, ...)
 # are allow-listed separately in the linter. They do not use a prefix.
@@ -12,14 +14,14 @@ prefixes:
   AP:  { object: allowed-protocols, scope: network-access }
   PR:  { object: authorization-profile, scope: network-access }
   ACL: { object: downloadable-acl, scope: network-access }
-  SGT: { object: security-group-tag, scope: trustsec }
+  SGT: { object: security-group-tag, scope: trustsec }  # separator is _; see docs/naming.md
   CND: { object: library-condition, scope: network-access }
   ISS: { object: identity-source-sequence, scope: identity }
   CAP: { object: certificate-authentication-profile, scope: identity }
   EIG: { object: endpoint-identity-group, scope: identity }
   LP:  { object: logical-profile, scope: profiler }
   VIP: { object: load-balanced-vip-name, scope: documentation-only }
-
+  
 # Out of scope for this deployment (Network Access only).
 # Listed so the linter can reject TACACS / Device Admin objects if they appear.
 rejected_scopes:

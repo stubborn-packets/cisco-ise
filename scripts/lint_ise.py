@@ -5,7 +5,7 @@ Reads lint/prefixes.yaml + lint/builtins.yaml and walks the desired-state
 and inventory YAML. Does not talk to ISE. Does not read exports/.
 
 Fails on:
-  - names that are not PREFIX- + kebab-case (unless allow-listed built-ins)
+  - names that are not PREFIX- + kebab-case (unless SGT_ + snake_case, or allow-listed built-ins)
   - missing state on policy objects
   - missing or expired exception metadata (ticket, owner, expires_on)
   - NDG roots that are not in the locked set
@@ -34,7 +34,9 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 NAME_RE = re.compile(r"^([A-Z]+)-([a-z0-9]+(?:-[a-z0-9]+)*)$")
+SGT_RE = re.compile(r"^SGT_([a-z0-9]+(?:_[a-z0-9]+)*)$")
 KEBAB_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+SGT_MAX_LEN = 32
 ISO_ALPHA3_RE = re.compile(r"^[A-Z]{3}$")
 UUID_RE = re.compile(
     r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
@@ -278,9 +280,13 @@ class Linter:
                 expected_prefix,
             ):
                 # Built-ins like Default are allowed even when the collection
-                # normally wants PS- / AP- / SGT-.
+                # normally wants PS- / AP- / SGT_.
                 pass
             return
+        if expected_prefix == "SGT":
+            self._check_sgt_name(name, rel)
+            return
+        match = NAME_RE.fullmatch(name)
         match = NAME_RE.fullmatch(name)
         if not match:
             self.error(
@@ -305,6 +311,32 @@ class Linter:
                 name,
                 f"expected prefix {expected_prefix}- for this object, found {prefix}-",
             )
+
+    def _check_sgt_name(self, name: str, rel: str) -> None:
+        # policy/sgt.yaml only. YAML name must equal the ISE ERS name.
+        # Do not map '-' to '_'.
+        if SGT_RE.fullmatch(name):
+            if len(name) > SGT_MAX_LEN:
+                self.error(
+                    rel,
+                    name,
+                    f"SGT name exceeds {SGT_MAX_LEN} characters ({len(name)})",
+                )
+            return
+        match = NAME_RE.fullmatch(name)
+        if match and match.group(1) != "SGT":
+            self.error(
+                rel,
+                name,
+                f"expected prefix SGT_ for this object, found {match.group(1)}-",
+            )
+            return
+        self.error(
+            rel,
+            name,
+            "SGT name must be SGT_ + snake_case [a-z0-9], max 32 "
+            "(e.g. SGT_lab_users). ISE rejects hyphens.",
+        )
 
     def _prefix_meta(self, prefix: str) -> dict[str, str] | None:
         if prefix in self.prefixes:
@@ -560,6 +592,8 @@ def _rel(root: Path, path: Path) -> str:
 
 
 def _prefix_of(name: str) -> str | None:
+    if SGT_RE.fullmatch(name):
+        return "SGT"
     match = NAME_RE.fullmatch(name)
     return match.group(1) if match else None
 

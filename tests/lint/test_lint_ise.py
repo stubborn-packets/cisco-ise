@@ -282,6 +282,34 @@ class NameTests(unittest.TestCase):
         msgs = self.fx.messages()
         self.assertTrue(any("unknown prefix FOO-" in m for m in msgs), msgs)
 
+    def test_sgt_snake_passes(self) -> None:
+        self.fx.put_policy(
+            "sgt.yaml",
+            {
+                "sgts": [
+                    {"name": "SGT_lab_users", "value": 1010, "state": "enabled"},
+                    {"name": "SGT_lab_bootstrap", "value": 1001, "state": "enabled"},
+                ]
+            },
+        )
+        self.assertEqual(self.fx.messages(), [])
+
+    def test_sgt_hyphen_fails(self) -> None:
+        self.fx.put_policy(
+            "sgt.yaml",
+            {"sgts": [{"name": "SGT-lab-users", "value": 1010, "state": "enabled"}]},
+        )
+        msgs = self.fx.messages()
+        self.assertTrue(any("SGT-lab-users" in m for m in msgs), msgs)
+        self.assertTrue(any("SGT_" in m and "snake_case" in m for m in msgs), msgs)
+
+    def test_sgt_title_case_fails(self) -> None:
+        self.fx.put_policy(
+            "sgt.yaml",
+            {"sgts": [{"name": "SGT_Lab_Users", "value": 1010, "state": "enabled"}]},
+        )
+        msgs = self.fx.messages()
+        self.assertTrue(any("SGT_Lab_Users" in m for m in msgs), msgs)
 
 class StateTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -293,15 +321,15 @@ class StateTests(unittest.TestCase):
     def test_missing_state_fails(self) -> None:
         self.fx.put_policy(
             "sgt.yaml",
-            {"sgts": [{"name": "SGT-lab-users", "value": 1001}]},
+            {"sgts": [{"name": "SGT_lab_users", "value": 1001}]},
         )
         msgs = self.fx.messages()
         self.assertTrue(any("missing state" in m for m in msgs), msgs)
-
+        
     def test_invalid_state_fails(self) -> None:
         self.fx.put_policy(
             "sgt.yaml",
-            {"sgts": [{"name": "SGT-lab-users", "value": 1001, "state": "active"}]},
+            {"sgts": [{"name": "SGT_lab_users", "value": 1001, "state": "active"}]},
         )
         msgs = self.fx.messages()
         self.assertTrue(any("enabled or disabled" in m for m in msgs), msgs)
@@ -453,7 +481,7 @@ class HygieneTests(unittest.TestCase):
             {
                 "sgts": [
                     {
-                        "name": "SGT-lab-users",
+                        "name": "SGT_lab_users",
                         "state": "enabled",
                         "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
                     }

@@ -73,7 +73,7 @@ Three planes. Do not mix them.
 
 ## YAML conventions
 
-- kebab-case object names inside the prefix table
+- kebab-case object names inside the prefix table, except SGTs (`SGT_` + snake_case)
 - comments explain intent
 - explicit `state` on policy objects
 - UUIDs do not belong in `policy/` or `inventory/`
