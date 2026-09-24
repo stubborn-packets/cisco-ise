@@ -21,7 +21,7 @@ Inventory first. Export ISE so the non-standard names are visible.
 
 Lint the name before the API ever sees it.
 
-## Post 4 — after Phase 3
+## Post 4 — after Phase 3 (done)
 
 The first object Terraform is allowed to create. Keep this post separate.
 
