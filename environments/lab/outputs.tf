@@ -16,3 +16,31 @@ output "sgt_id" {
   value       = module.sgt_bootstrap.id
   description = "ISE UUID. State only."
 }
+
+output "ndg_names" {
+  value = {
+    business_unit      = module.ndg_business_unit.name
+    stage              = module.ndg_stage.name
+    function           = module.ndg_function.name
+    location_usa       = module.ndg_location_usa.name
+    device_type_switch = module.ndg_device_type_switch.name
+    business_unit_lab  = module.ndg_business_unit_lab.name
+    stage_monitor      = module.ndg_stage_monitor.name
+    function_lab       = module.ndg_function_lab.name
+  }
+  description = "NDG names stored on lab ISE."
+}
+
+output "ndg_ids" {
+  value = {
+    business_unit      = module.ndg_business_unit.id
+    stage              = module.ndg_stage.id
+    function           = module.ndg_function.id
+    location_usa       = module.ndg_location_usa.id
+    device_type_switch = module.ndg_device_type_switch.id
+    business_unit_lab  = module.ndg_business_unit_lab.id
+    stage_monitor      = module.ndg_stage_monitor.id
+    function_lab       = module.ndg_function_lab.id
+  }
+  description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
+}

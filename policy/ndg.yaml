@@ -1,7 +1,11 @@
 # policy/ndg.yaml
 # Plane: desired state. Terraform may create these from Phase 4.
 # Intent: allowed Network Device Group roots and values.
-# ISE NDG names are hierarchical: Root#All <Root>#Leaf
+# ISE NDG names are hierarchical.
+#   Built-in: Location#All Locations#USA
+#   Custom:   BusinessUnit#BusinessUnit#lab
+# ERS rejects a bare type token. Custom container is type#type so the GUI
+# row matches the type. Do not rename All Locations / All Device Types.
 #
 # Roots (locked 2026-09-10):
 #   All Locations    — ISO 3166-1 alpha-3 country code
