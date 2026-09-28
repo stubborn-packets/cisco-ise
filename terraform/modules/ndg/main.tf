@@ -1,6 +1,7 @@
 # terraform/modules/ndg/main.tf
-# One network device group leaf. Roots (Location, Device Type, and any
-# custom type node) are not this resource's first write.
+# One network device group: a custom type container (is_root) or a leaf.
+# Custom type container name is type#type, not the bare type token.
+# Do not use is_root for Location or Device Type.
 # Resource address: module.<label>.ise_network_device_group.this
 
 resource "ise_network_device_group" "this" {
