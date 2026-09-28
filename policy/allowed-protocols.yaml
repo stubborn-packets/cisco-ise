@@ -2,19 +2,66 @@
 # Plane: desired state. Terraform may create these from Phase 4.
 # Names use AP- plus kebab-case. List enabled EAP methods explicitly.
 # ISE built-in "Default Network Access" may be referenced but is not renamed.
+# First write: AP-wired-dot1x and AP-wired-mab only.
 
-allowed_protocols: []
-  # - name: AP-wired-dot1x
-  #   state: enabled
-  #   description: 802.1X for wired campus. No MAB on this service.
-  #   owner: lab
-  #   allow_pap_ascii: false
-  #   allow_chap: false
-  #   allow_eap_tls: true
-  #   allow_teap: true
-  #   allow_peap: true
-  #   allow_eap_fast: false
-  #   allow_leap: false
-  #   allow_eap_md5: false
-  #   allow_eap_ttls: false
-  #   process_host_lookup: false
+allowed_protocols:
+  - name: AP-wired-dot1x
+    state: enabled
+    description: Wired 802.1X. No MAB on this service.
+    owner: lab
+    process_host_lookup: false
+    allow_pap_ascii: false
+    allow_chap: false
+    allow_ms_chap_v1: false
+    allow_ms_chap_v2: false
+    allow_eap_md5: false
+    allow_leap: false
+    allow_eap_tls: true
+    allow_eap_ttls: false
+    allow_eap_fast: false
+    allow_peap: true
+    allow_teap: true
+    allow_preferred_eap_protocol: false
+    allow_weak_ciphers_for_eap: false
+    eap_tls_l_bit: false
+    require_message_auth: false
+    allow_5g: false
+    eap_tls_allow_auth_of_expired_certs: false
+    eap_tls_enable_stateless_session_resume: false
+    peap_allow_peap_eap_ms_chap_v2: true
+    peap_allow_peap_eap_ms_chap_v2_pwd_change: false
+    peap_allow_peap_eap_ms_chap_v2_pwd_change_retries: 0
+    peap_allow_peap_eap_gtc: false
+    require_cryptobinding: false
+    peap_allow_peap_eap_tls: true
+    peap_allow_peap_eap_tls_auth_of_expired_certs: false
+    peap_peap_v0: false
+    teap_eap_tls: true
+    teap_eap_tls_auth_of_expired_certs: false
+    teap_eap_ms_chap_v2: false
+    teap_eap_accept_client_cert_during_tunnel_est: true
+    teap_eap_chaining: false
+    teap_downgrade_msk: false
+    teap_request_basic_pwd_auth: false
+
+  - name: AP-wired-mab
+    state: enabled
+    description: Wired MAB host lookup. No EAP on this service.
+    owner: lab
+    process_host_lookup: true
+    allow_pap_ascii: false
+    allow_chap: false
+    allow_ms_chap_v1: false
+    allow_ms_chap_v2: false
+    allow_eap_md5: false
+    allow_leap: false
+    allow_eap_tls: false
+    allow_eap_ttls: false
+    allow_eap_fast: false
+    allow_peap: false
+    allow_teap: false
+    allow_preferred_eap_protocol: false
+    allow_weak_ciphers_for_eap: false
+    eap_tls_l_bit: false
+    require_message_auth: false
+    allow_5g: false

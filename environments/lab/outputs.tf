@@ -44,3 +44,19 @@ output "ndg_ids" {
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
+
+output "ap_names" {
+  value = {
+    wired_dot1x = module.ap_wired_dot1x.name
+    wired_mab   = module.ap_wired_mab.name
+  }
+  description = "Allowed-protocols names stored on lab ISE."
+}
+
+output "ap_ids" {
+  value = {
+    wired_dot1x = module.ap_wired_dot1x.id
+    wired_mab   = module.ap_wired_mab.id
+  }
+  description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
+}
