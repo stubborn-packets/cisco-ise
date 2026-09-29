@@ -2,15 +2,27 @@
 # Plane: desired state. Terraform may create these from Phase 4.
 # Reusable library conditions. Names use CND-.
 # Prefer library conditions over one-off rule conditions.
+# First write: two attribute conditions. No AND/OR children.
 
-conditions: []
-  # - name: CND-wired-dot1x
-  #   state: enabled
-  #   description: Wired 802.1X via NAS-Port-Type.
-  #   owner: lab
-  #   type: LibraryConditionAttributes
-  #   is_negate: false
-  #   dictionary_name: Radius
-  #   attribute_name: NAS-Port-Type
-  #   operator: equals
-  #   attribute_value: Ethernet
+conditions:
+  - name: CND-wired-dot1x
+    state: enabled
+    description: Wired 802.1X via NAS-Port-Type Ethernet.
+    owner: lab
+    type: LibraryConditionAttributes
+    is_negate: false
+    dictionary_name: Radius
+    attribute_name: NAS-Port-Type
+    operator: equals
+    attribute_value: Ethernet
+
+  - name: CND-wired-mab
+    state: enabled
+    description: Wired MAB via Network Access AuthenticationMethod Lookup.
+    owner: lab
+    type: LibraryConditionAttributes
+    is_negate: false
+    dictionary_name: Network Access
+    attribute_name: AuthenticationMethod
+    operator: equals
+    attribute_value: Lookup

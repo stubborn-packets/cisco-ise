@@ -8,12 +8,16 @@ The root that may apply them is `environments/lab/` only. There is no
 ## Layout
 
 ```text
-terraform/modules/sgt/     one ise_trustsec_security_group
-environments/lab/          provider pin, local state, module call
+terraform/modules/sgt/                  one ise_trustsec_security_group
+terraform/modules/ndg/                  one ise_network_device_group
+terraform/modules/allowed-protocols/    one ise_allowed_protocols
+terraform/modules/condition/            one ise_network_access_condition
+environments/lab/                       provider pin, local state, module calls
 ```
 
-Phase 3 object lives in `environments/lab/terraform.tfvars`, not in
-`policy/sgt.yaml`. That YAML stays an empty scaffold until Phase 4.
+Phase 3 SGT lives in `environments/lab/terraform.tfvars`, not in
+`policy/sgt.yaml`. NDG allow-lists live in `policy/ndg.yaml`. Lab NDG
+calls live in `environments/lab/ndg.tf`.
 
 ## Lab apply
 
@@ -44,13 +48,65 @@ Provider: `CiscoDevNet/ise` 0.4.1, pinned in
 | Field | Value |
 | --- | --- |
 | Terraform address | `module.sgt_bootstrap.ise_trustsec_security_group.this` |
-| ISE name | `SGT-lab-bootstrap` |
+| ISE name | `SGT_lab_bootstrap` |
 | Tag | `1001` |
 | GUI | Work Centers > TrustSec > Components > Security Groups |
 
 Do not import an existing non-standard lab SGT as this address.
 Do not put the UUID from `terraform output sgt_id` into `policy/` or
 `inventory/`.
+
+## NDG objects
+
+ERS `name` must include `#`. Custom type container is `type#type`
+(`BusinessUnit#BusinessUnit`) so the GUI row is `BusinessUnit`.
+Custom leaf is `type#type#value`. Built-in Location / Device Type keep
+`All Locations` / `All Device Types`. Bare `BusinessUnit` returns HTTP 400.
+ISE rejects `<` and `>` in `description` (XSS validation).
+
+| Terraform address | ISE name | Role |
+| --- | --- | --- |
+| `module.ndg_business_unit.ise_network_device_group.this` | `BusinessUnit#BusinessUnit` | type container |
+| `module.ndg_stage.ise_network_device_group.this` | `Stage#Stage` | type container |
+| `module.ndg_function.ise_network_device_group.this` | `Function#Function` | type container |
+| `module.ndg_location_usa.ise_network_device_group.this` | `Location#All Locations#USA` | leaf |
+| `module.ndg_device_type_switch.ise_network_device_group.this` | `Device Type#All Device Types#switch` | leaf |
+| `module.ndg_business_unit_lab.ise_network_device_group.this` | `BusinessUnit#BusinessUnit#lab` | leaf |
+| `module.ndg_stage_monitor.ise_network_device_group.this` | `Stage#Stage#monitor` | leaf |
+| `module.ndg_function_lab.ise_network_device_group.this` | `Function#Function#lab` | leaf |
+
+GUI: Administration > Network Resources > Network Device Groups.
+
+Do not put `terraform output ndg_ids` into `policy/` or `inventory/`.
+Do not manage NADs here.
+
+## Allowed protocols
+
+Do not manage Default Network Access. ISE 3.3 requires `allow_5g` on every
+object and inner PEAP/TEAP/EAP-TLS settings when those parents are true.
+
+| Terraform address | ISE name |
+| --- | --- |
+| `module.ap_wired_dot1x.ise_allowed_protocols.this` | `AP-wired-dot1x` |
+| `module.ap_wired_mab.ise_allowed_protocols.this` | `AP-wired-mab` |
+
+GUI: Policy > Policy Elements > Results > Authentication > Allowed Protocols.
+
+Do not put `terraform output ap_ids` into `policy/` or `inventory/`.
+
+## Library conditions
+
+Attribute conditions only. AND/OR children later. Do not use the
+Device Admin condition resource.
+
+| Terraform address | ISE name |
+| --- | --- |
+| `module.cnd_wired_dot1x.ise_network_access_condition.this` | `CND-wired-dot1x` |
+| `module.cnd_wired_mab.ise_network_access_condition.this` | `CND-wired-mab` |
+
+GUI: Policy > Policy Elements > Conditions > Library Conditions.
+
+Do not put `terraform output cnd_ids` into `policy/` or `inventory/`.
 
 ## Out of scope here
 

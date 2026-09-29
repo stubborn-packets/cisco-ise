@@ -1,7 +1,3 @@
-
-## `docs/file-map.md` (full)
-
-```markdown
 # File map
 
 Three planes. Do not mix them.
@@ -11,7 +7,7 @@ Three planes. Do not mix them.
 | Desired policy | `policy/` | What should ISE be? | Yes, from Phase 4 |
 | Inventory | `inventory/` | What exists around ISE? | No |
 | Observed | `exports/` | What did the API return? | No (generated) |
-| Environment | `environments/lab/` | Which ISE, which state? | Wiring + Phase 3 bootstrap apply |
+| Environment | `environments/lab/` | Which ISE, which state? | Wiring + lab apply |
 | Modules | `terraform/modules/` | How to write one object type | Called from lab only |
 
 ## policy/ — desired state
@@ -43,7 +39,7 @@ Three planes. Do not mix them.
 | `lab/` | Home-lab eval. Only write target. |
 | `stage/` | Not created. Add only if a second eval exists. |
 
-`environments/lab/` Terraform files (Phase 3):
+`environments/lab/` Terraform files:
 
 | File | Owns |
 | --- | --- |
@@ -51,9 +47,12 @@ Three planes. Do not mix them.
 | `versions.tf` | Terraform floor + `CiscoDevNet/ise` 0.4.1 pin |
 | `providers.tf` | Empty `provider "ise"`; creds from `ISE_*` env |
 | `backend.tf` | Local state `terraform.tfstate` |
-| `variables.tf` / `terraform.tfvars` | Phase 3 object: `SGT-lab-bootstrap` / `1001` |
+| `variables.tf` / `terraform.tfvars` | Phase 3 object: `SGT_lab_bootstrap` / `1001` |
 | `main.tf` | `module "sgt_bootstrap"` |
-| `outputs.tf` | name, value, id (id stays out of `policy/`) |
+| `ndg.tf` | Custom type containers + first NDG leaves |
+| `allowed-protocols.tf` | `AP-wired-dot1x`, `AP-wired-mab` |
+| `conditions.tf` | `CND-wired-dot1x`, `CND-wired-mab` |
+| `outputs.tf` | SGT + NDG + AP + CND names; ids stay out of `policy/` |
 
 ## terraform/
 
@@ -61,6 +60,9 @@ Three planes. Do not mix them.
 | --- | --- |
 | `terraform/README.md` | How to init / plan / apply / destroy from lab |
 | `terraform/modules/sgt/` | One `ise_trustsec_security_group` |
+| `terraform/modules/ndg/` | One `ise_network_device_group` |
+| `terraform/modules/allowed-protocols/` | One `ise_allowed_protocols` |
+| `terraform/modules/condition/` | One `ise_network_access_condition` |
 
 ## lint/
 

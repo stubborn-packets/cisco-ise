@@ -60,3 +60,19 @@ output "ap_ids" {
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
+
+output "cnd_names" {
+  value = {
+    wired_dot1x = module.cnd_wired_dot1x.name
+    wired_mab   = module.cnd_wired_mab.name
+  }
+  description = "Library condition names stored on lab ISE."
+}
+
+output "cnd_ids" {
+  value = {
+    wired_dot1x = module.cnd_wired_dot1x.id
+    wired_mab   = module.cnd_wired_mab.id
+  }
+  description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
+}
