@@ -52,7 +52,9 @@ Three planes. Do not mix them.
 | `ndg.tf` | Custom type containers + first NDG leaves |
 | `allowed-protocols.tf` | `AP-wired-dot1x`, `AP-wired-mab` |
 | `conditions.tf` | `CND-wired-dot1x`, `CND-wired-mab` |
-| `outputs.tf` | SGT + NDG + AP + CND names; ids stay out of `policy/` |
+| `dacls.tf` | `ACL-permit-all` |
+| `authz-profiles.tf` | `PR-wired-lab-access` |
+| `outputs.tf` | SGT + NDG + AP + CND + ACL + PR names; ids stay out of `policy/` |
 
 ## terraform/
 
@@ -63,6 +65,8 @@ Three planes. Do not mix them.
 | `terraform/modules/ndg/` | One `ise_network_device_group` |
 | `terraform/modules/allowed-protocols/` | One `ise_allowed_protocols` |
 | `terraform/modules/condition/` | One `ise_network_access_condition` |
+| `terraform/modules/dacl/` | One `ise_downloadable_acl` |
+| `terraform/modules/authorization-profile/` | One `ise_authorization_profile` |
 
 ## lint/
 

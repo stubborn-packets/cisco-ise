@@ -11,8 +11,10 @@ The root that may apply them is `environments/lab/` only. There is no
 terraform/modules/sgt/                  one ise_trustsec_security_group
 terraform/modules/ndg/                  one ise_network_device_group
 terraform/modules/allowed-protocols/    one ise_allowed_protocols
-terraform/modules/condition/            one ise_network_access_condition
-environments/lab/                       provider pin, local state, module calls
+terraform/modules/condition/              one ise_network_access_condition
+terraform/modules/dacl/                   one ise_downloadable_acl
+terraform/modules/authorization-profile/  one ise_authorization_profile
+environments/lab/                         provider pin, local state, module calls
 ```
 
 Phase 3 SGT lives in `environments/lab/terraform.tfvars`, not in
@@ -108,9 +110,7 @@ GUI: Policy > Policy Elements > Conditions > Library Conditions.
 
 Do not put `terraform output cnd_ids` into `policy/` or `inventory/`.
 
-## Out of scope here
+## Downloadable ACLs and authorization profiles
 
-- NAD resources
-- `netascode/nac-ise`
-- remote state
-- a second environment folder
+VLANs live in `inventory/vlans.yaml`. They are not ISE objects.
+`vlan_tag_id` is the RADIUS tunnel tag (usually 1), not the VLAN ID.

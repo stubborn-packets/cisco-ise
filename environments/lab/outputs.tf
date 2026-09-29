@@ -90,3 +90,17 @@ output "acl_ids" {
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
+
+output "pr_names" {
+  value = {
+    wired_lab_access = module.pr_wired_lab_access.name
+  }
+  description = "Authorization profile names stored on lab ISE."
+}
+
+output "pr_ids" {
+  value = {
+    wired_lab_access = module.pr_wired_lab_access.id
+  }
+  description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
+}
