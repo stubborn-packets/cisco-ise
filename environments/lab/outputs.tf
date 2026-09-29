@@ -76,3 +76,17 @@ output "cnd_ids" {
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
+
+output "acl_names" {
+  value = {
+    permit_all = module.acl_permit_all.name
+  }
+  description = "Downloadable ACL names stored on lab ISE."
+}
+
+output "acl_ids" {
+  value = {
+    permit_all = module.acl_permit_all.id
+  }
+  description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
+}
