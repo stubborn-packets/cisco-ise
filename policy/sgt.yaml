@@ -2,12 +2,22 @@
 # Plane: desired state. Terraform may create these from Phase 4.
 # Names use SGT_ + snake_case [a-z0-9], max 32. ISE ERS rejects hyphens.
 # YAML name equals the ISE name. Tag value is explicit.
+# First write: two lab tags. SGT_lab_bootstrap stays in lab tfvars, not here.
+# Do not import ISE built-in Unknown (tag 0).
 
-sgts: []
-  # - name: SGT_lab_users
-  #   value: 1010
-  #   description: Lab user endpoints.
-  #   owner: lab
-  #   bu: lab
-  #   propagate_to_apic: false
-  #   state: enabled
+sgts:
+  - name: SGT_lab_users
+    value: 1010
+    description: Lab user endpoints.
+    owner: lab
+    bu: lab
+    propagate_to_apic: false
+    state: enabled
+
+  - name: SGT_lab_devices
+    value: 1020
+    description: Lab device endpoints.
+    owner: lab
+    bu: lab
+    propagate_to_apic: false
+    state: enabled

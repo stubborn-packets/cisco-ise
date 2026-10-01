@@ -49,6 +49,7 @@ Three planes. Do not mix them.
 | `backend.tf` | Local state `terraform.tfstate` |
 | `variables.tf` / `terraform.tfvars` | Phase 3 object: `SGT_lab_bootstrap` / `1001` |
 | `main.tf` | `module "sgt_bootstrap"` |
+| `sgts.tf` | `SGT_lab_users`, `SGT_lab_devices` |
 | `ndg.tf` | Custom type containers + first NDG leaves |
 | `allowed-protocols.tf` | `AP-wired-dot1x`, `AP-wired-mab` |
 | `conditions.tf` | `CND-wired-dot1x`, `CND-wired-mab` |

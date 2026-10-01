@@ -58,6 +58,18 @@ Do not import an existing non-standard lab SGT as this address.
 Do not put the UUID from `terraform output sgt_id` into `policy/` or
 `inventory/`.
 
+## Phase 4 SGTs
+
+`policy/sgt.yaml` is the review surface. Bootstrap stays in tfvars.
+Do not manage ISE built-in Unknown (tag 0).
+
+| Terraform address | ISE name | Tag |
+| --- | --- | --- |
+| `module.sgt_lab_users.ise_trustsec_security_group.this` | `SGT_lab_users` | 1010 |
+| `module.sgt_lab_devices.ise_trustsec_security_group.this` | `SGT_lab_devices` | 1020 |
+
+Do not put `terraform output sgt_ids` into `policy/` or `inventory/`.
+
 ## NDG objects
 
 ERS `name` must include `#`. Custom type container is `type#type`
@@ -114,3 +126,20 @@ Do not put `terraform output cnd_ids` into `policy/` or `inventory/`.
 
 VLANs live in `inventory/vlans.yaml`. They are not ISE objects.
 `vlan_tag_id` is the RADIUS tunnel tag (usually 1), not the VLAN ID.
+First profile has no SGT.
+
+| Terraform address | ISE name |
+| --- | --- |
+| `module.acl_permit_all.ise_downloadable_acl.this` | `ACL-permit-all` |
+| `module.pr_wired_lab_access.ise_authorization_profile.this` | `PR-wired-lab-access` |
+
+GUI: Policy > Policy Elements > Results > Authorization.
+
+Do not put `terraform output acl_ids` or `pr_ids` into `policy/` or `inventory/`.
+
+## Out of scope here
+
+- NAD resources
+- `netascode/nac-ise`
+- remote state
+- a second environment folder

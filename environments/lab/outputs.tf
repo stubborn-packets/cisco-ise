@@ -104,3 +104,21 @@ output "pr_ids" {
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
+
+output "sgt_names" {
+  value = {
+    bootstrap   = module.sgt_bootstrap.name
+    lab_users   = module.sgt_lab_users.name
+    lab_devices = module.sgt_lab_devices.name
+  }
+  description = "SGT names stored on lab ISE."
+}
+
+output "sgt_ids" {
+  value = {
+    bootstrap   = module.sgt_bootstrap.id
+    lab_users   = module.sgt_lab_users.id
+    lab_devices = module.sgt_lab_devices.id
+  }
+  description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
+}
