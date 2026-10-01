@@ -23,25 +23,26 @@ Exit: CSVs generated from the lab ISE, including non-standard GUI objects.
 
 ## Phase 2 — Naming linter (done)
 
-- Linter reads `lint/prefixes.yaml` + `policy/` + `inventory/`
+- Linter reads `lint/prefixes.yaml` + `lint/builtins.yaml` + `policy/` + `inventory/`
 - Fails bad names, missing `state`, missing exception metadata, unknown NDG roots
+- Empty scaffolds pass. `exports/` is not linted.
 
 Exit: a bad name fails; a good name passes. ISE still untouched.
 
-## Phase 3 — Terraform lab bootstrap
+## Phase 3 — Terraform lab bootstrap (done)
 
-- Pin `CiscoDevNet/ise` under `environments/lab/`
-- Modules live in `terraform/modules/`
-- First apply is one low-risk lab object (NDG, SGT, or allowed-protocols)
+- Pin `CiscoDevNet/ise` 0.4.1 under `environments/lab/`
+- Module: `terraform/modules/sgt/`
+- First object: `SGT_lab_bootstrap` / 1001 (underscores; ISE rejects hyphenated SGT names)
 - Local Terraform state only
 
-Exit: one object created in the lab GUI and destroyed (or documented if the API cannot delete it).
+Exit met 2026-09-21: object created and destroyed via ERS. Unused SGT is deletable.
 
-## Phase 4 — Policy building blocks
+## Phase 4 — Policy building blocks (done)
 
 Order: NDG → allowed protocols → conditions → authz profiles / DACLs → SGTs → EIGs.
 
-NADs stay in `inventory/` + `exports/` unless a later increment opens NAD writes.
+Exit met 2026-10-01: each family has a YAML row, a thin module, a lab call, and a live object on lab ISE. NADs stayed in `inventory/` + `exports/`. No policy sets.
 
 ## Phase 5 — Policy sets and ranks
 

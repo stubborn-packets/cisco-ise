@@ -4,7 +4,7 @@ Write after a phase is merged to `main`. Each stop should have a cloneable artif
 
 Skip a post if the phase was small. Combining 0+1+2 into one foundations article is fine. Do not combine a read-only phase with the first write.
 
-## Post 1 — after Phase 0 (done)
+## Post 1 — after Phase 0 (now)
 
 Starting ISE policy-as-code without touching a live change window.
 
@@ -13,21 +13,27 @@ Starting ISE policy-as-code without touching a live change window.
 - Prefix table and rank bands
 - Why there is no provider block yet
 
-## Post 2 — after Phase 1 (done)
+## Post 2 — after Phase 1
 
 Inventory first. Export ISE so the non-standard names are visible.
 
-## Post 3 — after Phase 2 (done)
+## Post 3 — after Phase 2
 
 Lint the name before the API ever sees it.
 
-## Post 4 — after Phase 3 (done)
+## Post 4 — after Phase 3
 
 The first object Terraform is allowed to create. Keep this post separate.
+
+Draft: `blog/cisco-ise-policy-as-code-part3/index.md`
 
 ## Post 5 — after Phase 4
 
 Building blocks before policy sets. Why NADs stay in inventory.
+
+Draft (next chat): `blog/cisco-ise-policy-as-code-part4/index.md`
+
+Do not rewrite Part 3. Do not publish hostnames, UUIDs, or internal IPs.
 
 ## Post 6 — after Phase 5
 
