@@ -49,13 +49,14 @@ Three planes. Do not mix them.
 | `backend.tf` | Local state `terraform.tfstate` |
 | `variables.tf` / `terraform.tfvars` | Phase 3 object: `SGT_lab_bootstrap` / `1001` |
 | `main.tf` | `module "sgt_bootstrap"` |
-| `sgts.tf` | `SGT_lab_users`, `SGT_lab_devices` |
 | `ndg.tf` | Custom type containers + first NDG leaves |
 | `allowed-protocols.tf` | `AP-wired-dot1x`, `AP-wired-mab` |
 | `conditions.tf` | `CND-wired-dot1x`, `CND-wired-mab` |
 | `dacls.tf` | `ACL-permit-all` |
 | `authz-profiles.tf` | `PR-wired-lab-access` |
-| `outputs.tf` | SGT + NDG + AP + CND + ACL + PR names; ids stay out of `policy/` |
+| `sgts.tf` | `SGT_lab_users`, `SGT_lab_devices` |
+| `eigs.tf` | `EIG-printers`, `EIG-lab-iot` |
+| `outputs.tf` | SGT + NDG + AP + CND + ACL + PR + EIG names; ids stay out of `policy/` |
 
 ## terraform/
 
@@ -68,6 +69,7 @@ Three planes. Do not mix them.
 | `terraform/modules/condition/` | One `ise_network_access_condition` |
 | `terraform/modules/dacl/` | One `ise_downloadable_acl` |
 | `terraform/modules/authorization-profile/` | One `ise_authorization_profile` |
+| `terraform/modules/eig/` | One `ise_endpoint_identity_group` |
 
 ## lint/
 

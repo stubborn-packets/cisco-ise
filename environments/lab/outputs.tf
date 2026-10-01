@@ -122,3 +122,19 @@ output "sgt_ids" {
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
+
+output "eig_names" {
+  value = {
+    printers = module.eig_printers.name
+    lab_iot  = module.eig_lab_iot.name
+  }
+  description = "Endpoint identity group names stored on lab ISE."
+}
+
+output "eig_ids" {
+  value = {
+    printers = module.eig_printers.id
+    lab_iot  = module.eig_lab_iot.id
+  }
+  description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
+}

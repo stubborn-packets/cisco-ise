@@ -1,11 +1,20 @@
 # policy/eig.yaml
 # Plane: desired state. Terraform may create these from Phase 4.
 # Approved static Endpoint Identity Groups. Names use EIG-.
+# parent is the human ISE root name. Do not store the parent UUID here.
+# Do not import Unknown, Profiled, Blacklist, GuestEndpoints, RegisteredDevices.
 
-endpoint_identity_groups: []
-  # - name: EIG-printers
-  #   description: Statically classified printers.
-  #   owner: lab
-  #   bu: lab
-  #   parent: Endpoint Identity Groups
-  #   state: enabled
+endpoint_identity_groups:
+  - name: EIG-printers
+    description: Statically classified printers.
+    owner: lab
+    bu: lab
+    parent: Endpoint Identity Groups
+    state: enabled
+
+  - name: EIG-lab-iot
+    description: Statically classified lab IoT devices.
+    owner: lab
+    bu: lab
+    parent: Endpoint Identity Groups
+    state: enabled
