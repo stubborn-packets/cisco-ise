@@ -26,3 +26,39 @@ conditions:
     attribute_name: AuthenticationMethod
     operator: equals
     attribute_value: Lookup
+  
+  - name: CND-wired-dot1x-framed
+    state: enabled
+    description: Policy set condition. Wired 802.1X. Ethernet and Service-Type Framed.
+    owner: lab
+    type: LibraryConditionAndBlock
+    is_negate: false
+    children:
+      - type: ConditionAttributes
+        dictionary_name: Radius
+        attribute_name: NAS-Port-Type
+        operator: equals
+        attribute_value: Ethernet
+      - type: ConditionAttributes
+        dictionary_name: Radius
+        attribute_name: Service-Type
+        operator: equals
+        attribute_value: Framed
+
+  - name: CND-wired-mab-call-check
+    state: enabled
+    description: Policy set condition. Wired MAB. Ethernet and Service-Type Call Check.
+    owner: lab
+    type: LibraryConditionAndBlock
+    is_negate: false
+    children:
+      - type: ConditionAttributes
+        dictionary_name: Radius
+        attribute_name: NAS-Port-Type
+        operator: equals
+        attribute_value: Ethernet
+      - type: ConditionAttributes
+        dictionary_name: Radius
+        attribute_name: Service-Type
+        operator: equals
+        attribute_value: Call Check

@@ -20,15 +20,65 @@
 #   2. Leave the old GUI objects in place below them.
 #   3. Cut traffic over, then disable, then delete the old objects.
 # Do not import non-standard names into Terraform as desired state.
+#
+# First write: wired subset only. Services are the Phase 4 allowed-protocols
+# objects. Conditions are the Phase 4 library conditions. Do not name
+# Default Network Access. Do not manage rank 99. Rules stay empty until
+# the pinned provider schema is read. No VPN, wireless, infra, or PS-<bu>-*.
 
-policy_sets: []
-  # - name: PS-infra-health-checks
-  #   rank: 1
-  #   state: enabled
-  #   service: AP-default-network-access
-  #   description: Synthetic probes and ISE health RADIUS.
-  #   owner: lab
-  #   bu: lab
-  #   condition: {}
-  #   authentication_rules: []
-  #   authorization_rules: []
+policy_sets:
+  - name: PS-global-wired-8021x
+    rank: 40
+    state: disabled
+    service: AP-wired-dot1x
+    condition: CND-wired-dot1x
+    description: Global wired 802.1X. Evaluated before wired MAB.
+    owner: lab
+    bu: lab
+    authentication_rules:
+      - name: AN-wired-dot1x
+        rank: 0
+        state: enabled
+        condition: CND-wired-dot1x-framed
+        identity_source: Internal Users
+        if_auth_fail: REJECT
+        if_process_fail: DROP
+        if_user_not_found: REJECT
+        description: Wired 802.1X against Internal Users.
+        owner: lab
+    authorization_rules:
+      - name: AZ-wired-dot1x
+        rank: 0
+        state: enabled
+        condition: CND-wired-dot1x-framed
+        profile: PR-wired-lab-access
+        description: Wired 802.1X result. VLAN 20 and ACL-permit-all. No SGT.
+        owner: lab
+
+  - name: PS-global-wired-mab
+    rank: 50
+    state: disabled
+    service: AP-wired-mab
+    condition: CND-wired-mab
+    description: Global wired MAB. Evaluated after wired 802.1X.
+    owner: lab
+    bu: lab
+    authentication_rules:
+      - name: AN-wired-mab
+        rank: 0
+        state: enabled
+        condition: CND-wired-mab
+        identity_source: Internal Endpoints
+        if_auth_fail: REJECT
+        if_process_fail: DROP
+        if_user_not_found: CONTINUE
+        description: Wired MAB against Internal Endpoints. Unknown MAC continues.
+        owner: lab
+    authorization_rules:
+      - name: AZ-wired-mab
+        rank: 0
+        state: enabled
+        condition: CND-wired-mab-call-check
+        profile: PR-wired-lab-access
+        description: Wired MAB result. VLAN 20 and ACL-permit-all. No SGT.
+        owner: lab

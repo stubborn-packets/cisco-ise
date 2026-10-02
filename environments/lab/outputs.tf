@@ -63,16 +63,20 @@ output "ap_ids" {
 
 output "cnd_names" {
   value = {
-    wired_dot1x = module.cnd_wired_dot1x.name
-    wired_mab   = module.cnd_wired_mab.name
+    wired_dot1x          = module.cnd_wired_dot1x.name
+    wired_mab            = module.cnd_wired_mab.name
+    wired_dot1x_framed   = module.cnd_wired_dot1x_framed.name
+    wired_mab_call_check = module.cnd_wired_mab_call_check.name
   }
   description = "Library condition names stored on lab ISE."
 }
 
 output "cnd_ids" {
   value = {
-    wired_dot1x = module.cnd_wired_dot1x.id
-    wired_mab   = module.cnd_wired_mab.id
+    wired_dot1x          = module.cnd_wired_dot1x.id
+    wired_mab            = module.cnd_wired_mab.id
+    wired_dot1x_framed   = module.cnd_wired_dot1x_framed.id
+    wired_mab_call_check = module.cnd_wired_mab_call_check.id
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
@@ -135,6 +139,86 @@ output "eig_ids" {
   value = {
     printers = module.eig_printers.id
     lab_iot  = module.eig_lab_iot.id
+  }
+  description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
+}
+
+output "ps_names" {
+  value = {
+    wired_8021x = module.ps_global_wired_8021x.name
+    wired_mab   = module.ps_global_wired_mab.name
+  }
+  description = "Policy set names stored on lab ISE."
+}
+
+output "ps_ranks" {
+  value = {
+    wired_8021x = module.ps_global_wired_8021x.rank
+    wired_mab   = module.ps_global_wired_mab.rank
+  }
+  description = "Policy set ranks stored on lab ISE. Lower is evaluated first."
+}
+
+output "ps_ids" {
+  value = {
+    wired_8021x = module.ps_global_wired_8021x.id
+    wired_mab   = module.ps_global_wired_mab.id
+  }
+  description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
+}
+
+output "ps_states" {
+  value = {
+    wired_8021x = module.ps_global_wired_8021x.state
+    wired_mab   = module.ps_global_wired_mab.state
+  }
+  description = "Policy set states stored on ISE."
+}
+
+output "an_names" {
+  value = {
+    wired_dot1x = module.an_wired_dot1x.name
+    wired_mab   = module.an_wired_mab.name
+  }
+  description = "Authentication rule names stored on lab ISE."
+}
+
+output "an_states" {
+  value = {
+    wired_dot1x = module.an_wired_dot1x.state
+    wired_mab   = module.an_wired_mab.state
+  }
+  description = "Authentication rule states stored on ISE."
+}
+
+output "an_ids" {
+  value = {
+    wired_dot1x = module.an_wired_dot1x.id
+    wired_mab   = module.an_wired_mab.id
+  }
+  description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
+}
+
+output "az_names" {
+  value = {
+    wired_dot1x = module.az_wired_dot1x.name
+    wired_mab   = module.az_wired_mab.name
+  }
+  description = "Authorization rule names stored on lab ISE."
+}
+
+output "az_states" {
+  value = {
+    wired_dot1x = module.az_wired_dot1x.state
+    wired_mab   = module.az_wired_mab.state
+  }
+  description = "Authorization rule states stored on ISE."
+}
+
+output "az_ids" {
+  value = {
+    wired_dot1x = module.az_wired_dot1x.id
+    wired_mab   = module.az_wired_mab.id
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }

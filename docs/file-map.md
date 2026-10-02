@@ -21,7 +21,7 @@ Three planes. Do not mix them.
 | `sgt.yaml` | SGTs | 4 (Phase 3 bootstrap is tfvars, not this file) |
 | `eig.yaml` | Static EIGs | 4 |
 | `logical-profiles.yaml` | Profiler logical profiles | TBD |
-| `policy-sets.yaml` | Policy set order and rules | 5 |
+| `policy-sets.yaml` | Policy set order and rules | 5 (shell live; rules not written) |
 | `exceptions.yaml` | Ticketed exception rules | 6 |
 
 ## inventory/ — reference
@@ -51,12 +51,15 @@ Three planes. Do not mix them.
 | `main.tf` | `module "sgt_bootstrap"` |
 | `ndg.tf` | Custom type containers + first NDG leaves |
 | `allowed-protocols.tf` | `AP-wired-dot1x`, `AP-wired-mab` |
-| `conditions.tf` | `CND-wired-dot1x`, `CND-wired-mab` |
+| `conditions.tf` | `CND-wired-dot1x`, `CND-wired-mab`, `CND-wired-dot1x-framed`, `CND-wired-mab-call-check` |
 | `dacls.tf` | `ACL-permit-all` |
 | `authz-profiles.tf` | `PR-wired-lab-access` |
 | `sgts.tf` | `SGT_lab_users`, `SGT_lab_devices` |
 | `eigs.tf` | `EIG-printers`, `EIG-lab-iot` |
-| `outputs.tf` | SGT + NDG + AP + CND + ACL + PR + EIG names; ids stay out of `policy/` |
+| `policy-sets.tf` | `PS-global-wired-8021x`, `PS-global-wired-mab` (insert rank; YAML keeps the design band) |
+| `authn-rules.tf` | `AN-wired-dot1x`, `AN-wired-mab` |
+| `authz-rules.tf` | `AZ-wired-dot1x`, `AZ-wired-mab` |
+| `outputs.tf` | SGT + NDG + AP + CND + ACL + PR + EIG + PS + AN + AZ names; ids stay out of `policy/` |
 
 ## terraform/
 
@@ -66,10 +69,13 @@ Three planes. Do not mix them.
 | `terraform/modules/sgt/` | One `ise_trustsec_security_group` |
 | `terraform/modules/ndg/` | One `ise_network_device_group` |
 | `terraform/modules/allowed-protocols/` | One `ise_allowed_protocols` |
-| `terraform/modules/condition/` | One `ise_network_access_condition` |
+| `terraform/modules/condition/` | One `ise_network_access_condition` (attribute, AND, or OR) |
 | `terraform/modules/dacl/` | One `ise_downloadable_acl` |
 | `terraform/modules/authorization-profile/` | One `ise_authorization_profile` |
 | `terraform/modules/eig/` | One `ise_endpoint_identity_group` |
+| `terraform/modules/policy-set/` | One `ise_network_access_policy_set`. No rules. |
+| `terraform/modules/authentication-rule/` | One `ise_network_access_authentication_rule` |
+| `terraform/modules/authorization-rule/` | One `ise_network_access_authorization_rule` |
 
 ## lint/
 

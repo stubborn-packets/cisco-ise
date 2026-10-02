@@ -14,6 +14,8 @@ terraform/modules/allowed-protocols/    one ise_allowed_protocols
 terraform/modules/condition/              one ise_network_access_condition
 terraform/modules/dacl/                   one ise_downloadable_acl
 terraform/modules/authorization-profile/  one ise_authorization_profile
+terraform/modules/eig/                    one ise_endpoint_identity_group
+terraform/modules/policy-set/             one ise_network_access_policy_set
 environments/lab/                         provider pin, local state, module calls
 ```
 
@@ -137,8 +139,52 @@ GUI: Policy > Policy Elements > Results > Authorization.
 
 Do not put `terraform output acl_ids` or `pr_ids` into `policy/` or `inventory/`.
 
+## Endpoint identity groups
+
+Static groups only. Parent UUID is omitted; ISE hangs them off the root.
+Do not manage Unknown, Profiled, Blacklist, GuestEndpoints, or RegisteredDevices.
+Do not create endpoints here.
+
+| Terraform address | ISE name |
+| --- | --- |
+| `module.eig_printers.ise_endpoint_identity_group.this` | `EIG-printers` |
+| `module.eig_lab_iot.ise_endpoint_identity_group.this` | `EIG-lab-iot` |
+
+GUI: Work Centers > Network Access > Identities > Endpoint Identity Groups.
+
+Do not put `terraform output eig_ids` into `policy/` or `inventory/`.
+
+## Policy sets
+
+YAML rank is the design band. ISE rank is a packed insert index. This lab
+rejected POST rank 40. The shell inserted disabled at 0, then 1.
+`ise_network_access_policy_set_update_rank` is not wired. It is a later
+reorder, used when an existing set must move. It cannot open a gap at 40.
+Do not manage rank 99 Default. Do not manage Default Network Access.
+Rules are separate resources. The parent sets stay disabled, so the rules
+are not evaluated.
+
+| Terraform address | ISE name | Insert rank | State |
+| --- | --- | --- | --- |
+| `module.ps_global_wired_8021x.ise_network_access_policy_set.this` | `PS-global-wired-8021x` | 0 | disabled |
+| `module.ps_global_wired_mab.ise_network_access_policy_set.this` | `PS-global-wired-mab` | 1 | disabled |
+| `module.an_wired_dot1x.ise_network_access_authentication_rule.this` | `AN-wired-dot1x` | 0 | enabled |
+| `module.an_wired_mab.ise_network_access_authentication_rule.this` | `AN-wired-mab` | 0 | enabled |
+| `module.az_wired_dot1x.ise_network_access_authorization_rule.this` | `AZ-wired-dot1x` | 0 | enabled |
+| `module.az_wired_mab.ise_network_access_authorization_rule.this` | `AZ-wired-mab` | 0 | enabled |
+
+`AN-wired-dot1x` uses `Internal Users`. `AN-wired-mab` uses `Internal Endpoints`
+and `if_user_not_found = CONTINUE`. Both `AZ-` rules return `PR-wired-lab-access`.
+No security group.
+
+GUI: Policy > Policy Sets.
+
+Do not put `terraform output ps_ids`, `an_ids`, or `az_ids` into `policy/` or `inventory/`.
+
 ## Out of scope here
 
+- Enabling the two policy sets (cutover, not this write)
+- `ise_network_access_policy_set_update_rank`
 - NAD resources
 - `netascode/nac-ise`
 - remote state

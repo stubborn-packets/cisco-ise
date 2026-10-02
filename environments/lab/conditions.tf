@@ -23,3 +23,53 @@ module "cnd_wired_mab" {
   operator        = "equals"
   attribute_value = "Lookup"
 }
+
+module "cnd_wired_dot1x_framed" {
+  source = "../../terraform/modules/condition"
+
+  name           = "CND-wired-dot1x-framed"
+  description    = "Policy set condition. Wired 802.1X. Ethernet and Service-Type Framed."
+  condition_type = "LibraryConditionAndBlock"
+
+  children = [
+    {
+      condition_type  = "ConditionAttributes"
+      dictionary_name = "Radius"
+      attribute_name  = "NAS-Port-Type"
+      operator        = "equals"
+      attribute_value = "Ethernet"
+    },
+    {
+      condition_type  = "ConditionAttributes"
+      dictionary_name = "Radius"
+      attribute_name  = "Service-Type"
+      operator        = "equals"
+      attribute_value = "Framed"
+    },
+  ]
+}
+
+module "cnd_wired_mab_call_check" {
+  source = "../../terraform/modules/condition"
+
+  name           = "CND-wired-mab-call-check"
+  description    = "Policy set condition. Wired MAB. Ethernet and Service-Type Call Check."
+  condition_type = "LibraryConditionAndBlock"
+
+  children = [
+    {
+      condition_type  = "ConditionAttributes"
+      dictionary_name = "Radius"
+      attribute_name  = "NAS-Port-Type"
+      operator        = "equals"
+      attribute_value = "Ethernet"
+    },
+    {
+      condition_type  = "ConditionAttributes"
+      dictionary_name = "Radius"
+      attribute_name  = "Service-Type"
+      operator        = "equals"
+      attribute_value = "Call Check"
+    },
+  ]
+}
