@@ -8,12 +8,27 @@
 # condition_id is the AND condition UUID. It stays in state, not in policy/.
 # No VPN, wireless, infra, or PS-<bu>-*. Rules are a later resource.
 
+module "ps_global_vpn" {
+  source = "../../terraform/modules/policy-set"
+
+  name                = "PS-global-vpn"
+  description         = "Global VPN. Evaluated before wired."
+  rank                = 0
+  state               = "disabled"
+  service_name        = module.ap_vpn.name
+  is_proxy            = false
+  condition_id        = module.cnd_vpn.id
+  condition_is_negate = false
+
+  depends_on = [module.ap_vpn, module.cnd_vpn]
+}
+
 module "ps_global_wired_8021x" {
   source = "../../terraform/modules/policy-set"
 
   name                = "PS-global-wired-8021x"
   description         = "Global wired 802.1X. Evaluated before wired MAB."
-  rank                = 0
+  rank                = 1
   state               = "disabled"
   service_name        = module.ap_wired_dot1x.name
   is_proxy            = false
@@ -28,7 +43,7 @@ module "ps_global_wired_mab" {
 
   name                = "PS-global-wired-mab"
   description         = "Global wired MAB. Evaluated after wired 802.1X."
-  rank                = 1
+  rank                = 2
   state               = "disabled"
   service_name        = module.ap_wired_mab.name
   is_proxy            = false

@@ -62,3 +62,14 @@ conditions:
         attribute_name: Service-Type
         operator: equals
         attribute_value: Call Check
+
+  - name: CND-vpn
+    state: enabled
+    description: VPN via NAS-Port-Type Virtual.
+    owner: lab
+    type: LibraryConditionAttributes
+    is_negate: false
+    dictionary_name: Radius
+    attribute_name: NAS-Port-Type
+    operator: equals
+    attribute_value: Virtual

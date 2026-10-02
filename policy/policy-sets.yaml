@@ -27,6 +27,34 @@
 # the pinned provider schema is read. No VPN, wireless, infra, or PS-<bu>-*.
 
 policy_sets:
+  - name: PS-global-vpn
+    rank: 10
+    state: disabled
+    service: AP-vpn
+    condition: CND-vpn
+    description: Global VPN. Evaluated before wired.
+    owner: lab
+    bu: lab
+    authentication_rules:
+      - name: AN-vpn
+        rank: 0
+        state: enabled
+        condition: CND-vpn
+        identity_source: Internal Users
+        if_auth_fail: REJECT
+        if_process_fail: DROP
+        if_user_not_found: REJECT
+        description: VPN against Internal Users.
+        owner: lab
+    authorization_rules:
+      - name: AZ-vpn
+        rank: 0
+        state: enabled
+        condition: CND-vpn
+        profile: PR-global-vpn
+        description: VPN result. Class ou=GP-global-vpn. No VLAN. No SGT.
+        owner: lab
+    
   - name: PS-global-wired-8021x
     rank: 40
     state: disabled

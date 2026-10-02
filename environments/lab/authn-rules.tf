@@ -39,3 +39,20 @@ module "an_wired_mab" {
 
   depends_on = [module.ps_global_wired_mab, module.cnd_wired_mab]
 }
+
+module "an_vpn" {
+  source = "../../terraform/modules/authentication-rule"
+
+  name                 = "AN-vpn"
+  policy_set_id        = module.ps_global_vpn.id
+  rank                 = 0
+  state                = "enabled"
+  condition_id         = module.cnd_vpn.id
+  condition_is_negate  = false
+  identity_source_name = "Internal Users"
+  if_auth_fail         = "REJECT"
+  if_process_fail      = "DROP"
+  if_user_not_found    = "REJECT"
+
+  depends_on = [module.ps_global_vpn, module.cnd_vpn]
+}

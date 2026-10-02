@@ -73,3 +73,14 @@ module "cnd_wired_mab_call_check" {
     },
   ]
 }
+
+module "cnd_vpn" {
+  source = "../../terraform/modules/condition"
+
+  name            = "CND-vpn"
+  description     = "VPN via NAS-Port-Type Virtual."
+  dictionary_name = "Radius"
+  attribute_name  = "NAS-Port-Type"
+  operator        = "equals"
+  attribute_value = "Virtual"
+}

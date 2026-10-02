@@ -46,22 +46,18 @@ Exit met 2026-10-01: each family has a YAML row, a thin module, a lab call, and 
 
 ## Phase 5 — Policy sets and ranks
 
-Wired subset met 2026-10-02 on lab ISE. Sets stay disabled. Enable is the cutover, not this write.
+Wired subset and VPN family closed 2026-10-02 on lab ISE. Sets stay disabled. Enable was not part of the close.
 
-- `PS-global-wired-8021x` and `PS-global-wired-mab` created disabled
-- YAML rank stays 40 and 50. ISE stores a packed insert index (0 and 1 on this lab)
-- Services are `AP-wired-dot1x` and `AP-wired-mab`
-- Set conditions are `CND-wired-dot1x-framed` and `CND-wired-mab-call-check`
-- `AN-wired-dot1x` searches `Internal Users` (`REJECT` / `DROP` / `REJECT`)
-- `AN-wired-mab` searches `Internal Endpoints` (`REJECT` / `DROP` / `CONTINUE`)
-- `AZ-wired-dot1x` and `AZ-wired-mab` return `PR-wired-lab-access`. No SGT
-- `CND-wired-mab` is the MAB authentication-rule condition. It is illegal on a policy set
-- Do not import existing non-standard lab policy sets as desired state
-- Do not manage rank 99 Default, or the built-in Default rule inside a set
+- `PS-global-vpn`, `PS-global-wired-8021x`, and `PS-global-wired-mab` created disabled
+- YAML rank stays 10, 40, and 50. ISE insert ranks on this lab are 0, 1, and 2
+- VPN service is `AP-vpn` (EAP-TLS, PEAP, TEAP, PAP). Condition is `CND-vpn`
+- `AN-vpn` searches `Internal Users`. `AZ-vpn` returns `PR-global-vpn`
+- `PR-global-vpn` returns `ACL-permit-all`, Class `ou=GP-global-vpn`, session timeout 28800, no VLAN
+- Wired services, conditions, and rules are unchanged from the wired close
 - Old GUI sets were shifted down, not renamed
-- `ise_network_access_policy_set_update_rank` is not wired. Add it when a later apply must move an existing set
+- Blog not written. It waits until the rest of Phase 5 is closed
 
-VPN, wireless, infra, and `PS-<bu>-*` wait until those services exist. Blog waits until the phase is closed.
+Wireless, infra, and `PS-<bu>-*` still wait.
 
 ## Phase 6 — Exceptions
 

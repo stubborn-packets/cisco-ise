@@ -14,6 +14,17 @@ authorization_profiles:
     access_type: ACCESS_ACCEPT
     vlan: VLAN-lab-data
     dacl: ACL-permit-all
+  
+  - name: PR-global-vpn
+    state: enabled
+    description: Lab VPN access. ASA group policy via Class ou=gp-global-vpn.
+    owner: lab
+    bu: lab
+    access_type: ACCESS_ACCEPT
+    dacl: ACL-permit-all
+    reauth_timer: 28800
+    reauth_connectivity: DEFAULT
+    asa_vpn: ou=GP-global-vpn
 
 downloadable_acls:
   - name: ACL-permit-all

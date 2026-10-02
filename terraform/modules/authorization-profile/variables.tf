@@ -63,3 +63,31 @@ variable "profile_name" {
   default     = "Cisco"
   description = "ISE network device profile. Built-in Cisco is the lab default."
 }
+
+variable "asa_vpn" {
+  type        = string
+  default     = ""
+  description = "ASA VPN Class value. Lab VPN uses ou=gp-global-vpn. Empty means unset."
+}
+
+variable "reauthentication_timer" {
+  type        = number
+  default     = 0
+  description = "Reauthentication timer in seconds. 0 means unset. ISE range is 1-65535."
+
+  validation {
+    condition     = var.reauthentication_timer == 0 || (var.reauthentication_timer >= 1 && var.reauthentication_timer <= 65535)
+    error_message = "reauthentication_timer must be 0 or 1-65535."
+  }
+}
+
+variable "reauthentication_connectivity" {
+  type        = string
+  default     = "DEFAULT"
+  description = "Required by ISE when the timer is set. DEFAULT or RADIUS_REQUEST."
+
+  validation {
+    condition     = contains(["DEFAULT", "RADIUS_REQUEST"], var.reauthentication_connectivity)
+    error_message = "reauthentication_connectivity must be DEFAULT or RADIUS_REQUEST."
+  }
+}

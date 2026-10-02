@@ -166,16 +166,19 @@ are not evaluated.
 
 | Terraform address | ISE name | Insert rank | State |
 | --- | --- | --- | --- |
-| `module.ps_global_wired_8021x.ise_network_access_policy_set.this` | `PS-global-wired-8021x` | 0 | disabled |
-| `module.ps_global_wired_mab.ise_network_access_policy_set.this` | `PS-global-wired-mab` | 1 | disabled |
+| `module.ps_global_vpn.ise_network_access_policy_set.this` | `PS-global-vpn` | 0 | disabled |
+| `module.ps_global_wired_8021x.ise_network_access_policy_set.this` | `PS-global-wired-8021x` | 1 | disabled |
+| `module.ps_global_wired_mab.ise_network_access_policy_set.this` | `PS-global-wired-mab` | 2 | disabled |
+| `module.an_vpn.ise_network_access_authentication_rule.this` | `AN-vpn` | 0 | enabled |
 | `module.an_wired_dot1x.ise_network_access_authentication_rule.this` | `AN-wired-dot1x` | 0 | enabled |
 | `module.an_wired_mab.ise_network_access_authentication_rule.this` | `AN-wired-mab` | 0 | enabled |
+| `module.az_vpn.ise_network_access_authorization_rule.this` | `AZ-vpn` | 0 | enabled |
 | `module.az_wired_dot1x.ise_network_access_authorization_rule.this` | `AZ-wired-dot1x` | 0 | enabled |
 | `module.az_wired_mab.ise_network_access_authorization_rule.this` | `AZ-wired-mab` | 0 | enabled |
 
-`AN-wired-dot1x` uses `Internal Users`. `AN-wired-mab` uses `Internal Endpoints`
-and `if_user_not_found = CONTINUE`. Both `AZ-` rules return `PR-wired-lab-access`.
-No security group.
+`AN-vpn` and `AN-wired-dot1x` use `Internal Users`. `AN-wired-mab` uses `Internal Endpoints`
+and `if_user_not_found = CONTINUE`. `AZ-vpn` returns `PR-global-vpn`.
+The wired `AZ-` rules return `PR-wired-lab-access`. No security group.
 
 GUI: Policy > Policy Sets.
 
