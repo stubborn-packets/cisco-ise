@@ -26,6 +26,13 @@ authorization_profiles:
     reauth_connectivity: DEFAULT
     asa_vpn: ou=GP-global-vpn
 
+  - name: PR-infra-permit
+    state: enabled
+    description: Infra health check. Access accept only. No VLAN, DACL, or SGT.
+    owner: lab
+    bu: lab
+    access_type: ACCESS_ACCEPT
+
 downloadable_acls:
   - name: ACL-permit-all
     state: enabled

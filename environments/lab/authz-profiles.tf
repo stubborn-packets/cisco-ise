@@ -29,30 +29,10 @@ module "pr_global_vpn" {
   depends_on = [module.acl_permit_all]
 }
 
-module "az_wireless_dot1x" {
-  source = "../../terraform/modules/authorization-rule"
+module "pr_infra_permit" {
+  source = "../../terraform/modules/authorization-profile"
 
-  name                = "AZ-wireless-dot1x"
-  policy_set_id       = module.ps_global_wireless_8021x.id
-  rank                = 0
-  state               = "enabled"
-  condition_id        = module.cnd_wireless_dot1x_framed.id
-  condition_is_negate = false
-  profiles            = ["PR-wired-lab-access"]
-
-  depends_on = [module.ps_global_wireless_8021x, module.cnd_wireless_dot1x_framed, module.pr_wired_lab_access]
-}
-
-module "az_wireless_mab" {
-  source = "../../terraform/modules/authorization-rule"
-
-  name                = "AZ-wireless-mab"
-  policy_set_id       = module.ps_global_wireless_mab.id
-  rank                = 0
-  state               = "enabled"
-  condition_id        = module.cnd_wireless_mab_call_check.id
-  condition_is_negate = false
-  profiles            = ["PR-wired-lab-access"]
-
-  depends_on = [module.ps_global_wireless_mab, module.cnd_wireless_mab_call_check, module.pr_wired_lab_access]
+  name        = "PR-infra-permit"
+  description = "Infra health check. Access accept only. No VLAN, DACL, or SGT."
+  access_type = "ACCESS_ACCEPT"
 }

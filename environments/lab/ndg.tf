@@ -5,6 +5,7 @@
 # All Locations / All Device Types. Leaves are type#container#value.
 # No for_each over policy/. No NAD module.
 
+## Root type containers
 module "ndg_business_unit" {
   source = "../../terraform/modules/ndg"
 
@@ -32,6 +33,7 @@ module "ndg_function" {
   description = "Custom NDG type container for lab Function leaves."
 }
 
+## Location sub-leaves
 module "ndg_location_usa" {
   source = "../../terraform/modules/ndg"
 
@@ -40,6 +42,7 @@ module "ndg_location_usa" {
   description = "Lab location leaf."
 }
 
+## Device Type sub-leaves
 module "ndg_device_type_switch" {
   source = "../../terraform/modules/ndg"
 
@@ -48,6 +51,15 @@ module "ndg_device_type_switch" {
   description = "Lab device-type leaf."
 }
 
+module "ndg_device_type_load_balancer" {
+  source = "../../terraform/modules/ndg"
+
+  name        = "Device Type#All Device Types#load-balancer"
+  root_group  = "Device Type"
+  description = "F5 and other load-balancer NADs."
+}
+
+## Business Unit sub-leaves
 module "ndg_business_unit_lab" {
   source = "../../terraform/modules/ndg"
 
@@ -58,6 +70,7 @@ module "ndg_business_unit_lab" {
   depends_on = [module.ndg_business_unit]
 }
 
+## Stage sub-leaves
 module "ndg_stage_monitor" {
   source = "../../terraform/modules/ndg"
 
@@ -68,6 +81,7 @@ module "ndg_stage_monitor" {
   depends_on = [module.ndg_stage]
 }
 
+## Function sub-leaves
 module "ndg_function_lab" {
   source = "../../terraform/modules/ndg"
 

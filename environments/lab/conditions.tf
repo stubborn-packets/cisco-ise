@@ -134,3 +134,30 @@ module "cnd_wireless_mab_call_check" {
     },
   ]
 }
+
+module "cnd_infra_f5_health" {
+  source = "../../terraform/modules/condition"
+
+  name           = "CND-infra-f5-health"
+  description    = "F5 health check. Load-balancer NAD and RADIUS user svc-ise-f5-health."
+  condition_type = "LibraryConditionAndBlock"
+
+  children = [
+    {
+      condition_type  = "ConditionAttributes"
+      dictionary_name = "DEVICE"
+      attribute_name  = "Device Type"
+      operator        = "equals"
+      attribute_value = "All Device Types#load-balancer"
+    },
+    {
+      condition_type  = "ConditionAttributes"
+      dictionary_name = "Radius"
+      attribute_name  = "User-Name"
+      operator        = "equals"
+      attribute_value = "svc-ise-f5-health"
+    },
+  ]
+
+  depends_on = [module.ndg_device_type_load_balancer]
+}

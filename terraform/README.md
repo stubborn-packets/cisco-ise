@@ -166,17 +166,18 @@ are not evaluated.
 
 | Terraform address | ISE name | Insert rank | State |
 | --- | --- | --- | --- |
-| `module.ps_global_wireless_8021x.ise_network_access_policy_set.this` | `PS-global-wireless-8021x` | 0 | disabled |
-| `module.ps_global_wireless_mab.ise_network_access_policy_set.this` | `PS-global-wireless-mab` | 1 | disabled |
-| `module.ps_global_vpn.ise_network_access_policy_set.this` | `PS-global-vpn` | 2 | disabled |
-| `module.ps_global_wired_8021x.ise_network_access_policy_set.this` | `PS-global-wired-8021x` | 3 | disabled |
-| `module.ps_global_wired_mab.ise_network_access_policy_set.this` | `PS-global-wired-mab` | 4 | disabled |
-| `module.an_wireless_dot1x.ise_network_access_authentication_rule.this` | `AN-wireless-dot1x` | 0 | enabled |
+| `module.ps_infra_health_checks.ise_network_access_policy_set.this` | `PS-infra-health-checks` | 0 | disabled |
+| `module.ps_global_wireless_8021x.ise_network_access_policy_set.this` | `PS-global-wireless-8021x` | 1 | disabled |
+| `module.ps_global_wireless_mab.ise_network_access_policy_set.this` | `PS-global-wireless-mab` | 2 | disabled |
+| `module.ps_global_vpn.ise_network_access_policy_set.this` | `PS-global-vpn` | 3 | disabled |
+| `module.ps_global_wired_8021x.ise_network_access_policy_set.this` | `PS-global-wired-8021x` | 4 | disabled |
+| `module.ps_global_wired_mab.ise_network_access_policy_set.this` | `PS-global-wired-mab` | 5 | disabled |
+| `module.an_infra_f5_health.ise_network_access_authentication_rule.this` | `AN-infra-f5-health` | 0 | enabled |
 | `module.an_wireless_mab.ise_network_access_authentication_rule.this` | `AN-wireless-mab` | 0 | enabled |
 | `module.an_vpn.ise_network_access_authentication_rule.this` | `AN-vpn` | 0 | enabled |
 | `module.an_wired_dot1x.ise_network_access_authentication_rule.this` | `AN-wired-dot1x` | 0 | enabled |
 | `module.an_wired_mab.ise_network_access_authentication_rule.this` | `AN-wired-mab` | 0 | enabled |
-| `module.az_wireless_dot1x.ise_network_access_authorization_rule.this` | `AZ-wireless-dot1x` | 0 | enabled |
+| `module.az_infra_f5_health.ise_network_access_authorization_rule.this` | `AZ-infra-f5-health` | 0 | enabled |
 | `module.az_wireless_mab.ise_network_access_authorization_rule.this` | `AZ-wireless-mab` | 0 | enabled |
 | `module.az_vpn.ise_network_access_authorization_rule.this` | `AZ-vpn` | 0 | enabled |
 | `module.az_wired_dot1x.ise_network_access_authorization_rule.this` | `AZ-wired-dot1x` | 0 | enabled |

@@ -21,12 +21,52 @@
 #   3. Cut traffic over, then disable, then delete the old objects.
 # Do not import non-standard names into Terraform as desired state.
 #
-# First write: wired subset only. Services are the Phase 4 allowed-protocols
-# objects. Conditions are the Phase 4 library conditions. Do not name
-# Default Network Access. Do not manage rank 99. Rules stay empty until
-# the pinned provider schema is read. No VPN, wireless, infra, or PS-<bu>-*.
+# First write: wired subset only, state disabled. Services are the Phase 4
+# allowed-protocols objects. Policy-set conditions are the AND library
+# conditions (Ethernet plus Service-Type). CND-wired-mab stays an
+# authentication-rule condition. ISE rank is a dense insert index, so the
+# lab call cannot POST rank 40 until 40 sets exist. rank here stays the
+# design band. Do not name Default Network Access. Do not manage rank 99.
+# No VPN service on the wired sets. PS-global-vpn is rank 10, state disabled.
+# Service AP-vpn. Condition CND-vpn. AN-vpn searches Internal Users.
+# AZ-vpn returns PR-global-vpn. Do not manage the built-in Default rule.
+# Wireless sets stay at the old bands, 20 and 30, until the rank conversion.
+# The lab call inserts them at 0 and 1 and shifts VPN and wired down.
+# rank here is not the ISE index yet.
+# Authentication rules are the first rule write. Authorization rules return
+# PR-wired-lab-access. No SGT on that profile. Do not manage the built-in
+# Default rule. Identity source is the lab internal store. 802.1X searches
+# Internal Users. MAB searches Internal Endpoints.
 
 policy_sets:
+  - name: PS-infra-health-checks
+    rank: 1
+    state: disabled
+    service: AP-infra-health
+    condition: CND-infra-f5-health
+    description: F5 health check. Evaluated before wireless, VPN, and wired.
+    owner: lab
+    bu: lab
+    authentication_rules:
+      - name: AN-infra-f5-health
+        rank: 0
+        state: enabled
+        condition: CND-infra-f5-health
+        identity_source: Internal Users
+        if_auth_fail: REJECT
+        if_process_fail: DROP
+        if_user_not_found: REJECT
+        description: F5 probe against Internal Users. User is not created here.
+        owner: lab
+    authorization_rules:
+      - name: AZ-infra-f5-health
+        rank: 0
+        state: enabled
+        condition: CND-infra-f5-health
+        profile: PR-infra-permit
+        description: F5 probe result. Access accept only. No VLAN.
+        owner: lab
+
   - name: PS-global-vpn
     rank: 10
     state: disabled

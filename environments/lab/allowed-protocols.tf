@@ -116,3 +116,12 @@ module "ap_wireless_mab" {
   process_host_lookup = true
   allow_5g            = false
 }
+
+module "ap_infra_health" {
+  source = "../../terraform/modules/allowed-protocols"
+
+  name            = "AP-infra-health"
+  description     = "F5 health check. PAP only. No EAP and no MAB."
+  allow_pap_ascii = true
+  allow_5g        = false
+}

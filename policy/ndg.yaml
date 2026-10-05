@@ -40,6 +40,7 @@ roots:
       - wlc
       - firewall
       - vpn-concentrator
+      - load-balancer
 
   - name: BusinessUnit
     ise_root: BusinessUnit

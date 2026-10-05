@@ -109,3 +109,21 @@ conditions:
         attribute_name: Service-Type
         operator: equals
         attribute_value: Call Check
+
+  - name: CND-infra-f5-health
+    state: enabled
+    description: F5 health check. Load-balancer NAD and RADIUS user svc-ise-f5-health.
+    owner: lab
+    type: LibraryConditionAndBlock
+    is_negate: false
+    children:
+      - type: ConditionAttributes
+        dictionary_name: Network Access
+        attribute_name: Device Type
+        operator: equals
+        attribute_value: All Device Types#load-balancer
+      - type: ConditionAttributes
+        dictionary_name: Radius
+        attribute_name: User-Name
+        operator: equals
+        attribute_value: svc-ise-f5-health

@@ -46,18 +46,17 @@ Exit met 2026-10-01: each family has a YAML row, a thin module, a lab call, and 
 
 ## Phase 5 — Policy sets and ranks
 
-Wired subset and VPN family closed 2026-10-02 on lab ISE. Sets stay disabled. Enable was not part of the close.
+Wired, VPN, wireless, and infra families closed 2026-10-05 on lab ISE. Sets stay disabled. Enable was not part of the close.
 
-- `PS-global-vpn`, `PS-global-wired-8021x`, and `PS-global-wired-mab` created disabled
-- YAML rank stays 10, 40, and 50. ISE insert ranks on this lab are 0, 1, and 2
-- VPN service is `AP-vpn` (EAP-TLS, PEAP, TEAP, PAP). Condition is `CND-vpn`
-- `AN-vpn` searches `Internal Users`. `AZ-vpn` returns `PR-global-vpn`
-- `PR-global-vpn` returns `ACL-permit-all`, Class `ou=GP-global-vpn`, session timeout 28800, no VLAN
-- Wired services, conditions, and rules are unchanged from the wired close
-- Old GUI sets were shifted down, not renamed
+- Global sets are infra, wireless 802.1X, wireless MAB, VPN, wired 802.1X, wired MAB
+- YAML ranks stay 1, 20, 30, 10, 40, and 50. ISE insert ranks are 0 through 5
+- Infra is `PS-infra-health-checks`. Service `AP-infra-health` is PAP only. Condition is `DEVICE` Device Type `All Device Types#load-balancer` plus RADIUS user `svc-ise-f5-health`
+- `AN-infra-f5-health` searches `Internal Users`. `AZ-infra-f5-health` returns `PR-infra-permit`
+- The probe user is not created. The load-balancer NAD is not placed. Enable waits on both
+- Rank and band decision is in `docs/decisions.md`. YAML conversion is a later phase
 - Blog not written. It waits until the rest of Phase 5 is closed
 
-Wireless, infra, and `PS-<bu>-*` still wait.
+`PS-<bu>-*` still waits. The YAML-reading root waits until those families are known.
 
 ## Phase 6 — Exceptions
 
