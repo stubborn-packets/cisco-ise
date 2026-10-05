@@ -84,3 +84,53 @@ module "cnd_vpn" {
   operator        = "equals"
   attribute_value = "Virtual"
 }
+
+module "cnd_wireless_dot1x_framed" {
+  source = "../../terraform/modules/condition"
+
+  name           = "CND-wireless-dot1x-framed"
+  description    = "Policy set condition. Wireless 802.1X. IEEE 802.11 and Service-Type Framed."
+  condition_type = "LibraryConditionAndBlock"
+
+  children = [
+    {
+      condition_type  = "ConditionAttributes"
+      dictionary_name = "Radius"
+      attribute_name  = "NAS-Port-Type"
+      operator        = "equals"
+      attribute_value = "Wireless - IEEE 802.11"
+    },
+    {
+      condition_type  = "ConditionAttributes"
+      dictionary_name = "Radius"
+      attribute_name  = "Service-Type"
+      operator        = "equals"
+      attribute_value = "Framed"
+    },
+  ]
+}
+
+module "cnd_wireless_mab_call_check" {
+  source = "../../terraform/modules/condition"
+
+  name           = "CND-wireless-mab-call-check"
+  description    = "Policy set condition. Wireless MAB. IEEE 802.11 and Service-Type Call Check."
+  condition_type = "LibraryConditionAndBlock"
+
+  children = [
+    {
+      condition_type  = "ConditionAttributes"
+      dictionary_name = "Radius"
+      attribute_name  = "NAS-Port-Type"
+      operator        = "equals"
+      attribute_value = "Wireless - IEEE 802.11"
+    },
+    {
+      condition_type  = "ConditionAttributes"
+      dictionary_name = "Radius"
+      attribute_name  = "Service-Type"
+      operator        = "equals"
+      attribute_value = "Call Check"
+    },
+  ]
+}

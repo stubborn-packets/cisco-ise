@@ -50,15 +50,15 @@ Three planes. Do not mix them.
 | `variables.tf` / `terraform.tfvars` | Phase 3 object: `SGT_lab_bootstrap` / `1001` |
 | `main.tf` | `module "sgt_bootstrap"` |
 | `ndg.tf` | Custom type containers + first NDG leaves |
-| `allowed-protocols.tf` | `AP-wired-dot1x`, `AP-wired-mab`, `AP-vpn` |
-| `conditions.tf` | `CND-wired-dot1x`, `CND-wired-mab`, `CND-wired-dot1x-framed`, `CND-wired-mab-call-check`, `CND-vpn` |
+| `allowed-protocols.tf` | `AP-wired-dot1x`, `AP-wired-mab`, `AP-vpn`, `AP-wireless-dot1x`, `AP-wireless-mab` |
+| `conditions.tf` | `CND-wired-dot1x`, `CND-wired-mab`, `CND-wired-dot1x-framed`, `CND-wired-mab-call-check`, `CND-vpn`, `CND-wireless-dot1x-framed`, `CND-wireless-mab-call-check` |
 | `dacls.tf` | `ACL-permit-all` |
 | `authz-profiles.tf` | `PR-wired-lab-access`, `PR-global-vpn` |
 | `sgts.tf` | `SGT_lab_users`, `SGT_lab_devices` |
 | `eigs.tf` | `EIG-printers`, `EIG-lab-iot` |
-| `policy-sets.tf` | `PS-global-vpn`, `PS-global-wired-8021x`, `PS-global-wired-mab` |
-| `authn-rules.tf` | `AN-vpn`, `AN-wired-dot1x`, `AN-wired-mab` |
-| `authz-rules.tf` | `AZ-vpn`, `AZ-wired-dot1x`, `AZ-wired-mab` |
+| `policy-sets.tf` | `PS-global-wireless-8021x`, `PS-global-wireless-mab`, `PS-global-vpn`, `PS-global-wired-8021x`, `PS-global-wired-mab` |
+| `authn-rules.tf` | `AN-wireless-dot1x`, `AN-wireless-mab`, `AN-vpn`, `AN-wired-dot1x`, `AN-wired-mab` |
+| `authz-rules.tf` | `AZ-wireless-dot1x`, `AZ-wireless-mab`, `AZ-vpn`, `AZ-wired-dot1x`, `AZ-wired-mab` |
 | `outputs.tf` | SGT + NDG + AP + CND + ACL + PR + EIG + PS + AN + AZ names; ids stay out of `policy/` |
 
 ## terraform/

@@ -54,7 +54,63 @@ policy_sets:
         profile: PR-global-vpn
         description: VPN result. Class ou=GP-global-vpn. No VLAN. No SGT.
         owner: lab
-    
+
+  - name: PS-global-wireless-8021x
+    rank: 20
+    state: disabled
+    service: AP-wireless-dot1x
+    condition: CND-wireless-dot1x-framed
+    description: Global wireless 802.1X. Evaluated before wireless MAB.
+    owner: lab
+    bu: lab
+    authentication_rules:
+      - name: AN-wireless-dot1x
+        rank: 0
+        state: enabled
+        condition: CND-wireless-dot1x-framed
+        identity_source: Internal Users
+        if_auth_fail: REJECT
+        if_process_fail: DROP
+        if_user_not_found: REJECT
+        description: Wireless 802.1X against Internal Users.
+        owner: lab
+    authorization_rules:
+      - name: AZ-wireless-dot1x
+        rank: 0
+        state: enabled
+        condition: CND-wireless-dot1x-framed
+        profile: PR-wired-lab-access
+        description: Wireless 802.1X result. VLAN 20 and ACL-permit-all. No SGT.
+        owner: lab
+
+  - name: PS-global-wireless-mab
+    rank: 30
+    state: disabled
+    service: AP-wireless-mab
+    condition: CND-wireless-mab-call-check
+    description: Global wireless MAB. Evaluated after wireless 802.1X.
+    owner: lab
+    bu: lab
+    authentication_rules:
+      - name: AN-wireless-mab
+        rank: 0
+        state: enabled
+        condition: CND-wireless-mab-call-check
+        identity_source: Internal Endpoints
+        if_auth_fail: REJECT
+        if_process_fail: DROP
+        if_user_not_found: CONTINUE
+        description: Wireless MAB against Internal Endpoints. Unknown MAC continues.
+        owner: lab
+    authorization_rules:
+      - name: AZ-wireless-mab
+        rank: 0
+        state: enabled
+        condition: CND-wireless-mab-call-check
+        profile: PR-wired-lab-access
+        description: Wireless MAB result. VLAN 20 and ACL-permit-all. No SGT.
+        owner: lab
+   
   - name: PS-global-wired-8021x
     rank: 40
     state: disabled

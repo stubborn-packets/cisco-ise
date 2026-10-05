@@ -17,9 +17,35 @@ Recorded 2026-09-10. Change these with a PR.
 
 ## Policy set evaluation order
 
-See `policy/policy-sets.yaml` and `docs/naming.md`.
+Superseded 2026-10-05 by the rank and band decision below. The 1–50 / 60+ / 99 table was a spacing convention. ISE does not store those numbers.
 
-Ranks 1–50 are global. Ranks 60+ are per business unit. Rank 99 is ISE Default.
+## Policy set rank and band
+
+Recorded 2026-10-05. Lab ISE rejected POST rank 40. Legal create rank was a packed index. This lab will not have 99 policy sets, so the design-band numbers will never become ISE slots.
+
+- `rank` in `policy/policy-sets.yaml` is the index ISE stores. Lower is evaluated first. It is packed: 0, 1, 2, with no gaps.
+- `band` is a label, not a number Terraform sends. The linter uses it to group and order families: infra, then VPN, then wireless, then wired, then business-unit sets. Default is not a band and is not managed.
+- Inserting a set means editing `rank` on the sets that shift. That edit is the order change. There is no second hidden rank.
+- The lab call sends `rank`. It does not send `band`. `ps_ranks` should match the YAML rank.
+- `ise_network_access_policy_set_update_rank` stays unused. It cannot open a gap, and the YAML no longer asks for one.
+- The exact 10 / 40 / 50 linter check is retired when the YAML is converted. Do not convert it in the wireless write.
+
+Current lab order, which the converted YAML should show:
+
+| rank | name | band |
+| --- | --- | --- |
+| 0 | `PS-global-vpn` | `global-vpn` |
+| 1 | `PS-global-wired-8021x` | `global-wired` |
+| 2 | `PS-global-wired-mab` | `global-wired-mab` |
+
+## YAML is the source the root will read
+
+Recorded 2026-10-05. Copied lab calls were the first-write rule so a bad row could not create an object without a reviewed `.tf` diff. That rule is not the end state.
+
+- One YAML file per family under `policy/`. Names and ranks live there. Ids do not.
+- Thin modules stay. A later root reads the YAML and calls those modules. `condition: CND-vpn` resolves to the condition module output inside the root.
+- Do not build that root in the wireless write. The YAML shape is still moving.
+- Until that root exists, the lab call is still copied. The copy is the drift this decision is meant to end.
 
 ## NDG roots
 

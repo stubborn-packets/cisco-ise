@@ -56,3 +56,37 @@ module "an_vpn" {
 
   depends_on = [module.ps_global_vpn, module.cnd_vpn]
 }
+
+module "an_wireless_dot1x" {
+  source = "../../terraform/modules/authentication-rule"
+
+  name                 = "AN-wireless-dot1x"
+  policy_set_id        = module.ps_global_wireless_8021x.id
+  rank                 = 0
+  state                = "enabled"
+  condition_id         = module.cnd_wireless_dot1x_framed.id
+  condition_is_negate  = false
+  identity_source_name = "Internal Users"
+  if_auth_fail         = "REJECT"
+  if_process_fail      = "DROP"
+  if_user_not_found    = "REJECT"
+
+  depends_on = [module.ps_global_wireless_8021x, module.cnd_wireless_dot1x_framed]
+}
+
+module "an_wireless_mab" {
+  source = "../../terraform/modules/authentication-rule"
+
+  name                 = "AN-wireless-mab"
+  policy_set_id        = module.ps_global_wireless_mab.id
+  rank                 = 0
+  state                = "enabled"
+  condition_id         = module.cnd_wireless_mab_call_check.id
+  condition_is_negate  = false
+  identity_source_name = "Internal Endpoints"
+  if_auth_fail         = "REJECT"
+  if_process_fail      = "DROP"
+  if_user_not_found    = "CONTINUE"
+
+  depends_on = [module.ps_global_wireless_mab, module.cnd_wireless_mab_call_check]
+}

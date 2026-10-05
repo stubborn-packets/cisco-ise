@@ -47,40 +47,48 @@ output "ndg_ids" {
 
 output "ap_names" {
   value = {
-    wired_dot1x = module.ap_wired_dot1x.name
-    wired_mab   = module.ap_wired_mab.name
-    vpn         = module.ap_vpn.name
+    wired_dot1x    = module.ap_wired_dot1x.name
+    wired_mab      = module.ap_wired_mab.name
+    vpn            = module.ap_vpn.name
+    wireless_dot1x = module.ap_wireless_dot1x.name
+    wireless_mab   = module.ap_wireless_mab.name
   }
   description = "Allowed-protocols names stored on lab ISE."
 }
 
 output "ap_ids" {
   value = {
-    wired_dot1x = module.ap_wired_dot1x.id
-    wired_mab   = module.ap_wired_mab.id
-    vpn         = module.ap_vpn.id
+    wired_dot1x    = module.ap_wired_dot1x.id
+    wired_mab      = module.ap_wired_mab.id
+    vpn            = module.ap_vpn.id
+    wireless_dot1x = module.ap_wireless_dot1x.id
+    wireless_mab   = module.ap_wireless_mab.id
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
 
 output "cnd_names" {
   value = {
-    wired_dot1x          = module.cnd_wired_dot1x.name
-    wired_mab            = module.cnd_wired_mab.name
-    wired_dot1x_framed   = module.cnd_wired_dot1x_framed.name
-    wired_mab_call_check = module.cnd_wired_mab_call_check.name
-    vpn                  = module.cnd_vpn.name
+    wired_dot1x             = module.cnd_wired_dot1x.name
+    wired_mab               = module.cnd_wired_mab.name
+    wired_dot1x_framed      = module.cnd_wired_dot1x_framed.name
+    wired_mab_call_check    = module.cnd_wired_mab_call_check.name
+    vpn                     = module.cnd_vpn.name
+    wireless_dot1x_framed   = module.cnd_wireless_dot1x_framed.name
+    wireless_mab_call_check = module.cnd_wireless_mab_call_check.name
   }
   description = "Library condition names stored on lab ISE."
 }
 
 output "cnd_ids" {
   value = {
-    wired_dot1x          = module.cnd_wired_dot1x.id
-    wired_mab            = module.cnd_wired_mab.id
-    wired_dot1x_framed   = module.cnd_wired_dot1x_framed.id
-    wired_mab_call_check = module.cnd_wired_mab_call_check.id
-    vpn                  = module.cnd_vpn.id
+    wired_dot1x             = module.cnd_wired_dot1x.id
+    wired_mab               = module.cnd_wired_mab.id
+    wired_dot1x_framed      = module.cnd_wired_dot1x_framed.id
+    wired_mab_call_check    = module.cnd_wired_mab_call_check.id
+    vpn                     = module.cnd_vpn.id
+    wireless_dot1x_framed   = module.cnd_wireless_dot1x_framed.id
+    wireless_mab_call_check = module.cnd_wireless_mab_call_check.id
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
@@ -154,6 +162,8 @@ output "ps_names" {
     wired_8021x = module.ps_global_wired_8021x.name
     wired_mab   = module.ps_global_wired_mab.name
     global_vpn  = module.ps_global_vpn.name
+    global-wireless-mab = module.ps_global_wireless_mab.name
+    global-wireless-8021x = module.ps_global_wireless_8021x.name
   }
   description = "Policy set names stored on lab ISE."
 }
@@ -163,6 +173,8 @@ output "ps_ranks" {
     wired_8021x   = module.ps_global_wired_8021x.rank
     wired_mab     = module.ps_global_wired_mab.rank
     global_vpn    = module.ps_global_vpn.rank
+    global-wireless-8021x = module.ps_global_wireless_8021x.rank
+    global-wireless-mab   = module.ps_global_wireless_mab.rank
   }
   description = "Policy set ranks stored on lab ISE. Lower is evaluated first."
 }
@@ -172,6 +184,8 @@ output "ps_ids" {
     wired_8021x   = module.ps_global_wired_8021x.id
     wired_mab     = module.ps_global_wired_mab.id
     global_vpn    = module.ps_global_vpn.id
+    global-wireless-8021x = module.ps_global_wireless_8021x.id
+    global-wireless-mab   = module.ps_global_wireless_mab.id
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
@@ -181,6 +195,8 @@ output "ps_states" {
     wired_8021x   = module.ps_global_wired_8021x.state
     wired_mab     = module.ps_global_wired_mab.state
     global_vpn    = module.ps_global_vpn.state
+    global-wireless-8021x = module.ps_global_wireless_8021x.state
+    global-wireless-mab   = module.ps_global_wireless_mab.state
   }
   description = "Policy set states stored on ISE."
 }
@@ -190,6 +206,8 @@ output "an_names" {
     wired_dot1x = module.an_wired_dot1x.name
     wired_mab   = module.an_wired_mab.name
     vpn         = module.an_vpn.name
+    wireless_dot1x = module.an_wireless_dot1x.name
+    wireless_mab   = module.an_wireless_mab.name
   }
   description = "Authentication rule names stored on lab ISE."
 }
@@ -199,6 +217,8 @@ output "an_states" {
     wired_dot1x = module.an_wired_dot1x.state
     wired_mab   = module.an_wired_mab.state
     vpn         = module.an_vpn.state
+    wireless_dot1x = module.an_wireless_dot1x.state
+    wireless_mab   = module.an_wireless_mab.state
   }
   description = "Authentication rule states stored on ISE."
 }
@@ -208,6 +228,8 @@ output "an_ids" {
     wired_dot1x = module.an_wired_dot1x.id
     wired_mab   = module.an_wired_mab.id
     vpn         = module.an_vpn.id
+    wireless_dot1x = module.an_wireless_dot1x.id
+    wireless_mab   = module.an_wireless_mab.id
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
@@ -217,6 +239,8 @@ output "az_names" {
     wired_dot1x = module.az_wired_dot1x.name
     wired_mab   = module.az_wired_mab.name
     vpn         = module.az_vpn.name
+    wireless_dot1x = module.az_wireless_dot1x.name
+    wireless_mab   = module.az_wireless_mab.name
   }
   description = "Authorization rule names stored on lab ISE."
 }
@@ -226,6 +250,8 @@ output "az_states" {
     wired_dot1x = module.az_wired_dot1x.state
     wired_mab   = module.az_wired_mab.state
     vpn         = module.az_vpn.state
+    wireless_dot1x = module.az_wireless_dot1x.state
+    wireless_mab   = module.az_wireless_mab.state
   }
   description = "Authorization rule states stored on ISE."
 }
@@ -235,6 +261,8 @@ output "az_ids" {
     wired_dot1x = module.az_wired_dot1x.id
     wired_mab   = module.az_wired_mab.id
     vpn         = module.az_vpn.id
+    wireless_dot1x = module.az_wireless_dot1x.id
+    wireless_mab   = module.az_wireless_mab.id
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }

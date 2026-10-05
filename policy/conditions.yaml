@@ -73,3 +73,39 @@ conditions:
     attribute_name: NAS-Port-Type
     operator: equals
     attribute_value: Virtual
+
+  - name: CND-wireless-dot1x-framed
+    state: enabled
+    description: Policy set condition. Wireless 802.1X. IEEE 802.11 and Service-Type Framed.
+    owner: lab
+    type: LibraryConditionAndBlock
+    is_negate: false
+    children:
+      - type: ConditionAttributes
+        dictionary_name: Radius
+        attribute_name: NAS-Port-Type
+        operator: equals
+        attribute_value: Wireless - IEEE 802.11
+      - type: ConditionAttributes
+        dictionary_name: Radius
+        attribute_name: Service-Type
+        operator: equals
+        attribute_value: Framed
+
+  - name: CND-wireless-mab-call-check
+    state: enabled
+    description: Policy set condition. Wireless MAB. IEEE 802.11 and Service-Type Call Check.
+    owner: lab
+    type: LibraryConditionAndBlock
+    is_negate: false
+    children:
+      - type: ConditionAttributes
+        dictionary_name: Radius
+        attribute_name: NAS-Port-Type
+        operator: equals
+        attribute_value: Wireless - IEEE 802.11
+      - type: ConditionAttributes
+        dictionary_name: Radius
+        attribute_name: Service-Type
+        operator: equals
+        attribute_value: Call Check
