@@ -46,17 +46,19 @@ Exit met 2026-10-01: each family has a YAML row, a thin module, a lab call, and 
 
 ## Phase 5 — Policy sets and ranks
 
-Wired, VPN, wireless, and infra families closed 2026-10-05 on lab ISE. Sets stay disabled. Enable was not part of the close.
+Wired, VPN, wireless, infra, and the first business-unit pair closed 2026-10-05 on lab ISE. Sets stay disabled. Enable was not part of the close.
 
 - Global sets are infra, wireless 802.1X, wireless MAB, VPN, wired 802.1X, wired MAB
-- YAML ranks stay 1, 20, 30, 10, 40, and 50. ISE insert ranks are 0 through 5
-- Infra is `PS-infra-health-checks`. Service `AP-infra-health` is PAP only. Condition is `DEVICE` Device Type `All Device Types#load-balancer` plus RADIUS user `svc-ise-f5-health`
-- `AN-infra-f5-health` searches `Internal Users`. `AZ-infra-f5-health` returns `PR-infra-permit`
-- The probe user is not created. The load-balancer NAD is not placed. Enable waits on both
+- Business-unit sets are `PS-hr-wired` and `PS-guest-wired`
+- YAML ranks stay the old bands. ISE insert ranks are 0 through 7 for managed sets
+- Wired global conditions require `DEVICE` `BusinessUnit` `BusinessUnit#global`. Guest and HR require `BusinessUnit#guest` and `BusinessUnit#hr`
+- `AN-hr-wired` and `AN-guest-wired` search `Internal Endpoints` and continue if the MAC is unknown
+- `AZ-hr-wired` returns `PR-hr-wired-mab` (VLAN 30) when `EIG-hr` matches. Guest returns VLAN 40
+- Old GUI sets were not imported. They still occupy slots between managed sets
 - Rank and band decision is in `docs/decisions.md`. YAML conversion is a later phase
 - Blog not written. It waits until the rest of Phase 5 is closed
 
-`PS-<bu>-*` still waits. The YAML-reading root waits until those families are known.
+`it`, wireless business-unit sets, and the YAML-reading root still wait.
 
 ## Phase 6 — Exceptions
 

@@ -9,3 +9,15 @@ vlans:
     bu: lab
     description: Lab user data VLAN.
     owner: lab
+
+  - name: VLAN-hr-data
+    vlan_id: 30
+    bu: hr
+    description: HR user data VLAN.
+    owner: lab
+
+  - name: VLAN-guest-data
+    vlan_id: 40
+    bu: guest
+    description: Guest user data VLAN.
+    owner: lab

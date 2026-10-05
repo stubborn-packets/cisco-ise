@@ -51,6 +51,7 @@ roots:
       - hr
       - guest
       - it
+      - global
 
   - name: Stage
     ise_root: Stage

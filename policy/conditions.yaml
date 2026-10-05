@@ -2,7 +2,16 @@
 # Plane: desired state. Terraform may create these from Phase 4.
 # Reusable library conditions. Names use CND-.
 # Prefer library conditions over one-off rule conditions.
-# First write: two attribute conditions. No AND/OR children.
+# Attribute conditions: CND-wired-dot1x, CND-wired-mab, CND-vpn.
+# CND-vpn is Radius NAS-Port-Type Virtual. That is the VPN request signal.
+# Wireless policy-set conditions use NAS-Port-Type Wireless - IEEE 802.11
+# plus Service-Type. The label has spaces and hyphens. ISE 3.3 shows it
+# that way in Condition Studio.
+# CND-infra-f5-health is the F5 probe: NAD device type plus RADIUS User-Name.
+# The user is not an ISE object in this repo. Enable is not this write.
+# CND-wired-mab uses Network Access AuthenticationMethod. That attribute
+# is illegal on a policy set. Policy-set conditions are the AND rows below.
+# Children are Radius attributes from the request, not an auth result.
 
 conditions:
   - name: CND-wired-dot1x
@@ -26,7 +35,18 @@ conditions:
     attribute_name: AuthenticationMethod
     operator: equals
     attribute_value: Lookup
-  
+
+  - name: CND-vpn
+    state: enabled
+    description: VPN via NAS-Port-Type Virtual.
+    owner: lab
+    type: LibraryConditionAttributes
+    is_negate: false
+    dictionary_name: Radius
+    attribute_name: NAS-Port-Type
+    operator: equals
+    attribute_value: Virtual
+
   - name: CND-wired-dot1x-framed
     state: enabled
     description: Policy set condition. Wired 802.1X. Ethernet and Service-Type Framed.
@@ -44,6 +64,11 @@ conditions:
         attribute_name: Service-Type
         operator: equals
         attribute_value: Framed
+      - type: ConditionAttributes
+        dictionary_name: DEVICE
+        attribute_name: BusinessUnit
+        operator: equals
+        attribute_value: global
 
   - name: CND-wired-mab-call-check
     state: enabled
@@ -62,17 +87,11 @@ conditions:
         attribute_name: Service-Type
         operator: equals
         attribute_value: Call Check
-
-  - name: CND-vpn
-    state: enabled
-    description: VPN via NAS-Port-Type Virtual.
-    owner: lab
-    type: LibraryConditionAttributes
-    is_negate: false
-    dictionary_name: Radius
-    attribute_name: NAS-Port-Type
-    operator: equals
-    attribute_value: Virtual
+      - type: ConditionAttributes
+        dictionary_name: DEVICE
+        attribute_name: BusinessUnit
+        operator: equals
+        attribute_value: global
 
   - name: CND-wireless-dot1x-framed
     state: enabled
@@ -91,6 +110,11 @@ conditions:
         attribute_name: Service-Type
         operator: equals
         attribute_value: Framed
+      - type: ConditionAttributes
+        dictionary_name: DEVICE
+        attribute_name: BusinessUnit
+        operator: equals
+        attribute_value: global
 
   - name: CND-wireless-mab-call-check
     state: enabled
@@ -109,6 +133,11 @@ conditions:
         attribute_name: Service-Type
         operator: equals
         attribute_value: Call Check
+      - type: ConditionAttributes
+        dictionary_name: DEVICE
+        attribute_name: BusinessUnit
+        operator: equals
+        attribute_value: global
 
   - name: CND-infra-f5-health
     state: enabled
@@ -118,7 +147,7 @@ conditions:
     is_negate: false
     children:
       - type: ConditionAttributes
-        dictionary_name: Network Access
+        dictionary_name: DEVICE
         attribute_name: Device Type
         operator: equals
         attribute_value: All Device Types#load-balancer
@@ -127,3 +156,69 @@ conditions:
         attribute_name: User-Name
         operator: equals
         attribute_value: svc-ise-f5-health
+
+  - name: CND-hr-wired-mab-call-check
+    state: enabled
+    description: HR Policy set condition. Wired MAB. Ethernet and Service-Type Call Check.
+    owner: lab
+    type: LibraryConditionAndBlock
+    is_negate: false
+    children:
+      - type: ConditionAttributes
+        dictionary_name: Radius
+        attribute_name: NAS-Port-Type
+        operator: equals
+        attribute_value: Ethernet
+      - type: ConditionAttributes
+        dictionary_name: Radius
+        attribute_name: Service-Type
+        operator: equals
+        attribute_value: Call Check
+      - type: ConditionAttributes
+        dictionary_name: DEVICE
+        attribute_name: BusinessUnit
+        operator: equals
+        attribute_value: hr
+
+  - name: CND-guest-wired-mab-call-check
+    state: enabled
+    description: Guest Policy set condition. Wired MAB. Ethernet and Service-Type Call Check.
+    owner: lab
+    type: LibraryConditionAndBlock
+    is_negate: false
+    children:
+      - type: ConditionAttributes
+        dictionary_name: Radius
+        attribute_name: NAS-Port-Type
+        operator: equals
+        attribute_value: Ethernet
+      - type: ConditionAttributes
+        dictionary_name: Radius
+        attribute_name: Service-Type
+        operator: equals
+        attribute_value: Call Check
+      - type: ConditionAttributes
+        dictionary_name: DEVICE
+        attribute_name: BusinessUnit
+        operator: equals
+        attribute_value: guest
+
+  - name: CND-hr-eig
+    state: enabled
+    description: Authorization condition. Endpoint is in EIG-hr.
+    owner: lab
+    type: ConditionAttributes
+    dictionary_name: IdentityGroup
+    attribute_name: Name
+    operator: equals
+    attribute_value: Endpoint Identity Groups:EIG-hr
+
+  - name: CND-guest-eig
+    state: enabled
+    description: Authorization condition. Endpoint is in EIG-guest.
+    owner: lab
+    type: ConditionAttributes
+    dictionary_name: IdentityGroup
+    attribute_name: Name
+    operator: equals
+    attribute_value: Endpoint Identity Groups:EIG-guest

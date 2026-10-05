@@ -39,6 +39,62 @@
 # Internal Users. MAB searches Internal Endpoints.
 
 policy_sets:
+  - name: PS-hr-wired
+    rank: 80
+    state: disabled
+    service: AP-wired-mab
+    condition: CND-hr-wired-mab-call-check
+    description: HR wired MAB. Evaluated as a business-unit set.
+    owner: lab
+    bu: hr
+    authentication_rules:
+      - name: AN-hr-wired
+        rank: 0
+        state: enabled
+        condition: CND-hr-wired-mab-call-check
+        identity_source: Internal Endpoints
+        if_auth_fail: REJECT
+        if_process_fail: DROP
+        if_user_not_found: CONTINUE
+        description: HR wired MAB. Unknown MAC continues to the EIG check.
+        owner: lab
+    authorization_rules:
+      - name: AZ-hr-wired
+        rank: 0
+        state: enabled
+        condition: CND-hr-eig
+        profile: PR-hr-wired-mab
+        description: HR wired MAB result. VLAN 30. No SGT.
+        owner: lab
+
+  - name: PS-guest-wired
+    rank: 81
+    state: disabled
+    service: AP-wired-mab
+    condition: CND-guest-wired-mab-call-check
+    description: Guest wired MAB. Evaluated as a business-unit set.
+    owner: lab
+    bu: guest
+    authentication_rules:
+      - name: AN-guest-wired
+        rank: 0
+        state: enabled
+        condition: CND-guest-wired-mab-call-check
+        identity_source: Internal Endpoints
+        if_auth_fail: REJECT
+        if_process_fail: DROP
+        if_user_not_found: CONTINUE
+        description: Guest wired MAB. Unknown MAC continues to the EIG check.
+        owner: lab
+    authorization_rules:
+      - name: AZ-guest-wired
+        rank: 0
+        state: enabled
+        condition: CND-guest-eig
+        profile: PR-guest-wired-mab
+        description: Guest wired MAB result. VLAN 40. No SGT.
+        owner: lab
+
   - name: PS-infra-health-checks
     rank: 1
     state: disabled
@@ -65,34 +121,6 @@ policy_sets:
         condition: CND-infra-f5-health
         profile: PR-infra-permit
         description: F5 probe result. Access accept only. No VLAN.
-        owner: lab
-
-  - name: PS-global-vpn
-    rank: 10
-    state: disabled
-    service: AP-vpn
-    condition: CND-vpn
-    description: Global VPN. Evaluated before wired.
-    owner: lab
-    bu: lab
-    authentication_rules:
-      - name: AN-vpn
-        rank: 0
-        state: enabled
-        condition: CND-vpn
-        identity_source: Internal Users
-        if_auth_fail: REJECT
-        if_process_fail: DROP
-        if_user_not_found: REJECT
-        description: VPN against Internal Users.
-        owner: lab
-    authorization_rules:
-      - name: AZ-vpn
-        rank: 0
-        state: enabled
-        condition: CND-vpn
-        profile: PR-global-vpn
-        description: VPN result. Class ou=GP-global-vpn. No VLAN. No SGT.
         owner: lab
 
   - name: PS-global-wireless-8021x
@@ -150,12 +178,40 @@ policy_sets:
         profile: PR-wired-lab-access
         description: Wireless MAB result. VLAN 20 and ACL-permit-all. No SGT.
         owner: lab
-   
+
+  - name: PS-global-vpn
+    rank: 10
+    state: disabled
+    service: AP-vpn
+    condition: CND-vpn
+    description: Global VPN. Evaluated before wired.
+    owner: lab
+    bu: lab
+    authentication_rules:
+      - name: AN-vpn
+        rank: 0
+        state: enabled
+        condition: CND-vpn
+        identity_source: Internal Users
+        if_auth_fail: REJECT
+        if_process_fail: DROP
+        if_user_not_found: REJECT
+        description: VPN against Internal Users.
+        owner: lab
+    authorization_rules:
+      - name: AZ-vpn
+        rank: 0
+        state: enabled
+        condition: CND-vpn
+        profile: PR-global-vpn
+        description: VPN result. Class ou=GP-global-vpn. No VLAN. No SGT.
+        owner: lab
+
   - name: PS-global-wired-8021x
     rank: 40
     state: disabled
     service: AP-wired-dot1x
-    condition: CND-wired-dot1x
+    condition: CND-wired-dot1x-framed
     description: Global wired 802.1X. Evaluated before wired MAB.
     owner: lab
     bu: lab
@@ -183,7 +239,7 @@ policy_sets:
     rank: 50
     state: disabled
     service: AP-wired-mab
-    condition: CND-wired-mab
+    condition: CND-wired-mab-call-check
     description: Global wired MAB. Evaluated after wired 802.1X.
     owner: lab
     bu: lab

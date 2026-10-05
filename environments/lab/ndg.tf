@@ -70,6 +70,36 @@ module "ndg_business_unit_lab" {
   depends_on = [module.ndg_business_unit]
 }
 
+module "ndg_business_unit_global" {
+  source = "../../terraform/modules/ndg"
+
+  name        = "BusinessUnit#BusinessUnit#global"
+  root_group  = "BusinessUnit"
+  description = "Global business-unit leaf."
+
+  depends_on = [module.ndg_business_unit]
+}
+
+module "ndg_business_unit_hr" {
+  source = "../../terraform/modules/ndg"
+
+  name        = "BusinessUnit#BusinessUnit#hr"
+  root_group  = "BusinessUnit"
+  description = "HR business-unit leaf."
+
+  depends_on = [module.ndg_business_unit]
+}
+
+module "ndg_business_unit_guest" {
+  source = "../../terraform/modules/ndg"
+
+  name        = "BusinessUnit#BusinessUnit#guest"
+  root_group  = "BusinessUnit"
+  description = "Guest business-unit leaf."
+
+  depends_on = [module.ndg_business_unit]
+}
+
 ## Stage sub-leaves
 module "ndg_stage_monitor" {
   source = "../../terraform/modules/ndg"

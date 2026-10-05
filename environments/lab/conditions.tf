@@ -46,6 +46,13 @@ module "cnd_wired_dot1x_framed" {
       operator        = "equals"
       attribute_value = "Framed"
     },
+    {
+      condition_type  = "ConditionAttributes"
+      dictionary_name = "DEVICE"
+      attribute_name  = "BusinessUnit"
+      operator        = "equals"
+      attribute_value = "BusinessUnit#global"
+    },
   ]
 }
 
@@ -70,6 +77,13 @@ module "cnd_wired_mab_call_check" {
       attribute_name  = "Service-Type"
       operator        = "equals"
       attribute_value = "Call Check"
+    },
+    {
+      condition_type = "ConditionAttributes"
+      dictionary_name = "DEVICE"
+      attribute_name  = "BusinessUnit"
+      operator        = "equals"
+      attribute_value = "BusinessUnit#global"
     },
   ]
 }
@@ -160,4 +174,90 @@ module "cnd_infra_f5_health" {
   ]
 
   depends_on = [module.ndg_device_type_load_balancer]
+}
+
+module "cnd_hr_wired_mab_call_check" {
+  source = "../../terraform/modules/condition"
+
+  name           = "CND-hr-wired-mab-call-check"
+  description    = "HR Policy set condition. Wired MAB. Ethernet and Service-Type Call Check."
+  condition_type = "LibraryConditionAndBlock"
+
+  children = [
+    {
+      condition_type  = "ConditionAttributes"
+      dictionary_name = "Radius"
+      attribute_name  = "NAS-Port-Type"
+      operator        = "equals"
+      attribute_value = "Ethernet"
+    },
+    {
+      condition_type  = "ConditionAttributes"
+      dictionary_name = "Radius"
+      attribute_name  = "Service-Type"
+      operator        = "equals"
+      attribute_value = "Call Check"
+    },
+    {
+      condition_type = "ConditionAttributes"
+      dictionary_name = "DEVICE"
+      attribute_name  = "BusinessUnit"
+      operator        = "equals"
+      attribute_value = "BusinessUnit#hr"
+    },
+  ]
+}
+  
+module "cnd_guest_wired_mab_call_check" {
+  source = "../../terraform/modules/condition"
+
+  name           = "CND-guest-wired-mab-call-check"
+  description    = "Guest Policy set condition. Wired MAB. Ethernet and Service-Type Call Check."
+  condition_type = "LibraryConditionAndBlock"
+
+  children = [
+    {
+      condition_type  = "ConditionAttributes"
+      dictionary_name = "Radius"
+      attribute_name  = "NAS-Port-Type"
+      operator        = "equals"
+      attribute_value = "Ethernet"
+    },
+    {
+      condition_type  = "ConditionAttributes"
+      dictionary_name = "Radius"
+      attribute_name  = "Service-Type"
+      operator        = "equals"
+      attribute_value = "Call Check"
+    },
+    {
+      condition_type = "ConditionAttributes"
+      dictionary_name = "DEVICE"
+      attribute_name  = "BusinessUnit"
+      operator        = "equals"
+      attribute_value = "BusinessUnit#guest"
+    },
+  ]
+}
+
+module "cnd_hr_eig" {
+  source = "../../terraform/modules/condition"
+
+  name            = "CND-hr-eig"
+  description     = "Authorization condition. Endpoint is in EIG-hr."
+  dictionary_name = "IdentityGroup"
+  attribute_name  = "Name"
+  operator        = "equals"
+  attribute_value = "Endpoint Identity Groups:EIG-hr"
+}
+
+module "cnd_guest_eig" {
+  source = "../../terraform/modules/condition"
+
+  name            = "CND-guest-eig"
+  description     = "Authorization condition. Endpoint is in EIG-guest."
+  dictionary_name = "IdentityGroup"
+  attribute_name  = "Name"
+  operator        = "equals"
+  attribute_value = "Endpoint Identity Groups:EIG-guest"
 }

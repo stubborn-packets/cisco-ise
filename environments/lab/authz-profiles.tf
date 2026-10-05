@@ -36,3 +36,23 @@ module "pr_infra_permit" {
   description = "Infra health check. Access accept only. No VLAN, DACL, or SGT."
   access_type = "ACCESS_ACCEPT"
 }
+
+module "pr_guest_wired_mab" {
+  source = "../../terraform/modules/authorization-profile"
+
+  name         = "PR-guest-wired-mab"
+  description  = "Guest wired MAB access. VLAN from inventory/vlans.yaml."
+  access_type  = "ACCESS_ACCEPT"
+  vlan_name_id = "40"
+  vlan_tag_id  = 1
+}
+
+module "pr_hr_wired_mab" {
+  source = "../../terraform/modules/authorization-profile"
+
+  name         = "PR-hr-wired-mab"
+  description  = "HR wired MAB access. VLAN from inventory/vlans.yaml."
+  access_type  = "ACCESS_ACCEPT"
+  vlan_name_id = "30"
+  vlan_tag_id  = 1
+}

@@ -107,3 +107,37 @@ module "an_infra_f5_health" {
 
   depends_on = [module.ps_infra_health_checks, module.cnd_infra_f5_health]
 }
+
+module "an_hr_wired" {
+  source = "../../terraform/modules/authentication-rule"
+
+  name                 = "AN-hr-wired"
+  policy_set_id        = module.ps_hr_wired.id
+  rank                 = 0
+  state                = "enabled"
+  condition_id         = module.cnd_hr_wired_mab_call_check.id
+  condition_is_negate  = false
+  identity_source_name = "Internal Endpoints"
+  if_auth_fail         = "REJECT"
+  if_process_fail      = "DROP"
+  if_user_not_found    = "CONTINUE"
+
+  depends_on = [module.ps_hr_wired, module.cnd_hr_wired_mab_call_check]
+}
+
+module "an_guest_wired" {
+  source = "../../terraform/modules/authentication-rule"
+
+  name                 = "AN-guest-wired"
+  policy_set_id        = module.ps_guest_wired.id
+  rank                 = 0
+  state                = "enabled"
+  condition_id         = module.cnd_guest_wired_mab_call_check.id
+  condition_is_negate  = false
+  identity_source_name = "Internal Endpoints"
+  if_auth_fail         = "REJECT"
+  if_process_fail      = "DROP"
+  if_user_not_found    = "CONTINUE"
+
+  depends_on = [module.ps_guest_wired, module.cnd_guest_wired_mab_call_check]
+}

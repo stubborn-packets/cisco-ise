@@ -89,3 +89,31 @@ module "az_infra_f5_health" {
 
   depends_on = [module.ps_infra_health_checks, module.cnd_infra_f5_health, module.pr_infra_permit]
 }
+
+module "az_hr_wired" {
+  source = "../../terraform/modules/authorization-rule"
+
+  name                = "AZ-hr-wired"
+  policy_set_id       = module.ps_hr_wired.id
+  rank                = 0
+  state               = "enabled"
+  condition_id        = module.cnd_hr_eig.id
+  condition_is_negate = false
+  profiles            = ["PR-hr-wired-mab"]
+
+  depends_on = [module.ps_hr_wired, module.cnd_hr_eig, module.pr_hr_wired_mab]
+}
+
+module "az_guest_wired" {
+  source = "../../terraform/modules/authorization-rule"
+
+  name                = "AZ-guest-wired"
+  policy_set_id       = module.ps_guest_wired.id
+  rank                = 0
+  state               = "enabled"
+  condition_id        = module.cnd_guest_eig.id
+  condition_is_negate = false
+  profiles            = ["PR-guest-wired-mab"]
+
+  depends_on = [module.ps_guest_wired, module.cnd_guest_eig, module.pr_guest_wired_mab]
+}

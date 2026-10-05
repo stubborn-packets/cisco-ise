@@ -15,3 +15,17 @@ module "eig_lab_iot" {
   name        = "EIG-lab-iot"
   description = "Statically classified lab IoT devices."
 }
+
+module "eig_guest" {
+  source = "../../terraform/modules/eig"
+
+  name        = "EIG-guest"
+  description = "Statically classified guest devices."
+}
+
+module "eig_hr" {
+  source = "../../terraform/modules/eig"
+
+  name        = "EIG-hr"
+  description = "Statically classified HR devices."
+}

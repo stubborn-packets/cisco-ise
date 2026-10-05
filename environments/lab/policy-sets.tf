@@ -8,12 +8,42 @@
 # condition_id is the AND condition UUID. It stays in state, not in policy/.
 # No VPN, wireless, infra, or PS-<bu>-*. Rules are a later resource.
 
+module "ps_hr_wired" {
+  source = "../../terraform/modules/policy-set"
+
+  name                = "PS-hr-wired"
+  description         = "HR wired MAB. Evaluated as a business-unit set."
+  rank                = 0
+  state               = "disabled"
+  service_name        = module.ap_wired_mab.name
+  is_proxy            = false
+  condition_id        = module.cnd_hr_wired_mab_call_check.id
+  condition_is_negate = false
+
+  depends_on = [module.ap_wired_mab, module.cnd_hr_wired_mab_call_check]
+}
+
+module "ps_guest_wired" {
+  source = "../../terraform/modules/policy-set"
+
+  name                = "PS-guest-wired"
+  description         = "Guest wired MAB. Evaluated as a business-unit set."
+  rank                = 1
+  state               = "disabled"
+  service_name        = module.ap_wired_mab.name
+  is_proxy            = false
+  condition_id        = module.cnd_guest_wired_mab_call_check.id
+  condition_is_negate = false
+
+  depends_on = [module.ap_wired_mab, module.cnd_guest_wired_mab_call_check, module.ps_hr_wired]
+}
+
 module "ps_infra_health_checks" {
   source = "../../terraform/modules/policy-set"
 
   name                = "PS-infra-health-checks"
   description         = "F5 Infra health checks"
-  rank                = 0
+  rank                = 2
   state               = "disabled"
   service_name        = module.ap_infra_health.name
   is_proxy            = false
@@ -28,7 +58,7 @@ module "ps_global_wireless_8021x" {
 
   name                = "PS-global-wireless-8021x"
   description         = "Global wireless 802.1X. Evaluated before wireless MAB."
-  rank                = 1
+  rank                = 3
   state               = "disabled"
   service_name        = module.ap_wireless_dot1x.name
   is_proxy            = false
@@ -43,7 +73,7 @@ module "ps_global_wireless_mab" {
 
   name                = "PS-global-wireless-mab"
   description         = "Global wireless MAB. Evaluated after wireless 802.1X."
-  rank                = 2
+  rank                = 4
   state               = "disabled"
   service_name        = module.ap_wireless_mab.name
   is_proxy            = false
@@ -58,7 +88,7 @@ module "ps_global_vpn" {
 
   name                = "PS-global-vpn"
   description         = "Global VPN. Evaluated before wired."
-  rank                = 3
+  rank                = 5
   state               = "disabled"
   service_name        = module.ap_vpn.name
   is_proxy            = false
@@ -73,7 +103,7 @@ module "ps_global_wired_8021x" {
 
   name                = "PS-global-wired-8021x"
   description         = "Global wired 802.1X. Evaluated before wired MAB."
-  rank                = 4
+  rank                = 6
   state               = "disabled"
   service_name        = module.ap_wired_dot1x.name
   is_proxy            = false
@@ -88,7 +118,7 @@ module "ps_global_wired_mab" {
 
   name                = "PS-global-wired-mab"
   description         = "Global wired MAB. Evaluated after wired 802.1X."
-  rank                = 5
+  rank                = 7
   state               = "disabled"
   service_name        = module.ap_wired_mab.name
   is_proxy            = false

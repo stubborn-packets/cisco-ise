@@ -28,6 +28,9 @@ output "ndg_names" {
     stage_monitor      = module.ndg_stage_monitor.name
     function_lab       = module.ndg_function_lab.name
     device_type_load_balancer = module.ndg_device_type_load_balancer.name
+    business_unit_global = module.ndg_business_unit_global.name
+    business_unit_hr     = module.ndg_business_unit_hr.name
+    business_unit_guest  = module.ndg_business_unit_guest.name
   }
   description = "NDG names stored on lab ISE."
 }
@@ -43,6 +46,9 @@ output "ndg_ids" {
     stage_monitor      = module.ndg_stage_monitor.id
     function_lab       = module.ndg_function_lab.id
     device_type_load_balancer = module.ndg_device_type_load_balancer.id
+    business_unit_global = module.ndg_business_unit_global.id
+    business_unit_hr     = module.ndg_business_unit_hr.id
+    business_unit_guest  = module.ndg_business_unit_guest.id
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
@@ -81,6 +87,10 @@ output "cnd_names" {
     wireless_dot1x_framed   = module.cnd_wireless_dot1x_framed.name
     wireless_mab_call_check = module.cnd_wireless_mab_call_check.name
     infra_f5_health          = module.cnd_infra_f5_health.name
+    hr_wired_mab_call_check = module.cnd_hr_wired_mab_call_check.name
+    guest_wired_mab_call_check = module.cnd_guest_wired_mab_call_check.name
+    hr_eig              = module.cnd_hr_eig.name
+    guest_eig           = module.cnd_guest_eig.name
   }
   description = "Library condition names stored on lab ISE."
 }
@@ -95,6 +105,10 @@ output "cnd_ids" {
     wireless_dot1x_framed   = module.cnd_wireless_dot1x_framed.id
     wireless_mab_call_check = module.cnd_wireless_mab_call_check.id
     infra_f5_health          = module.cnd_infra_f5_health.id
+    hr_wired_mab_call_check = module.cnd_hr_wired_mab_call_check.id
+    guest_wired_mab_call_check = module.cnd_guest_wired_mab_call_check.id
+    hr_eig              = module.cnd_hr_eig.id
+    guest_eig           = module.cnd_guest_eig.id
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
@@ -118,6 +132,8 @@ output "pr_names" {
     wired_lab_access = module.pr_wired_lab_access.name
     global_vpn       = module.pr_global_vpn.name
     infra_permit = module.pr_infra_permit.name
+    guest_wired_mab = module.pr_guest_wired_mab.name
+    hr_wired_mab    = module.pr_hr_wired_mab.name
   }
   description = "Authorization profile names stored on lab ISE."
 }
@@ -127,6 +143,8 @@ output "pr_ids" {
     wired_lab_access = module.pr_wired_lab_access.id
     global_vpn       = module.pr_global_vpn.id
     infra_permit = module.pr_infra_permit.id
+    guest_wired_mab = module.pr_guest_wired_mab.id
+    hr_wired_mab    = module.pr_hr_wired_mab.id
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
@@ -153,6 +171,8 @@ output "eig_names" {
   value = {
     printers = module.eig_printers.name
     lab_iot  = module.eig_lab_iot.name
+    guest    = module.eig_guest.name
+    hr       = module.eig_hr.name
   }
   description = "Endpoint identity group names stored on lab ISE."
 }
@@ -161,6 +181,8 @@ output "eig_ids" {
   value = {
     printers = module.eig_printers.id
     lab_iot  = module.eig_lab_iot.id
+    guest    = module.eig_guest.id
+    hr       = module.eig_hr.id
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
@@ -173,6 +195,8 @@ output "ps_names" {
     global-wireless-mab = module.ps_global_wireless_mab.name
     global-wireless-8021x = module.ps_global_wireless_8021x.name
     infra_health_checks = module.ps_infra_health_checks.name
+    hr_wired = module.ps_hr_wired.name
+    guest_wired = module.ps_guest_wired.name
   }
   description = "Policy set names stored on lab ISE."
 }
@@ -185,6 +209,8 @@ output "ps_ranks" {
     global-wireless-8021x = module.ps_global_wireless_8021x.rank
     global-wireless-mab   = module.ps_global_wireless_mab.rank
     infra_health_checks = module.ps_infra_health_checks.rank
+    hr_wired = module.ps_hr_wired.rank
+    guest_wired = module.ps_guest_wired.rank
   }
   description = "Policy set ranks stored on lab ISE. Lower is evaluated first."
 }
@@ -197,6 +223,8 @@ output "ps_ids" {
     global-wireless-8021x = module.ps_global_wireless_8021x.id
     global-wireless-mab   = module.ps_global_wireless_mab.id
     infra_health_checks = module.ps_infra_health_checks.id
+    hr_wired = module.ps_hr_wired.id
+    guest_wired = module.ps_guest_wired.id
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
@@ -209,6 +237,8 @@ output "ps_states" {
     global-wireless-8021x = module.ps_global_wireless_8021x.state
     global-wireless-mab   = module.ps_global_wireless_mab.state
     infra_health_checks = module.ps_infra_health_checks.state
+    hr_wired = module.ps_hr_wired.state
+    guest_wired = module.ps_guest_wired.state
   }
   description = "Policy set states stored on ISE."
 }
@@ -221,6 +251,8 @@ output "an_names" {
     wireless_dot1x = module.an_wireless_dot1x.name
     wireless_mab   = module.an_wireless_mab.name
     infra_f5_health = module.an_infra_f5_health.name
+    hr_wired = module.an_hr_wired.name
+    guest_wired = module.an_guest_wired.name
   }
   description = "Authentication rule names stored on lab ISE."
 }
@@ -233,6 +265,8 @@ output "an_states" {
     wireless_dot1x = module.an_wireless_dot1x.state
     wireless_mab   = module.an_wireless_mab.state
     infra_f5_health = module.an_infra_f5_health.state
+    hr_wired = module.an_hr_wired.state
+    guest_wired = module.an_guest_wired.state
   }
   description = "Authentication rule states stored on ISE."
 }
@@ -245,6 +279,8 @@ output "an_ids" {
     wireless_dot1x = module.an_wireless_dot1x.id
     wireless_mab   = module.an_wireless_mab.id
     infra_f5_health = module.an_infra_f5_health.id
+    hr_wired = module.an_hr_wired.id
+    guest_wired = module.an_guest_wired.id 
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
@@ -257,6 +293,8 @@ output "az_names" {
     wireless_dot1x = module.az_wireless_dot1x.name
     wireless_mab   = module.az_wireless_mab.name
     infra_f5_health = module.az_infra_f5_health.name
+    hr_wired = module.az_hr_wired.name
+    guest_wired = module.az_guest_wired.name
   }
   description = "Authorization rule names stored on lab ISE."
 }
@@ -269,6 +307,8 @@ output "az_states" {
     wireless_dot1x = module.az_wireless_dot1x.state
     wireless_mab   = module.az_wireless_mab.state
     infra_f5_health = module.az_infra_f5_health.state
+    hr_wired = module.az_hr_wired.state
+    guest_wired = module.az_guest_wired.state
   }
   description = "Authorization rule states stored on ISE."
 }
@@ -281,6 +321,8 @@ output "az_ids" {
     wireless_dot1x = module.az_wireless_dot1x.id
     wireless_mab   = module.az_wireless_mab.id
     infra_f5_health = module.az_infra_f5_health.id
+    hr_wired = module.az_hr_wired.id
+    guest_wired = module.az_guest_wired.id 
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }

@@ -33,6 +33,22 @@ authorization_profiles:
     bu: lab
     access_type: ACCESS_ACCEPT
 
+  - name: PR-hr-wired-mab
+    state: enabled
+    description: HR wired MAB access. VLAN from inventory/vlans.yaml.
+    owner: lab
+    bu: hr
+    access_type: ACCESS_ACCEPT
+    vlan: VLAN-hr-data
+
+  - name: PR-guest-wired-mab
+    state: enabled
+    description: Guest wired MAB access. VLAN from inventory/vlans.yaml.
+    owner: lab
+    bu: guest
+    access_type: ACCESS_ACCEPT
+    vlan: VLAN-guest-data
+
 downloadable_acls:
   - name: ACL-permit-all
     state: enabled

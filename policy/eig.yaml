@@ -18,3 +18,17 @@ endpoint_identity_groups:
     bu: lab
     parent: Endpoint Identity Groups
     state: enabled
+  
+  - name: EIG-guest
+    description: Statically classified guest devices.
+    owner: lab
+    bu: guest
+    parent: Endpoint Identity Groups
+    state: enabled
+
+  - name: EIG-hr
+    description: Statically classified HR devices.
+    owner: lab
+    bu: hr
+    parent: Endpoint Identity Groups
+    state: enabled
