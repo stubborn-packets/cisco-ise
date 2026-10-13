@@ -47,14 +47,16 @@ Live order:
 
 `it`, `PS-<bu>-vpn`, and `PS-<bu>-wireless` are not written. Rank 99 Default is not in this table.
 
-## YAML is the source the root will read
+## YAML is the source the root reads
 
 Recorded 2026-10-05. Copied lab calls were the first-write rule so a bad row could not create an object without a reviewed `.tf` diff. That rule is not the end state.
 
+Closed for the policy-set family 2026-10-13.
+
 - One YAML file per family under `policy/`. Names and ranks live there. Ids do not.
-- Thin modules stay. A later root reads the YAML and calls those modules. `condition: CND-vpn` resolves to the condition module output inside the root.
-- Do not build that root in the wireless write. The YAML shape is still moving.
-- Until that root exists, the lab call is still copied. The copy is the drift this decision is meant to end.
+- Thin modules stay. `scripts/read_policy.py` reads `policy/policy-sets.yaml` and emits the lab calls. `condition: CND-vpn` becomes `module.cnd_vpn.id` inside the generated file. The reader does not look up a UUID.
+- `policy-sets.tf`, `authn-rules.tf`, and `authz-rules.tf` are generated. Do not hand-edit them.
+- NDG, allowed protocols, conditions, profiles, SGTs, and EIGs stay hand-copied until their family is added. The copy is the drift this decision is meant to end.
 
 ## NDG roots
 

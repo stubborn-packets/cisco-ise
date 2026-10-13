@@ -62,12 +62,13 @@ Wired, VPN, wireless, infra, and the first business-unit pair closed 2026-10-05 
 
 ## Rank conversion and YAML reader
 
-Started 2026-10-13. This is not exceptions. Sets stay disabled. No new sets. No ISE write in the YAML conversion.
+Closed for the policy-set family 2026-10-13. This is not exceptions. Sets stay disabled. No new sets. No ISE write in the YAML conversion.
 
 - `policy/policy-sets.yaml` `rank` is the packed index. `band` is the label. Live order is the insert order in `docs/decisions.md`.
 - `POLICY_SET_RANK_EXACT` is retired. The linter checks a packed rank and a contiguous band. The family sequence is not enforced.
 - `docs/naming.md` and `docs/decisions.md` no longer call YAML rank the design band.
-- The root that reads `policy/` and calls the thin modules is not written yet. Until it exists, `environments/lab/*.tf` is still the copied source.
+- `scripts/read_policy.py` emits `policy-sets.tf`, `authn-rules.tf`, and `authz-rules.tf`. Addresses stay `module.ps_*`, `module.an_*`, and `module.az_*`. No `for_each`. Ids stay out of `policy/`.
+- NDG, allowed protocols, conditions, profiles, SGTs, and EIGs stay hand-copied. One family at a time. Conditions next.
 - Enable is a cutover, not this increment. Do not manage rank 99 Default. Do not import the old GUI sets.
 
 ## Phase 6 — Exceptions
