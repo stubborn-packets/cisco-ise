@@ -156,15 +156,9 @@ Do not put `terraform output eig_ids` into `policy/` or `inventory/`.
 
 ## Policy sets
 
-YAML rank is the design band. ISE rank is a packed insert index. This lab
-rejected POST rank 40. The shell inserted disabled at 0, then 1.
-`ise_network_access_policy_set_update_rank` is not wired. It is a later
-reorder, used when an existing set must move. It cannot open a gap at 40.
-Do not manage rank 99 Default. Do not manage Default Network Access.
-Rules are separate resources. The parent sets stay disabled, so the rules
-are not evaluated.
+YAML `rank` is the packed ISE index. `band` is a label. This file does not send `band`. This lab rejected POST rank 40. The eight sets were inserted disabled at 0 through 7. YAML rank now matches those indexes. `ise_network_access_policy_set_update_rank` is not wired. It is a later reorder, used when an existing set must move. It cannot open a gap. Do not manage rank 99 Default. Do not manage Default Network Access. Rules are separate resources. The parent sets stay disabled, so the rules are not evaluated. `environments/lab/policy-sets.tf` is still the copied source until the reader exists.
 
-| Terraform address | ISE name | Insert rank | State |
+| Terraform address | ISE name | Rank | State |
 | --- | --- | --- | --- |
 | `module.ps_hr_wired.ise_network_access_policy_set.this` | `PS-hr-wired` | 0 | disabled |
 | `module.ps_guest_wired.ise_network_access_policy_set.this` | `PS-guest-wired` | 1 | disabled |
@@ -198,7 +192,7 @@ Do not put `terraform output ps_ids`, `an_ids`, or `az_ids` into `policy/` or `i
 
 ## Out of scope here
 
-- Enabling the two policy sets (cutover, not this write)
+- Enabling the policy sets (cutover, not this write)
 - `ise_network_access_policy_set_update_rank`
 - NAD resources
 - `netascode/nac-ise`

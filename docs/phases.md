@@ -50,15 +50,25 @@ Wired, VPN, wireless, infra, and the first business-unit pair closed 2026-10-05 
 
 - Global sets are infra, wireless 802.1X, wireless MAB, VPN, wired 802.1X, wired MAB
 - Business-unit sets are `PS-hr-wired` and `PS-guest-wired`
-- YAML ranks stay the old bands. ISE insert ranks are 0 through 7 for managed sets
+- YAML ranks at close were the old bands. ISE insert ranks were 0 through 7 for managed sets
 - Wired global conditions require `DEVICE` `BusinessUnit` `BusinessUnit#global`. Guest and HR require `BusinessUnit#guest` and `BusinessUnit#hr`
 - `AN-hr-wired` and `AN-guest-wired` search `Internal Endpoints` and continue if the MAC is unknown
 - `AZ-hr-wired` returns `PR-hr-wired-mab` (VLAN 30) when `EIG-hr` matches. Guest returns VLAN 40
 - Old GUI sets were not imported. They still occupy slots between managed sets
-- Rank and band decision is in `docs/decisions.md`. YAML conversion is a later phase
-- Blog not written. It waits until the rest of Phase 5 is closed
+- Rank and band decision is in `docs/decisions.md`. YAML conversion is the next increment
+- Blog saved 2026-10-06 at `blog/cisco-ise-policy-as-code-part5/`. Hero `ise-pac-part5-hero.jpg` is not generated in the post.
 
-`it`, wireless business-unit sets, and the YAML-reading root still wait.
+`it`, `PS-<bu>-vpn`, and `PS-<bu>-wireless` are not in this phase. A lab with nothing pointed at it does not gain a new pattern from those sets. Stop here. Do not rewrite the Phase 5 post.
+
+## Rank conversion and YAML reader
+
+Started 2026-10-13. This is not exceptions. Sets stay disabled. No new sets. No ISE write in the YAML conversion.
+
+- `policy/policy-sets.yaml` `rank` is the packed index. `band` is the label. Live order is the insert order in `docs/decisions.md`.
+- `POLICY_SET_RANK_EXACT` is retired. The linter checks a packed rank and a contiguous band. The family sequence is not enforced.
+- `docs/naming.md` and `docs/decisions.md` no longer call YAML rank the design band.
+- The root that reads `policy/` and calls the thin modules is not written yet. Until it exists, `environments/lab/*.tf` is still the copied source.
+- Enable is a cutover, not this increment. Do not manage rank 99 Default. Do not import the old GUI sets.
 
 ## Phase 6 — Exceptions
 

@@ -12,6 +12,8 @@ Fails on:
   - NDG / NAD values that are not on the allow-list (or ISO pattern)
   - UUIDs in policy/ or inventory/
   - TACACS / Device Admin keys or scopes
+  - policy-set rank that is not a packed index, or a band that splits
+
 
 Usage (from the repo root):
 
@@ -69,14 +71,24 @@ NESTED_RULES = {
     "exception_rules": "EX",
 }
 
-POLICY_SET_RANK_EXACT = {
-    10: "PS-global-vpn",
-    20: "PS-global-wireless-8021x",
-    30: "PS-global-wireless-mab",
-    40: "PS-global-wired-8021x",
-    50: "PS-global-wired-mab",
-    99: "Default",
+# rank is the packed ISE index (0, 1, 2, no gaps). band is a label.
+# Rank 99 is the built-in Default and is not part of the packed sequence.
+# A band must stay contiguous as rank increases. The family sequence
+# (infra, VPN, wireless, wired, business-unit) is not the live order.
+POLICY_SET_BANDS = {
+    "infra",
+    "global-vpn",
+    "global-wireless",
+    "global-wireless-mab",
+    "global-wired",
+    "global-wired-mab",
+    "bu-wired",
+    "bu-vpn",
+    "bu-wireless",
 }
+DEFAULT_POLICY_SET = "Default"
+DEFAULT_RANK = 99
+
 
 
 class Finding:
@@ -174,6 +186,8 @@ class Linter:
                         continue
                     self._lint_object(item, rel, plane, expected_prefix)
                     self._lint_nested_rules(item, rel, plane)
+                if filename == "policy-sets.yaml" and key == "policy_sets":
+                    self._check_policy_set_order(items, rel)
             return
         if plane == "inventory":
             self._scan_inventory_file(doc, rel, filename)
@@ -287,7 +301,6 @@ class Linter:
             self._check_sgt_name(name, rel)
             return
         match = NAME_RE.fullmatch(name)
-        match = NAME_RE.fullmatch(name)
         if not match:
             self.error(
                 rel,
@@ -386,27 +399,70 @@ class Linter:
             self.error(rel, name, f"exception expired on {expiry.isoformat()}")
 
     def _check_policy_set_rank(self, obj: dict[str, Any], rel: str, name: str) -> None:
+        if name == DEFAULT_POLICY_SET:
+            rank = obj.get("rank")
+            if rank is not None and rank != DEFAULT_RANK:
+                self.error(rel, name, f"Default rank must be {DEFAULT_RANK}")
+            return
         if "rank" not in obj:
+            self.error(rel, name, "rank is required")
             return
         rank = obj.get("rank")
         if not isinstance(rank, int):
             self.error(rel, name, "rank must be an integer")
             return
-        exact = POLICY_SET_RANK_EXACT.get(rank)
-        if exact and name != exact:
-            self.error(rel, name, f"rank {rank} must be named {exact}")
+        if rank < 0:
+            self.error(rel, name, "rank must be >= 0")
+        if rank == DEFAULT_RANK:
+            self.error(rel, name, f"rank {DEFAULT_RANK} is Default only")
+        band = obj.get("band")
+        if not isinstance(band, str) or not band.strip():
+            self.error(rel, name, "band is required")
             return
-        if 1 <= rank <= 9 and name != "PS-infra-health-checks":
-            self.error(rel, name, "ranks 1-9 must be named PS-infra-health-checks")
-            return
-        if 60 <= rank <= 69 and not _matches_bu_pattern(name, "vpn"):
-            self.error(rel, name, "ranks 60-69 must match PS-<business-unit>-vpn")
-            return
-        if 70 <= rank <= 79 and not _matches_bu_pattern(name, "wireless"):
-            self.error(rel, name, "ranks 70-79 must match PS-<business-unit>-wireless")
-            return
-        if 80 <= rank <= 89 and not _matches_bu_pattern(name, "wired"):
-            self.error(rel, name, "ranks 80-89 must match PS-<business-unit>-wired")
+        if band not in POLICY_SET_BANDS:
+            self.error(rel, name, f"unknown band {band}")
+
+    def _check_policy_set_order(self, items: list[Any], rel: str) -> None:
+        managed: list[tuple[int, str, str]] = []
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            name = item.get("name")
+            if not isinstance(name, str) or name == DEFAULT_POLICY_SET:
+                continue
+            rank = item.get("rank")
+            if not isinstance(rank, int) or rank < 0 or rank == DEFAULT_RANK:
+                continue
+            band = item.get("band")
+            if not isinstance(band, str):
+                continue
+            managed.append((rank, name, band))
+        ranks = [rank for rank, _name, _band in managed]
+        if len(ranks) != len(set(ranks)):
+            self.error(rel, None, f"policy set ranks must be unique, got {sorted(ranks)}")
+        expected = list(range(len(ranks)))
+        if sorted(ranks) != expected:
+            self.error(
+                rel,
+                None,
+                f"policy set ranks must be packed 0..{len(ranks) - 1}, got {sorted(ranks)}",
+            )
+        ordered = sorted(managed)
+        closed: set[str] = set()
+        previous: str | None = None
+        for _rank, name, band in ordered:
+            if previous is None or band == previous:
+                previous = band
+                continue
+            closed.add(previous)
+            if band in closed:
+                self.error(
+                    rel,
+                    name,
+                    f"band {band} is split; same band must stay contiguous",
+                )
+            previous = band
+
 
     def _check_scope(self, obj: dict[str, Any], rel: str, name: str) -> None:
         scope = obj.get("scope")
@@ -596,15 +652,6 @@ def _prefix_of(name: str) -> str | None:
         return "SGT"
     match = NAME_RE.fullmatch(name)
     return match.group(1) if match else None
-
-
-def _matches_bu_pattern(name: str, suffix: str) -> bool:
-    prefix = f"PS-"
-    end = f"-{suffix}"
-    if not name.startswith(prefix) or not name.endswith(end):
-        return False
-    middle = name[len(prefix) : len(name) - len(end)]
-    return bool(middle) and KEBAB_RE.fullmatch(middle) is not None
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:

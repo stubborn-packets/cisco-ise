@@ -52,24 +52,29 @@ Machine-readable copy: lint/prefixes.yaml.
 
 ISE built-ins stay as ISE named them: Default, Default Network Access, Unknown, and other system groups. The Phase 2 linter allow-lists these in `lint/builtins.yaml`.
 
-## Policy set name pattern
+## Policy set rank and band
 
-| Rank | Name pattern |
-| --- | --- |
-| 1–9 | PS-infra-health-checks |
-| 10 | PS-global-vpn |
-| 20 | PS-global-wireless-8021x |
-| 30 | PS-global-wireless-mab |
-| 40 | PS-global-wired-8021x |
-| 50 | PS-global-wired-mab |
-| 60+ | PS-<business-unit>-vpn |
-| 70+ | PS-<business-unit>-wireless |
-| 80+ | PS-<business-unit>-wired |
-| 99 | Default (built-in) |
+Rank is the packed ISE index. Lower is evaluated first. No gaps. Band is a label. Terraform does not send band. Rank does not select the name.
 
-<business-unit> is a kebab-case token from the BusinessUnit NDG allow-list.
+Live order is the insert order, not the family sequence (infra, VPN, wireless, wired, business-unit).
 
-The Phase 2 linter checks that token is kebab-case. It does not yet require it to appear in `policy/ndg.yaml` BusinessUnit `allowed_values`. NAD `ndg.business_unit` values *are* checked against that list once it is non-empty. How to turn the policy-set join on, and how to change ranks or prefixes, is in `lint/README.md`.
+| Rank | Name | Band |
+| --- | --- | --- |
+| 0 | PS-hr-wired | bu-wired |
+| 1 | PS-guest-wired | bu-wired |
+| 2 | PS-infra-health-checks | infra |
+| 3 | PS-global-wireless-8021x | global-wireless |
+| 4 | PS-global-wireless-mab | global-wireless-mab |
+| 5 | PS-global-vpn | global-vpn |
+| 6 | PS-global-wired-8021x | global-wired |
+| 7 | PS-global-wired-mab | global-wired-mab |
+| 99 | Default (built-in) | none |
+
+Rank 99 Default is not managed. Do not rename it. Moving a set means editing rank on the sets that shift.
+
+Name pattern is still `PS-` + kebab-case. A global set is `PS-global-<flow>`. A business-unit set is `PS-<business-unit>-<flow>`. `<business-unit>` is a kebab-case token from the BusinessUnit NDG allow-list. `it`, `PS-<bu>-vpn`, and `PS-<bu>-wireless` are not written.
+
+The Phase 2 linter checks that the name is kebab-case, that rank is packed, and that band is a known label and stays contiguous. It does not yet require the business-unit token to appear in `policy/ndg.yaml` BusinessUnit `allowed_values`. NAD `ndg.business_unit` values *are* checked against that list once it is non-empty. How to add a band or change the packed rule is in `lint/README.md`.
 
 ## NDG values
 

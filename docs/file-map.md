@@ -21,7 +21,7 @@ Three planes. Do not mix them.
 | `sgt.yaml` | SGTs | 4 (Phase 3 bootstrap is tfvars, not this file) |
 | `eig.yaml` | Static EIGs | 4 |
 | `logical-profiles.yaml` | Profiler logical profiles | TBD |
-| `policy-sets.yaml` | Policy set order and rules | 5 (shell live; rules not written) |
+| `policy-sets.yaml` | Policy set order, rank, band, and rules | 5. Rank is the packed index. Band is a label and is not sent. |
 | `exceptions.yaml` | Ticketed exception rules | 6 |
 
 ## inventory/ — reference
@@ -56,7 +56,7 @@ Three planes. Do not mix them.
 | `authz-profiles.tf` | `PR-infra-permit`, `PR-wired-lab-access`, `PR-global-vpn`, `PR-hr-wired-mab`, `PR-guest-wired-mab` |
 | `sgts.tf` | `SGT_lab_users`, `SGT_lab_devices` |
 | `eigs.tf` | `EIG-printers`, `EIG-lab-iot`, `EIG-guest`, `EIG-hr` |
-| `policy-sets.tf` | `PS-hr-wired`, `PS-guest-wired`, `PS-infra-health-checks`, `PS-global-wireless-8021x`, `PS-global-wireless-mab`, `PS-global-vpn`, `PS-global-wired-8021x`, `PS-global-wired-mab` |
+| `policy-sets.tf` | Copied calls for the eight sets. Sends `rank`, not `band`. Replaced when the reader exists. |
 | `authn-rules.tf` | `AN-hr-wired`, `AN-guest-wired`, `AN-infra-f5-health`, `AN-wireless-dot1x`, `AN-wireless-mab`, `AN-vpn`, `AN-wired-dot1x`, `AN-wired-mab` |
 | `authz-rules.tf` | `AZ-hr-wired`, `AZ-guest-wired`, `AZ-infra-f5-health`, `AZ-wireless-dot1x`, `AZ-wireless-mab`, `AZ-vpn`, `AZ-wired-dot1x`, `AZ-wired-mab` |
 | `outputs.tf` | SGT + NDG + AP + CND + ACL + PR + EIG + PS + AN + AZ names; ids stay out of `policy/` |
@@ -81,7 +81,7 @@ Three planes. Do not mix them.
 
 | File | Owns |
 | --- | --- |
-| `lint/README.md` | Which layer owns grammar vs prefixes vs ranks; how to change the shape |
+| `lint/README.md` | Which layer owns grammar vs prefixes vs packed rank and band; how to change the shape |
 | `lint/prefixes.yaml` | PREFIX- table and rejected scopes |
 | `lint/builtins.yaml` | ISE built-in names and locked NDG roots |
 | `scripts/lint_ise.py` | Phase 2 naming linter (policy/ + inventory/ only) |
@@ -93,3 +93,5 @@ Three planes. Do not mix them.
 - explicit `state` on policy objects
 - UUIDs do not belong in `policy/` or `inventory/`
 - ownership (`owner`, `bu`) lives in YAML even when ISE has no field for it
+- policy-set `rank` is the packed ISE index. `band` is a label. Ids do not belong here.
+- the root that reads `policy/` is not written yet. `environments/lab/*.tf` is still the copied source.

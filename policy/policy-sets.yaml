@@ -3,44 +3,38 @@
 # Intent: Network Access policy set order and desired names.
 # TACACS / Device Admin is out of scope on every environment.
 #
-# Evaluation order (locked 2026-09-10). Lower rank = evaluated first.
-#   1-9    PS-infra-health-checks
-#   10     PS-global-vpn
-#   20     PS-global-wireless-8021x
-#   30     PS-global-wireless-mab
-#   40     PS-global-wired-8021x
-#   50     PS-global-wired-mab
-#   60+    PS-<business-unit>-vpn
-#   70+    PS-<business-unit>-wireless
-#   80+    PS-<business-unit>-wired
-#   99     Default   (ISE built-in — do not rename)
+# rank is the packed ISE index. Lower is evaluated first. No gaps.
+# band is a label. Terraform does not send it. The linter groups by band.
+# Live order is the insert order, not the family sequence
+# (infra, VPN, wireless, wired, business-unit). HR and guest are 0 and 1
+# because they were inserted at 0. Moving a set means editing rank on the
+# sets that shift. That edit is the order change.
 #
-# Lab already has non-standard GUI policy sets. Cutover rule:
-#   1. Create NEW standard policy sets at the ranks above.
-#   2. Leave the old GUI objects in place below them.
-#   3. Cut traffic over, then disable, then delete the old objects.
-# Do not import non-standard names into Terraform as desired state.
+#   rank  name                         band
+#   0     PS-hr-wired                  bu-wired
+#   1     PS-guest-wired               bu-wired
+#   2     PS-infra-health-checks       infra
+#   3     PS-global-wireless-8021x     global-wireless
+#   4     PS-global-wireless-mab       global-wireless-mab
+#   5     PS-global-vpn                global-vpn
+#   6     PS-global-wired-8021x        global-wired
+#   7     PS-global-wired-mab          global-wired-mab
 #
-# First write: wired subset only, state disabled. Services are the Phase 4
-# allowed-protocols objects. Policy-set conditions are the AND library
-# conditions (Ethernet plus Service-Type). CND-wired-mab stays an
-# authentication-rule condition. ISE rank is a dense insert index, so the
-# lab call cannot POST rank 40 until 40 sets exist. rank here stays the
-# design band. Do not name Default Network Access. Do not manage rank 99.
-# No VPN service on the wired sets. PS-global-vpn is rank 10, state disabled.
-# Service AP-vpn. Condition CND-vpn. AN-vpn searches Internal Users.
-# AZ-vpn returns PR-global-vpn. Do not manage the built-in Default rule.
-# Wireless sets stay at the old bands, 20 and 30, until the rank conversion.
-# The lab call inserts them at 0 and 1 and shifts VPN and wired down.
-# rank here is not the ISE index yet.
-# Authentication rules are the first rule write. Authorization rules return
-# PR-wired-lab-access. No SGT on that profile. Do not manage the built-in
+# Rank 99 Default is the ISE built-in. Do not manage it. Do not rename it.
+# Do not import non-standard GUI names. Sets stay disabled. Enable is a
+# cutover, not this file.
+#
+# Services are the Phase 4 allowed-protocols objects. Policy-set conditions
+# are library conditions. CND-wired-mab stays an authentication-rule
+# condition. Do not name Default Network Access. Do not manage the built-in
 # Default rule. Identity source is the lab internal store. 802.1X searches
-# Internal Users. MAB searches Internal Endpoints.
+# Internal Users. MAB searches Internal Endpoints. Authorization rules
+# return a PR- profile. No SGT on those profiles.
 
 policy_sets:
   - name: PS-hr-wired
-    rank: 80
+    rank: 0
+    band: bu-wired
     state: disabled
     service: AP-wired-mab
     condition: CND-hr-wired-mab-call-check
@@ -68,7 +62,8 @@ policy_sets:
         owner: lab
 
   - name: PS-guest-wired
-    rank: 81
+    rank: 1
+    band: bu-wired
     state: disabled
     service: AP-wired-mab
     condition: CND-guest-wired-mab-call-check
@@ -96,11 +91,12 @@ policy_sets:
         owner: lab
 
   - name: PS-infra-health-checks
-    rank: 1
+    rank: 2
+    band: infra
     state: disabled
     service: AP-infra-health
     condition: CND-infra-f5-health
-    description: F5 health check. Evaluated before wireless, VPN, and wired.
+    description: F5 health check. After HR and guest, before wireless, VPN, and wired.
     owner: lab
     bu: lab
     authentication_rules:
@@ -124,7 +120,8 @@ policy_sets:
         owner: lab
 
   - name: PS-global-wireless-8021x
-    rank: 20
+    rank: 3
+    band: global-wireless
     state: disabled
     service: AP-wireless-dot1x
     condition: CND-wireless-dot1x-framed
@@ -152,7 +149,8 @@ policy_sets:
         owner: lab
 
   - name: PS-global-wireless-mab
-    rank: 30
+    rank: 4
+    band: global-wireless-mab
     state: disabled
     service: AP-wireless-mab
     condition: CND-wireless-mab-call-check
@@ -180,7 +178,8 @@ policy_sets:
         owner: lab
 
   - name: PS-global-vpn
-    rank: 10
+    rank: 5
+    band: global-vpn
     state: disabled
     service: AP-vpn
     condition: CND-vpn
@@ -208,7 +207,8 @@ policy_sets:
         owner: lab
 
   - name: PS-global-wired-8021x
-    rank: 40
+    rank: 6
+    band: global-wired
     state: disabled
     service: AP-wired-dot1x
     condition: CND-wired-dot1x-framed
@@ -236,7 +236,8 @@ policy_sets:
         owner: lab
 
   - name: PS-global-wired-mab
-    rank: 50
+    rank: 7
+    band: global-wired-mab
     state: disabled
     service: AP-wired-mab
     condition: CND-wired-mab-call-check

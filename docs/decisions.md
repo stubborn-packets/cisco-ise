@@ -23,20 +23,29 @@ Superseded 2026-10-05 by the rank and band decision below. The 1–50 / 60+ / 99
 
 Recorded 2026-10-05. Lab ISE rejected POST rank 40. Legal create rank was a packed index. This lab will not have 99 policy sets, so the design-band numbers will never become ISE slots.
 
+Converted 2026-10-13. YAML `rank` is the packed index. `band` is the label.
+
 - `rank` in `policy/policy-sets.yaml` is the index ISE stores. Lower is evaluated first. It is packed: 0, 1, 2, with no gaps.
-- `band` is a label, not a number Terraform sends. The linter uses it to group and order families: infra, then VPN, then wireless, then wired, then business-unit sets. Default is not a band and is not managed.
+- `band` is a label, not a number Terraform sends. It groups a family. The linter requires a known band and keeps a band contiguous. It does not enforce the family sequence (infra, then VPN, then wireless, then wired, then business-unit). Live order is the insert order. Default is not a band and is not managed.
 - Inserting a set means editing `rank` on the sets that shift. That edit is the order change. There is no second hidden rank.
 - The lab call sends `rank`. It does not send `band`. `ps_ranks` should match the YAML rank.
 - `ise_network_access_policy_set_update_rank` stays unused. It cannot open a gap, and the YAML no longer asks for one.
-- The exact 10 / 40 / 50 linter check is retired when the YAML is converted. Do not convert it in the wireless write.
+- The exact 10 / 40 / 50 linter check is retired.
 
-Current lab order, which the converted YAML should show:
+Live order:
 
 | rank | name | band |
 | --- | --- | --- |
-| 0 | `PS-global-vpn` | `global-vpn` |
-| 1 | `PS-global-wired-8021x` | `global-wired` |
-| 2 | `PS-global-wired-mab` | `global-wired-mab` |
+| 0 | `PS-hr-wired` | `bu-wired` |
+| 1 | `PS-guest-wired` | `bu-wired` |
+| 2 | `PS-infra-health-checks` | `infra` |
+| 3 | `PS-global-wireless-8021x` | `global-wireless` |
+| 4 | `PS-global-wireless-mab` | `global-wireless-mab` |
+| 5 | `PS-global-vpn` | `global-vpn` |
+| 6 | `PS-global-wired-8021x` | `global-wired` |
+| 7 | `PS-global-wired-mab` | `global-wired-mab` |
+
+`it`, `PS-<bu>-vpn`, and `PS-<bu>-wireless` are not written. Rank 99 Default is not in this table.
 
 ## YAML is the source the root will read
 
