@@ -182,7 +182,7 @@ policy_sets:
     band: global-vpn
     state: disabled
     service: AP-vpn
-    condition: CND-vpn
+    condition: CND-global-vpn
     description: Global VPN. Evaluated before wired.
     owner: lab
     bu: lab

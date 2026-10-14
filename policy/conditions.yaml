@@ -36,6 +36,24 @@ conditions:
     operator: equals
     attribute_value: Lookup
 
+  - name: CND-global-vpn
+    state: enabled
+    description: Global BU VPN via NAS-Port-Type Virtual. NAD BU equals Global.
+    owner: lab
+    type: LibraryConditionAndBlock
+    is_negate: false
+    children:
+      - type: ConditionAttributes
+        dictionary_name: Radius
+        attribute_name: NAS-Port-Type
+        operator: equals
+        attribute_value: Virtual
+      - type: ConditionAttributes
+        dictionary_name: DEVICE
+        attribute_name: BusinessUnit
+        operator: equals
+        attribute_value: BusinessUnit#global
+
   - name: CND-vpn
     state: enabled
     description: VPN via NAS-Port-Type Virtual.
@@ -49,7 +67,7 @@ conditions:
 
   - name: CND-wired-dot1x-framed
     state: enabled
-    description: Policy set condition. Wired 802.1X. Ethernet and Service-Type Framed.
+    description: Global BU Wired dot1x Policy set condition. Ethernet and Service-Type Framed. NAD BU equals Global.
     owner: lab
     type: LibraryConditionAndBlock
     is_negate: false
@@ -68,7 +86,7 @@ conditions:
         dictionary_name: DEVICE
         attribute_name: BusinessUnit
         operator: equals
-        attribute_value: global
+        attribute_value: BusinessUnit#global
 
   - name: CND-wired-mab-call-check
     state: enabled
@@ -91,7 +109,7 @@ conditions:
         dictionary_name: DEVICE
         attribute_name: BusinessUnit
         operator: equals
-        attribute_value: global
+        attribute_value: BusinessUnit#global
 
   - name: CND-wireless-dot1x-framed
     state: enabled
@@ -114,7 +132,7 @@ conditions:
         dictionary_name: DEVICE
         attribute_name: BusinessUnit
         operator: equals
-        attribute_value: global
+        attribute_value: BusinessUnit#global
 
   - name: CND-wireless-mab-call-check
     state: enabled
@@ -137,7 +155,7 @@ conditions:
         dictionary_name: DEVICE
         attribute_name: BusinessUnit
         operator: equals
-        attribute_value: global
+        attribute_value: BusinessUnit#global
 
   - name: CND-infra-f5-health
     state: enabled
@@ -178,7 +196,7 @@ conditions:
         dictionary_name: DEVICE
         attribute_name: BusinessUnit
         operator: equals
-        attribute_value: hr
+        attribute_value: BusinessUnit#hr
 
   - name: CND-guest-wired-mab-call-check
     state: enabled
@@ -201,13 +219,14 @@ conditions:
         dictionary_name: DEVICE
         attribute_name: BusinessUnit
         operator: equals
-        attribute_value: guest
+        attribute_value: BusinessUnit#guest
 
   - name: CND-hr-eig
     state: enabled
     description: Authorization condition. Endpoint is in EIG-hr.
     owner: lab
-    type: ConditionAttributes
+    type: LibraryConditionAttributes
+    is_negate: false
     dictionary_name: IdentityGroup
     attribute_name: Name
     operator: equals
@@ -217,7 +236,8 @@ conditions:
     state: enabled
     description: Authorization condition. Endpoint is in EIG-guest.
     owner: lab
-    type: ConditionAttributes
+    type: LibraryConditionAttributes
+    is_negate: false
     dictionary_name: IdentityGroup
     attribute_name: Name
     operator: equals

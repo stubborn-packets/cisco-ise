@@ -90,10 +90,10 @@ module "ps_global_vpn" {
   state               = "disabled"
   service_name        = module.ap_vpn.name
   is_proxy            = false
-  condition_id        = module.cnd_vpn.id
+  condition_id        = module.cnd_global_vpn.id
   condition_is_negate = false
 
-  depends_on = [module.ap_vpn, module.cnd_vpn, module.ps_global_wireless_mab]
+  depends_on = [module.ap_vpn, module.cnd_global_vpn, module.ps_global_wireless_mab]
 }
 
 module "ps_global_wired_8021x" {
