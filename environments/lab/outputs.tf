@@ -129,22 +129,22 @@ output "acl_ids" {
 
 output "pr_names" {
   value = {
-    wired_lab_access = module.pr_wired_lab_access.name
     global_vpn       = module.pr_global_vpn.name
-    infra_permit = module.pr_infra_permit.name
-    guest_wired_mab = module.pr_guest_wired_mab.name
-    hr_wired_mab    = module.pr_hr_wired_mab.name
+    guest_wired_mab  = module.pr_guest_wired_mab.name
+    hr_wired_mab     = module.pr_hr_wired_mab.name
+    infra_permit     = module.pr_infra_permit.name
+    wired_lab_access = module.pr_wired_lab_access.name
   }
   description = "Authorization profile names stored on lab ISE."
 }
 
 output "pr_ids" {
   value = {
-    wired_lab_access = module.pr_wired_lab_access.id
     global_vpn       = module.pr_global_vpn.id
-    infra_permit = module.pr_infra_permit.id
-    guest_wired_mab = module.pr_guest_wired_mab.id
-    hr_wired_mab    = module.pr_hr_wired_mab.id
+    guest_wired_mab  = module.pr_guest_wired_mab.id
+    hr_wired_mab     = module.pr_hr_wired_mab.id
+    infra_permit     = module.pr_infra_permit.id
+    wired_lab_access = module.pr_wired_lab_access.id
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }

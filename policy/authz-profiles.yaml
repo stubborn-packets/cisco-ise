@@ -2,8 +2,9 @@
 # Plane: desired state. Terraform may create these from Phase 4.
 # PR- = authorization profiles. ACL- = downloadable ACLs.
 # VLAN names come from inventory/vlans.yaml — VLANs are not ISE objects.
-# First write: one lab DACL and one lab profile. No SGT on the profile
-# (SGT family is next). Do not manage PermitAccess / DenyAccess.
+# First write: one lab DACL and one lab profile. No SGT on either profile.
+# PR-global-vpn returns the same DACL, a reauth timer, and the ASA Class
+# value. No VLAN. Do not manage PermitAccess / DenyAccess.
 
 authorization_profiles:
   - name: PR-wired-lab-access
@@ -17,7 +18,7 @@ authorization_profiles:
   
   - name: PR-global-vpn
     state: enabled
-    description: Lab VPN access. ASA group policy via Class ou=gp-global-vpn.
+    description: Lab VPN access. ASA group policy via Class ou=GP-global-vpn.
     owner: lab
     bu: lab
     access_type: ACCESS_ACCEPT
