@@ -1,201 +1,22 @@
-# terraform/
+# environments/
 
-Reusable write modules. They do not know which ISE they talk to.
+One folder per ISE this repo is allowed to target.
 
-The root that may apply them is `environments/lab/` only. There is no
-`environments/stage/` or `prod/` in this repo.
-
-## Layout
-
-```text
-terraform/modules/sgt/                  one ise_trustsec_security_group
-terraform/modules/ndg/                  one ise_network_device_group
-terraform/modules/allowed-protocols/    one ise_allowed_protocols
-terraform/modules/condition/              one ise_network_access_condition
-terraform/modules/dacl/                   one ise_downloadable_acl
-terraform/modules/authorization-profile/  one ise_authorization_profile
-terraform/modules/eig/                    one ise_endpoint_identity_group
-terraform/modules/policy-set/             one ise_network_access_policy_set
-environments/lab/                         provider pin, local state, module calls
-```
-
-Phase 3 SGT lives in `environments/lab/terraform.tfvars`, not in
-`policy/sgt.yaml`. NDG allow-lists live in `policy/ndg.yaml`. Lab NDG
-calls live in `environments/lab/ndg.tf`.
-
-## Lab apply
-
-Credentials: repo-root `.env` (`ISE_URL`, `ISE_USERNAME`, `ISE_PASSWORD`,
-`ISE_INSECURE`). Terraform does not load `.env` by itself.
-
-```bash
-cd environments/lab
-set -a && source ../../.env && set +a
-terraform init
-terraform plan
-terraform apply
-terraform output
-terraform destroy
-```
-
-`terraform validate` checks syntax and types. It does not load
-`terraform.tfvars` and will not fail a bad `SGT-` name. `terraform plan`
-does.
-
-State file: `environments/lab/terraform.tfstate` (gitignored).
-
-Provider: `CiscoDevNet/ise` 0.4.1, pinned in
-`environments/lab/versions.tf`.
-
-## First object
-
-| Field | Value |
-| --- | --- |
-| Terraform address | `module.sgt_bootstrap.ise_trustsec_security_group.this` |
-| ISE name | `SGT_lab_bootstrap` |
-| Tag | `1001` |
-| GUI | Work Centers > TrustSec > Components > Security Groups |
-
-Do not import an existing non-standard lab SGT as this address.
-Do not put the UUID from `terraform output sgt_id` into `policy/` or
-`inventory/`.
-
-## Phase 4 SGTs
-
-`policy/sgt.yaml` is the review surface. Bootstrap stays in tfvars.
-Do not manage ISE built-in Unknown (tag 0).
-
-| Terraform address | ISE name | Tag |
+| Folder | Status | Writes? |
 | --- | --- | --- |
-| `module.sgt_lab_users.ise_trustsec_security_group.this` | `SGT_lab_users` | 1010 |
-| `module.sgt_lab_devices.ise_trustsec_security_group.this` | `SGT_lab_devices` | 1020 |
+| `lab/` | Current home-lab eval | Yes, from Phase 3 |
+| `stage/` | Not created | Would be a second eval, same `policy/` tree, separate state |
 
-Do not put `terraform output sgt_ids` into `policy/` or `inventory/`.
+There is no `prod/` folder. A later remote environment would get its own folder and its own state file. It is not part of this checkout.
 
-## NDG objects
+What belongs here:
 
-ERS `name` must include `#`. Custom type container is `type#type`
-(`BusinessUnit#BusinessUnit`) so the GUI row is `BusinessUnit`.
-Custom leaf is `type#type#value`. Built-in Location / Device Type keep
-`All Locations` / `All Device Types`. Bare `BusinessUnit` returns HTTP 400.
-ISE rejects `<` and `>` in `description` (XSS validation).
+- ISE version / patch notes
+- `write_enabled`
+- Terraform backend + provider files (Phase 3+)
 
-| Terraform address | ISE name | Role |
-| --- | --- | --- |
-| `module.ndg_business_unit.ise_network_device_group.this` | `BusinessUnit#BusinessUnit` | type container |
-| `module.ndg_stage.ise_network_device_group.this` | `Stage#Stage` | type container |
-| `module.ndg_function.ise_network_device_group.this` | `Function#Function` | type container |
-| `module.ndg_location_usa.ise_network_device_group.this` | `Location#All Locations#USA` | leaf |
-| `module.ndg_device_type_switch.ise_network_device_group.this` | `Device Type#All Device Types#switch` | leaf |
-| `module.ndg_business_unit_lab.ise_network_device_group.this` | `BusinessUnit#BusinessUnit#lab` | leaf |
-| `module.ndg_stage_monitor.ise_network_device_group.this` | `Stage#Stage#monitor` | leaf |
-| `module.ndg_function_lab.ise_network_device_group.this` | `Function#Function#lab` | leaf |
+What does not:
 
-GUI: Administration > Network Resources > Network Device Groups.
-
-Do not put `terraform output ndg_ids` into `policy/` or `inventory/`.
-Do not manage NADs here.
-
-## Allowed protocols
-
-Do not manage Default Network Access. ISE 3.3 requires `allow_5g` on every
-object and inner PEAP/TEAP/EAP-TLS settings when those parents are true.
-
-| Terraform address | ISE name |
-| --- | --- |
-| `module.ap_wired_dot1x.ise_allowed_protocols.this` | `AP-wired-dot1x` |
-| `module.ap_wired_mab.ise_allowed_protocols.this` | `AP-wired-mab` |
-
-GUI: Policy > Policy Elements > Results > Authentication > Allowed Protocols.
-
-Do not put `terraform output ap_ids` into `policy/` or `inventory/`.
-
-## Library conditions
-
-Generated by `scripts/read_policy.py` from `policy/conditions.yaml`. Do not hand-edit `environments/lab/conditions.tf`. Attribute conditions omit `condition_type` (module default `LibraryConditionAttributes`). AND/OR blocks set `condition_type` and pass children as `ConditionAttributes`. BusinessUnit and Device Type values are the full ISE form (`BusinessUnit#global`, `All Device Types#load-balancer`). Do not use the Device Admin condition resource.
-
-| Terraform address | ISE name |
-| --- | --- |
-| `module.cnd_wired_dot1x.ise_network_access_condition.this` | `CND-wired-dot1x` |
-| `module.cnd_wired_mab.ise_network_access_condition.this` | `CND-wired-mab` |
-| `module.cnd_hr_wired_mab_call_check.ise_network_access_condition.this` | `CND-hr-wired-mab-call-check` |
-| `module.cnd_guest_wired_mab_call_check.ise_network_access_condition.this` | `CND-guest-wired-mab-call-check` |
-
-GUI: Policy > Policy Elements > Conditions > Library Conditions.
-
-Do not put `terraform output cnd_ids` into `policy/` or `inventory/`.
-
-## Downloadable ACLs and authorization profiles
-
-VLANs live in `inventory/vlans.yaml`. They are not ISE objects.
-`vlan_tag_id` is the RADIUS tunnel tag (usually 1), not the VLAN ID.
-First profile has no SGT.
-
-| Terraform address | ISE name |
-| --- | --- |
-| `module.acl_permit_all.ise_downloadable_acl.this` | `ACL-permit-all` |
-| `module.pr_wired_lab_access.ise_authorization_profile.this` | `PR-wired-lab-access` |
-
-GUI: Policy > Policy Elements > Results > Authorization.
-
-Do not put `terraform output acl_ids` or `pr_ids` into `policy/` or `inventory/`.
-
-## Endpoint identity groups
-
-Static groups only. Parent UUID is omitted; ISE hangs them off the root.
-Do not manage Unknown, Profiled, Blacklist, GuestEndpoints, or RegisteredDevices.
-Do not create endpoints here.
-
-| Terraform address | ISE name |
-| --- | --- |
-| `module.eig_printers.ise_endpoint_identity_group.this` | `EIG-printers` |
-| `module.eig_lab_iot.ise_endpoint_identity_group.this` | `EIG-lab-iot` |
-
-GUI: Work Centers > Network Access > Identities > Endpoint Identity Groups.
-
-Do not put `terraform output eig_ids` into `policy/` or `inventory/`.
-
-## Policy sets
-
-YAML `rank` is the packed ISE index. `band` is a label. This file does not send `band`. This lab rejected POST rank 40. The eight sets were inserted disabled at 0 through 7. YAML rank now matches those indexes. `scripts/read_policy.py` emits `environments/lab/policy-sets.tf`, `authn-rules.tf`, `authz-rules.tf`, and `conditions.tf` from `policy/`. Do not hand-edit those four. Other lab files are still copied. `ise_network_access_policy_set_update_rank` is not wired. It is a later reorder, used when an existing set must move. It cannot open a gap. Do not manage rank 99 Default. Do not manage Default Network Access. Rules are separate resources. The parent sets stay disabled, so the rules are not evaluated.
-
-| Terraform address | ISE name | Rank | State |
-| --- | --- | --- | --- |
-| `module.ps_hr_wired.ise_network_access_policy_set.this` | `PS-hr-wired` | 0 | disabled |
-| `module.ps_guest_wired.ise_network_access_policy_set.this` | `PS-guest-wired` | 1 | disabled |
-| `module.ps_infra_health_checks.ise_network_access_policy_set.this` | `PS-infra-health-checks` | 2 | disabled |
-| `module.ps_global_wireless_8021x.ise_network_access_policy_set.this` | `PS-global-wireless-8021x` | 3 | disabled |
-| `module.ps_global_wireless_mab.ise_network_access_policy_set.this` | `PS-global-wireless-mab` | 4 | disabled |
-| `module.ps_global_vpn.ise_network_access_policy_set.this` | `PS-global-vpn` | 5 | disabled |
-| `module.ps_global_wired_8021x.ise_network_access_policy_set.this` | `PS-global-wired-8021x` | 6 | disabled |
-| `module.ps_global_wired_mab.ise_network_access_policy_set.this` | `PS-global-wired-mab` | 7 | disabled |
-| `module.an_hr_wired.ise_network_access_authentication_rule.this` | `AN-hr-wired` | 0 | enabled |
-| `module.an_guest_wired.ise_network_access_authentication_rule.this` | `AN-guest-wired` | 0 | enabled |
-| `module.an_wireless_mab.ise_network_access_authentication_rule.this` | `AN-wireless-mab` | 0 | enabled |
-| `module.an_vpn.ise_network_access_authentication_rule.this` | `AN-vpn` | 0 | enabled |
-| `module.an_wired_dot1x.ise_network_access_authentication_rule.this` | `AN-wired-dot1x` | 0 | enabled |
-| `module.an_wired_mab.ise_network_access_authentication_rule.this` | `AN-wired-mab` | 0 | enabled |
-| `module.az_hr_wired.ise_network_access_authorization_rule.this` | `AZ-hr-wired` | 0 | enabled |
-| `module.az_guest_wired.ise_network_access_authorization_rule.this` | `AZ-guest-wired` | 0 | enabled |
-| `module.az_wireless_mab.ise_network_access_authorization_rule.this` | `AZ-wireless-mab` | 0 | enabled |
-| `module.az_vpn.ise_network_access_authorization_rule.this` | `AZ-vpn` | 0 | enabled |
-| `module.az_wired_dot1x.ise_network_access_authorization_rule.this` | `AZ-wired-dot1x` | 0 | enabled |
-| `module.az_wired_mab.ise_network_access_authorization_rule.this` | `AZ-wired-mab` | 0 | enabled |
-
-`AN-wireless-dot1x`, `AN-vpn`, and `AN-wired-dot1x` use `Internal Users`.
-`AN-wireless-mab` and `AN-wired-mab` use `Internal Endpoints` and
-`if_user_not_found = CONTINUE`. `AZ-vpn` returns `PR-global-vpn`.
-Wireless and wired `AZ-` rules return `PR-wired-lab-access`. No security group.
-
-GUI: Policy > Policy Sets.
-
-Do not put `terraform output ps_ids`, `an_ids`, or `az_ids` into `policy/` or `inventory/`.
-
-## Out of scope here
-
-- Enabling the policy sets (cutover, not this write)
-- `ise_network_access_policy_set_update_rank`
-- NAD resources
-- `netascode/nac-ise`
-- remote state
-- a second environment folder
+- Desired policy (that is `policy/`)
+- NAD / VLAN / node inventory (that is `inventory/`)
+- URLs, usernames, passwords (that is `.env`)
