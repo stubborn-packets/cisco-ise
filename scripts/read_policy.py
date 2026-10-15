@@ -864,12 +864,6 @@ SGT_HEADER = """\
 # Ids stay in state, not in policy/.
 """
 
-# Known live addresses. A new name would be a new address and orphan state.
-SGT_LIVE = {
-    "SGT_lab_users": "sgt_lab_users",
-    "SGT_lab_devices": "sgt_lab_devices",
-}
-
 
 def load_sgts(root: Path) -> list[dict[str, Any]]:
     path = root / "policy/sgt.yaml"
@@ -890,11 +884,8 @@ def validate_sgt(obj: dict[str, Any], index: int) -> None:
     name = obj.get("name")
     if not isinstance(name, str) or not name:
         raise ReaderError(f"sgt {index} needs a name")
-    if name not in SGT_LIVE:
-        raise ReaderError(
-            f"{name} is not a live SGT address. "
-            "Add it to SGT_LIVE only after the object exists in state."
-        )
+    if name == "SGT_lab_bootstrap":
+        raise ReaderError("SGT_lab_bootstrap stays in terraform.tfvars")
     if not name.startswith("SGT_") or "-" in name or len(name) > 32:
         raise ReaderError(
             f"{name} must be SGT_ + snake_case, max 32. ISE rejects hyphens."
@@ -904,8 +895,6 @@ def validate_sgt(obj: dict[str, Any], index: int) -> None:
         raise ReaderError(f"{name} value must be an integer 0 through 65519")
     if value == 0:
         raise ReaderError(f"{name} must not use the built-in Unknown tag 0")
-    if name == "SGT_lab_bootstrap":
-        raise ReaderError("SGT_lab_bootstrap stays in terraform.tfvars")
     for field in ("description", "owner", "bu", "state"):
         if field in obj and not isinstance(obj[field], str):
             raise ReaderError(f"{name} {field} must be a string when present")
@@ -915,7 +904,7 @@ def validate_sgt(obj: dict[str, Any], index: int) -> None:
 
 def render_sgt(obj: dict[str, Any]) -> str:
     name = obj["name"]
-    label = SGT_LIVE[name]
+    label = module_label(name)
     description = obj.get("description") or ""
     lines = [
         f'module "{label}" {{',
@@ -951,14 +940,6 @@ EIG_HEADER = """\
 # Ids stay in state, not in policy/.
 """
 
-# Known live addresses. A new name would be a new address and orphan state.
-EIG_LIVE = {
-    "EIG-printers": "eig_printers",
-    "EIG-lab-iot": "eig_lab_iot",
-    "EIG-guest": "eig_guest",
-    "EIG-hr": "eig_hr",
-}
-
 # System groups. Never managed.
 EIG_SYSTEM = {
     "Unknown",
@@ -990,11 +971,6 @@ def validate_eig(obj: dict[str, Any], index: int) -> None:
         raise ReaderError(f"eig {index} needs a name")
     if name in EIG_SYSTEM:
         raise ReaderError(f"{name} is a system group and is not managed")
-    if name not in EIG_LIVE:
-        raise ReaderError(
-            f"{name} is not a live EIG address. "
-            "Add it to EIG_LIVE only after the object exists in state."
-        )
     if not name.startswith("EIG-") or "_" in name:
         raise ReaderError(f"{name} must be EIG- + kebab-case")
     description = obj.get("description", "")
@@ -1015,7 +991,7 @@ def validate_eig(obj: dict[str, Any], index: int) -> None:
 
 def render_eig(obj: dict[str, Any]) -> str:
     name = obj["name"]
-    label = EIG_LIVE[name]
+    label = module_label(name)
     description = obj.get("description") or ""
     lines = [
         f'module "{label}" {{',
