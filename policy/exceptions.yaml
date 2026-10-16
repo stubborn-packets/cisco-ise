@@ -6,9 +6,12 @@
 # Rank is not stored here yet. The lab call will send a packed index
 # once the module and the reader exist. Sets stay disabled.
 # Rank is the packed index inside the parent set. 0 is the first exception.
+# Scope can be local or global (default is local and can be omiited). Local exceptions 
+# require policy_set to be specified. 
 
 exceptions:
   - name: EX-vendor-wired-temp
+    scope: local
     state: enabled
     policy_set: PS-global-wired-mab
     rank: 0
@@ -20,3 +23,16 @@ exceptions:
     profiles:
       - PR-wired-lab-access
     condition: CND-wired-mab
+
+  - name: EX-lab-global-monitor
+    scope: global
+    state: enabled
+    rank: 0
+    ticket: CHG0001235
+    owner: Cyber Security
+    bu: global
+    expires_on: "2026-12-31"
+    description: Lab-wide monitor exception. Parent sets stay disabled.
+    profiles:
+      - PR-infra-permit
+    condition: CND-infra-f5-health
