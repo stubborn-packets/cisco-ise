@@ -340,3 +340,31 @@ output "az_ids" {
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
+
+output "ex_names" {
+  value = {
+    vendor_wired_temp = module.ex_vendor_wired_temp.name
+  }
+  description = "Authorization exception rule names stored on lab ISE."
+}
+
+output "ex_ranks" {
+  value = {
+    vendor_wired_temp = module.ex_vendor_wired_temp.rank
+  }
+  description = "Authorization exception rule ranks stored on lab ISE. Lower is first."
+}
+
+output "ex_states" {
+  value = {
+    vendor_wired_temp = module.ex_vendor_wired_temp.state
+  }
+  description = "Authorization exception rule states stored on ISE."
+}
+
+output "ex_ids" {
+  value = {
+    vendor_wired_temp = module.ex_vendor_wired_temp.id
+  }
+  description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
+}
