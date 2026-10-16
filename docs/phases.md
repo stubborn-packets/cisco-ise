@@ -44,7 +44,7 @@ Order: NDG → allowed protocols → conditions → authz profiles / DACLs → S
 
 Exit met 2026-10-01: each family has a YAML row, a thin module, a lab call, and a live object on lab ISE. NADs stayed in `inventory/` + `exports/`. No policy sets. Blog saved at `blog/cisco-ise-policy-as-code-part4/`.
 
-## Phase 5 — Policy sets and ranks
+## Phase 5 — Policy sets and ranks (done)
 
 Wired, VPN, wireless, infra, and the first business-unit pair closed 2026-10-05 on lab ISE. Sets stay disabled. Enable was not part of the close.
 
@@ -60,20 +60,27 @@ Wired, VPN, wireless, infra, and the first business-unit pair closed 2026-10-05 
 
 `it`, `PS-<bu>-vpn`, and `PS-<bu>-wireless` are not in this phase. A lab with nothing pointed at it does not gain a new pattern from those sets. Stop here. Do not rewrite the Phase 5 post.
 
-## Rank conversion and YAML reader
+## Rank conversion and YAML reader (done)
 
-Closed for the policy-set family 2026-10-13. This is not exceptions. Sets stay disabled. No new sets. No ISE write in the YAML conversion.
+Closed 2026-10-16. Rank conversion, every family reader, outputs, and the bootstrap SGT move are done. This is not exceptions. Sets stay disabled. No new sets. No ISE write in the YAML conversion.
 
 - `policy/policy-sets.yaml` `rank` is the packed index. `band` is the label. Live order is the insert order in `docs/decisions.md`.
 - `POLICY_SET_RANK_EXACT` is retired. The linter checks a packed rank and a contiguous band. The family sequence is not enforced.
-- `docs/naming.md` and `docs/decisions.md` no longer call YAML rank the design band.
-- `scripts/read_policy.py` emits `policy-sets.tf`, `authn-rules.tf`, and `authz-rules.tf`. Addresses stay `module.ps_*`, `module.an_*`, and `module.az_*`. No `for_each`. Ids stay out of `policy/`.
-- NDG, allowed protocols, conditions, profiles, SGTs, and EIGs stay hand-copied. One family at a time. Conditions next.
+- `scripts/read_policy.py` emits every managed family and `outputs.tf`. Do not hand-edit those files. Addresses stay `module.ps_*`, `module.an_*`, `module.az_*`, and the matching family prefixes. No `for_each`. Ids stay out of `policy/`. Map keys are derived from the YAML name only.
+- `SGT_lab_bootstrap` / 1001 lives in `policy/sgt.yaml`. Address is `module.sgt_lab_bootstrap`. Map key is `lab_bootstrap`. State was moved. Hand-written main/variables/tfvars path is gone.
+- Blog saved 2026-10-16 at `blog/cisco-ise-policy-as-code-part6/`. Hero `ise-pac-yaml-hero.jpg` is not generated in the post.
 - Enable is a cutover, not this increment. Do not manage rank 99 Default. Do not import the old GUI sets.
 
-## Phase 6 — Exceptions
+## Phase 6 — Exceptions (done)
 
-`EX-*` requires ticket, owner, expiry. Linter fails expired exceptions.
+Closed 2026-10-16 on lab ISE. Local and global exception modules exist. Reader emits both scopes. Sets stay disabled.
+
+- `EX-*` requires ticket, owner, and expiry. Linter fails missing or expired metadata.
+- Local: `EX-vendor-wired-temp` rank 0 inside `PS-global-wired-mab`. Condition `CND-wired-mab`. Profile `PR-wired-lab-access`.
+- Global: `EX-lab-global-monitor` rank 0, no policy set. Condition `CND-infra-f5-health`. Profile `PR-infra-permit`.
+- Modules: `terraform/modules/authorization-exception-rule/` and `terraform/modules/authorization-global-exception-rule/`.
+- `scripts/read_policy.py` emits `environments/lab/exceptions.tf` and the shared `ex_*` maps. Do not hand-edit.
+- No SGT. No new sets. Enable is a cutover, not this phase.
 
 ## Phase 7 — Import (lab)
 
