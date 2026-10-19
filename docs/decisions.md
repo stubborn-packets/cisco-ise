@@ -104,6 +104,7 @@ Do:
 - One branch per phase (or per feature inside a phase)
 - PR + approval before `main`
 - `main` is last approved lab desired state, not a remote production ISE
+- CI runs secret-free checks only (lint, unit tests, `terraform fmt -check`, `terraform validate`). Plan and apply stay local. They require the lab `.env`.
 
 ## Public repo hygiene
 

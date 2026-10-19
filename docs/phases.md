@@ -94,9 +94,16 @@ Closed 2026-10-19. Import map of `name → uuid → terraform address`. Only obj
 
 ## Phase 8 — Git promotion path
 
-Branch → lint → validate → plan against lab → PR → approve → merge → apply lab.
+Closed when the path is written and the secret-free gates run.
 
-`environments/stage/` is added only if a second ISE eval exists.
+- `docs/promotion.md` is the checklist: branch → lint → validate → plan against lab → PR → approve → merge → apply lab.
+- `.github/workflows/ci.yml` runs on pull requests. Secret-free only: lint, unit tests, `terraform fmt -check`, `terraform validate`. No plan, no apply, no ISE.
+- `scripts/check.sh` is the local mirror of the same gates.
+- Plan and apply stay local. They require the lab `.env`.
+- Sets stay disabled. Enable is a cutover, not this path.
+- `environments/stage/` is added only if a second ISE eval exists.
+
+Exit: a PR that changes YAML fails CI if the name is bad or Terraform does not validate, and the checklist in `docs/promotion.md` matches the workflow and the script.
 
 ## Phase 9 — Drift
 
