@@ -8,8 +8,8 @@
 module "cnd_wired_dot1x" {
   source = "../../terraform/modules/condition"
 
-  name        = "CND-wired-dot1x"
-  description = "Wired 802.1X via NAS-Port-Type Ethernet."
+  name            = "CND-wired-dot1x"
+  description     = "Wired 802.1X via NAS-Port-Type Ethernet."
   dictionary_name = "Radius"
   attribute_name  = "NAS-Port-Type"
   operator        = "equals"
@@ -19,8 +19,8 @@ module "cnd_wired_dot1x" {
 module "cnd_wired_mab" {
   source = "../../terraform/modules/condition"
 
-  name        = "CND-wired-mab"
-  description = "Wired MAB via Network Access AuthenticationMethod Lookup."
+  name            = "CND-wired-mab"
+  description     = "Wired MAB via Network Access AuthenticationMethod Lookup."
   dictionary_name = "Network Access"
   attribute_name  = "AuthenticationMethod"
   operator        = "equals"
@@ -30,8 +30,8 @@ module "cnd_wired_mab" {
 module "cnd_global_vpn" {
   source = "../../terraform/modules/condition"
 
-  name        = "CND-global-vpn"
-  description = "Global BU VPN via NAS-Port-Type Virtual. NAD BU equals Global."
+  name           = "CND-global-vpn"
+  description    = "Global BU VPN via NAS-Port-Type Virtual. NAD BU equals Global."
   condition_type = "LibraryConditionAndBlock"
 
   children = [
@@ -55,8 +55,8 @@ module "cnd_global_vpn" {
 module "cnd_vpn" {
   source = "../../terraform/modules/condition"
 
-  name        = "CND-vpn"
-  description = "VPN via NAS-Port-Type Virtual."
+  name            = "CND-vpn"
+  description     = "VPN via NAS-Port-Type Virtual."
   dictionary_name = "Radius"
   attribute_name  = "NAS-Port-Type"
   operator        = "equals"
@@ -66,8 +66,8 @@ module "cnd_vpn" {
 module "cnd_wired_dot1x_framed" {
   source = "../../terraform/modules/condition"
 
-  name        = "CND-wired-dot1x-framed"
-  description = "Global BU Wired dot1x Policy set condition. Ethernet and Service-Type Framed. NAD BU equals Global."
+  name           = "CND-wired-dot1x-framed"
+  description    = "Global BU Wired dot1x Policy set condition. Ethernet and Service-Type Framed. NAD BU equals Global."
   condition_type = "LibraryConditionAndBlock"
 
   children = [
@@ -98,8 +98,8 @@ module "cnd_wired_dot1x_framed" {
 module "cnd_wired_mab_call_check" {
   source = "../../terraform/modules/condition"
 
-  name        = "CND-wired-mab-call-check"
-  description = "Policy set condition. Wired MAB. Ethernet and Service-Type Call Check."
+  name           = "CND-wired-mab-call-check"
+  description    = "Policy set condition. Wired MAB. Ethernet and Service-Type Call Check."
   condition_type = "LibraryConditionAndBlock"
 
   children = [
@@ -130,8 +130,8 @@ module "cnd_wired_mab_call_check" {
 module "cnd_wireless_dot1x_framed" {
   source = "../../terraform/modules/condition"
 
-  name        = "CND-wireless-dot1x-framed"
-  description = "Policy set condition. Wireless 802.1X. IEEE 802.11 and Service-Type Framed."
+  name           = "CND-wireless-dot1x-framed"
+  description    = "Policy set condition. Wireless 802.1X. IEEE 802.11 and Service-Type Framed."
   condition_type = "LibraryConditionAndBlock"
 
   children = [
@@ -162,8 +162,8 @@ module "cnd_wireless_dot1x_framed" {
 module "cnd_wireless_mab_call_check" {
   source = "../../terraform/modules/condition"
 
-  name        = "CND-wireless-mab-call-check"
-  description = "Policy set condition. Wireless MAB. IEEE 802.11 and Service-Type Call Check."
+  name           = "CND-wireless-mab-call-check"
+  description    = "Policy set condition. Wireless MAB. IEEE 802.11 and Service-Type Call Check."
   condition_type = "LibraryConditionAndBlock"
 
   children = [
@@ -194,8 +194,8 @@ module "cnd_wireless_mab_call_check" {
 module "cnd_infra_f5_health" {
   source = "../../terraform/modules/condition"
 
-  name        = "CND-infra-f5-health"
-  description = "F5 health check. Load-balancer NAD and RADIUS user svc-ise-f5-health."
+  name           = "CND-infra-f5-health"
+  description    = "F5 health check. Load-balancer NAD and RADIUS user svc-ise-f5-health."
   condition_type = "LibraryConditionAndBlock"
 
   children = [
@@ -219,8 +219,8 @@ module "cnd_infra_f5_health" {
 module "cnd_hr_wired_mab_call_check" {
   source = "../../terraform/modules/condition"
 
-  name        = "CND-hr-wired-mab-call-check"
-  description = "HR Policy set condition. Wired MAB. Ethernet and Service-Type Call Check."
+  name           = "CND-hr-wired-mab-call-check"
+  description    = "HR Policy set condition. Wired MAB. Ethernet and Service-Type Call Check."
   condition_type = "LibraryConditionAndBlock"
 
   children = [
@@ -251,8 +251,8 @@ module "cnd_hr_wired_mab_call_check" {
 module "cnd_guest_wired_mab_call_check" {
   source = "../../terraform/modules/condition"
 
-  name        = "CND-guest-wired-mab-call-check"
-  description = "Guest Policy set condition. Wired MAB. Ethernet and Service-Type Call Check."
+  name           = "CND-guest-wired-mab-call-check"
+  description    = "Guest Policy set condition. Wired MAB. Ethernet and Service-Type Call Check."
   condition_type = "LibraryConditionAndBlock"
 
   children = [
@@ -283,8 +283,8 @@ module "cnd_guest_wired_mab_call_check" {
 module "cnd_hr_eig" {
   source = "../../terraform/modules/condition"
 
-  name        = "CND-hr-eig"
-  description = "Authorization condition. Endpoint is in EIG-hr."
+  name            = "CND-hr-eig"
+  description     = "Authorization condition. Endpoint is in EIG-hr."
   dictionary_name = "IdentityGroup"
   attribute_name  = "Name"
   operator        = "equals"
@@ -294,8 +294,8 @@ module "cnd_hr_eig" {
 module "cnd_guest_eig" {
   source = "../../terraform/modules/condition"
 
-  name        = "CND-guest-eig"
-  description = "Authorization condition. Endpoint is in EIG-guest."
+  name            = "CND-guest-eig"
+  description     = "Authorization condition. Endpoint is in EIG-guest."
   dictionary_name = "IdentityGroup"
   attribute_name  = "Name"
   operator        = "equals"

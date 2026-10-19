@@ -14,7 +14,7 @@ variable "name" {
   validation {
     condition = var.is_root ? (
       var.name == "${var.root_group}#${var.root_group}"
-    ) : (
+      ) : (
       can(regex("^[^#]+#[^#]+#[^#]+$", var.name)) &&
       startswith(var.name, "${var.root_group}#")
     )

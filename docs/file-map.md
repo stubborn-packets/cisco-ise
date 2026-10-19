@@ -92,6 +92,14 @@ Three planes. Do not mix them.
 | `scripts/ise_client.py` | Shared GET-only ISE client. Used by `import_map.py`. `export_ise.py` not yet switched. |
 | `scripts/import_map.py` | Phase 7 import map. name → uuid → terraform address for owned families. State recovery and ownership boundary. Not day-to-day apply. UUIDs stay out of `policy/` and `inventory/`. |
 
+## Promotion path
+
+| File | Owns |
+| --- | --- |
+| `docs/promotion.md` | Human checklist for the Git path. Branch → lint → validate → plan → PR → merge → apply. |
+| `.github/workflows/ci.yml` | Secret-free gates on pull requests. Lint, unit tests, `terraform fmt -check`, `terraform validate`. No plan, no apply, no ISE. |
+| `scripts/check.sh` | Local mirror of the same gates. Run from the repo root before a PR. |
+
 ## YAML conventions
 
 - kebab-case object names inside the prefix table, except SGTs (`SGT_` + snake_case)

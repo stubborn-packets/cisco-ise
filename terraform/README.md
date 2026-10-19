@@ -42,6 +42,8 @@ terraform destroy
 `terraform.tfvars` and will not fail a bad `SGT-` name. `terraform plan`
 does.
 
+`terraform validate` is one of the secret-free gates in the promotion path (`docs/promotion.md`). It runs in CI and in `scripts/check.sh`. Plan and apply stay local.
+
 State file: `environments/lab/terraform.tfstate` (gitignored).
 
 Provider: `CiscoDevNet/ise` 0.4.1, pinned in
