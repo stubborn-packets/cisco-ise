@@ -44,7 +44,7 @@ Order: NDG → allowed protocols → conditions → authz profiles / DACLs → S
 
 Exit met 2026-10-01: each family has a YAML row, a thin module, a lab call, and a live object on lab ISE. NADs stayed in `inventory/` + `exports/`. No policy sets. Blog saved at `blog/cisco-ise-policy-as-code-part4/`.
 
-## Phase 5 — Policy sets and ranks (done)
+## Phase 5 — Policy sets and ranks
 
 Wired, VPN, wireless, infra, and the first business-unit pair closed 2026-10-05 on lab ISE. Sets stay disabled. Enable was not part of the close.
 
@@ -60,7 +60,7 @@ Wired, VPN, wireless, infra, and the first business-unit pair closed 2026-10-05 
 
 `it`, `PS-<bu>-vpn`, and `PS-<bu>-wireless` are not in this phase. A lab with nothing pointed at it does not gain a new pattern from those sets. Stop here. Do not rewrite the Phase 5 post.
 
-## Rank conversion and YAML reader (done)
+## Rank conversion and YAML reader
 
 Closed 2026-10-16. Rank conversion, every family reader, outputs, and the bootstrap SGT move are done. This is not exceptions. Sets stay disabled. No new sets. No ISE write in the YAML conversion.
 
@@ -82,9 +82,15 @@ Closed 2026-10-16 on lab ISE. Local and global exception modules exist. Reader e
 - `scripts/read_policy.py` emits `environments/lab/exceptions.tf` and the shared `ex_*` maps. Do not hand-edit.
 - No SGT. No new sets. Enable is a cutover, not this phase.
 
-## Phase 7 — Import (lab)
+## Phase 7 — Import (done)
 
-Import map of `name → uuid → terraform address`. Only objects we are ready to own.
+Closed 2026-10-19. Import map of `name → uuid → terraform address`. Only objects we are ready to own.
+
+- `scripts/ise_client.py` is the shared GET-only client.
+- `scripts/import_map.py` walks the families `read_policy.py` already emits. Loaders: `load_flat` (ERS), `load_openapi`, `load_rules`, `load_exceptions`, `load_ndg`.
+- Purpose is state recovery and the ownership boundary. Not part of day-to-day apply. Terraform state already holds the UUIDs while it is healthy.
+- Rank 99 Default, Default Network Access, old GUI sets, and NADs are not mapped.
+- UUIDs stay out of `policy/` and `inventory/`. Sets stay disabled.
 
 ## Phase 8 — Git promotion path
 
