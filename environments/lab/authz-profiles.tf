@@ -8,10 +8,10 @@
 module "pr_wired_lab_access" {
   source = "../../terraform/modules/authorization-profile"
 
-  name        = "PR-wired-lab-access"
-  description = "Lab wired access. VLAN from inventory/vlans.yaml."
-  access_type = "ACCESS_ACCEPT"
-  dacl_name   = module.acl_permit_all.name
+  name         = "PR-wired-lab-access"
+  description  = "Lab wired access. VLAN from inventory/vlans.yaml."
+  access_type  = "ACCESS_ACCEPT"
+  dacl_name    = module.acl_permit_all.name
   vlan_name_id = "20"
   vlan_tag_id  = 1
 
@@ -21,10 +21,10 @@ module "pr_wired_lab_access" {
 module "pr_global_vpn" {
   source = "../../terraform/modules/authorization-profile"
 
-  name        = "PR-global-vpn"
-  description = "Lab VPN access. ASA group policy via Class ou=GP-global-vpn."
-  access_type = "ACCESS_ACCEPT"
-  dacl_name   = module.acl_permit_all.name
+  name                          = "PR-global-vpn"
+  description                   = "Lab VPN access. ASA group policy via Class ou=GP-global-vpn."
+  access_type                   = "ACCESS_ACCEPT"
+  dacl_name                     = module.acl_permit_all.name
   asa_vpn                       = "ou=GP-global-vpn"
   reauthentication_timer        = 28800
   reauthentication_connectivity = "DEFAULT"
@@ -43,9 +43,9 @@ module "pr_infra_permit" {
 module "pr_hr_wired_mab" {
   source = "../../terraform/modules/authorization-profile"
 
-  name        = "PR-hr-wired-mab"
-  description = "HR wired MAB access. VLAN from inventory/vlans.yaml."
-  access_type = "ACCESS_ACCEPT"
+  name         = "PR-hr-wired-mab"
+  description  = "HR wired MAB access. VLAN from inventory/vlans.yaml."
+  access_type  = "ACCESS_ACCEPT"
   vlan_name_id = "30"
   vlan_tag_id  = 1
 }
@@ -53,9 +53,9 @@ module "pr_hr_wired_mab" {
 module "pr_guest_wired_mab" {
   source = "../../terraform/modules/authorization-profile"
 
-  name        = "PR-guest-wired-mab"
-  description = "Guest wired MAB access. VLAN from inventory/vlans.yaml."
-  access_type = "ACCESS_ACCEPT"
+  name         = "PR-guest-wired-mab"
+  description  = "Guest wired MAB access. VLAN from inventory/vlans.yaml."
+  access_type  = "ACCESS_ACCEPT"
   vlan_name_id = "40"
   vlan_tag_id  = 1
 }

@@ -39,11 +39,11 @@ resource "ise_allowed_protocols" "this" {
   peap_peap_v0                                      = var.allow_peap ? var.peap_peap_v0 : null
   require_cryptobinding                             = var.allow_peap ? var.require_cryptobinding : null
 
-  teap_eap_tls                               = var.allow_teap ? var.teap_eap_tls : null
-  teap_eap_tls_auth_of_expired_certs         = var.allow_teap && var.teap_eap_tls ? var.teap_eap_tls_auth_of_expired_certs : null
-  teap_eap_ms_chap_v2                        = var.allow_teap ? var.teap_eap_ms_chap_v2 : null
+  teap_eap_tls                                  = var.allow_teap ? var.teap_eap_tls : null
+  teap_eap_tls_auth_of_expired_certs            = var.allow_teap && var.teap_eap_tls ? var.teap_eap_tls_auth_of_expired_certs : null
+  teap_eap_ms_chap_v2                           = var.allow_teap ? var.teap_eap_ms_chap_v2 : null
   teap_eap_accept_client_cert_during_tunnel_est = var.allow_teap ? var.teap_eap_accept_client_cert_during_tunnel_est : null
-  teap_eap_chaining                          = var.allow_teap ? var.teap_eap_chaining : null
-  teap_downgrade_msk                         = var.allow_teap ? var.teap_downgrade_msk : null
-  teap_request_basic_pwd_auth                = var.allow_teap ? var.teap_request_basic_pwd_auth : null
+  teap_eap_chaining                             = var.allow_teap ? var.teap_eap_chaining : null
+  teap_downgrade_msk                            = var.allow_teap ? var.teap_downgrade_msk : null
+  teap_request_basic_pwd_auth                   = var.allow_teap ? var.teap_request_basic_pwd_auth : null
 }
