@@ -160,7 +160,8 @@ class NameTests(unittest.TestCase):
                 "policy_sets": [
                     {
                         "name": "PS-global-wired-8021x",
-                        "rank": 40,
+                        "rank": 0,
+                        "band": "global-wired",
                         "state": "enabled",
                         "service": "Default Network Access",
                         "authentication_rules": [
@@ -266,6 +267,59 @@ class NameTests(unittest.TestCase):
         msgs = self.fx.messages()
         self.assertTrue(any("PS-Global-Wired" in m for m in msgs), msgs)
 
+    def test_packed_rank_gap_fails(self) -> None:
+        self.fx.put_policy(
+            "policy-sets.yaml",
+            {
+                "policy_sets": [
+                    {
+                        "name": "PS-global-vpn",
+                        "rank": 0,
+                        "band": "global-vpn",
+                        "state": "disabled",
+                    },
+                    {
+                        "name": "PS-global-wired-8021x",
+                        "rank": 40,
+                        "band": "global-wired",
+                        "state": "disabled",
+                    },
+                ]
+            },
+        )
+        msgs = self.fx.messages()
+        self.assertTrue(any("packed" in m for m in msgs), msgs)
+
+    def test_split_band_fails(self) -> None:
+        self.fx.put_policy(
+            "policy-sets.yaml",
+            {
+                "policy_sets": [
+                    {
+                        "name": "PS-hr-wired",
+                        "rank": 0,
+                        "band": "bu-wired",
+                        "state": "disabled",
+                    },
+                    {
+                        "name": "PS-infra-health-checks",
+                        "rank": 1,
+                        "band": "infra",
+                        "state": "disabled",
+                    },
+                    {
+                        "name": "PS-guest-wired",
+                        "rank": 2,
+                        "band": "bu-wired",
+                        "state": "disabled",
+                    },
+                ]
+            },
+        )
+        msgs = self.fx.messages()
+        self.assertTrue(any("split" in m for m in msgs), msgs)
+
+
     def test_wrong_prefix_for_collection_fails(self) -> None:
         self.fx.put_policy(
             "allowed-protocols.yaml",
@@ -311,6 +365,7 @@ class NameTests(unittest.TestCase):
         msgs = self.fx.messages()
         self.assertTrue(any("SGT_Lab_Users" in m for m in msgs), msgs)
 
+
 class StateTests(unittest.TestCase):
     def setUp(self) -> None:
         self.fx = Fixture()
@@ -325,7 +380,7 @@ class StateTests(unittest.TestCase):
         )
         msgs = self.fx.messages()
         self.assertTrue(any("missing state" in m for m in msgs), msgs)
-        
+
     def test_invalid_state_fails(self) -> None:
         self.fx.put_policy(
             "sgt.yaml",
