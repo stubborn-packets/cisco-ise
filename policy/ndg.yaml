@@ -16,7 +16,7 @@
 #
 # Phase 4 first write: fill allow-lists before any NDG Terraform object.
 # Leaves only. Do not invent a sixth root. Do not import leftover GUI names.
-# BusinessUnit is filled; do not join PS-<bu>-* to this list in this phase.
+# BusinessUnit is filled. A bu-* policy set must use a token from this list.
 # The allow-list is the vocabulary. First lab apply can still be a subset.
 
 roots:

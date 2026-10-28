@@ -13,6 +13,7 @@ Fails on:
   - UUIDs in policy/ or inventory/
   - TACACS / Device Admin keys or scopes
   - policy-set rank that is not a packed index, or a band that splits
+  - a bu-* policy set whose second name token is not in BusinessUnit allowed_values
 
 
 Usage (from the repo root):
@@ -160,6 +161,7 @@ class Linter:
         self._scan_plane(self.inventory, plane="inventory")
         self._check_ndg_file()
         self._check_nads_ndg()
+        self._check_policy_set_bu_join()
         return 1 if self.errors else 0
 
     def _scan_plane(self, directory: Path, plane: str) -> None:
@@ -463,6 +465,55 @@ class Linter:
                 )
             previous = band
 
+    def _check_policy_set_bu_join(self) -> None:
+        """A bu-* set must be PS-<token>-<flow> with token in BusinessUnit.allowed_values.
+
+        Global and infra bands are not joined. Default is skipped.
+        Runs after NDG is loaded so the allow-list is available.
+        """
+        path = self.policy / "policy-sets.yaml"
+        if not path.is_file():
+            return
+        rel = _rel(self.root, path)
+        doc = _load_yaml(path)
+        items = _as_list(doc.get("policy_sets") if isinstance(doc, dict) else None)
+        bu_root = self.ndg_by_name.get("BusinessUnit") or {}
+        allowed = [
+            value
+            for value in (bu_root.get("allowed_values") or [])
+            if isinstance(value, str)
+        ]
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            name = item.get("name")
+            band = item.get("band")
+            if not isinstance(name, str) or name == DEFAULT_POLICY_SET:
+                continue
+            if not isinstance(band, str) or not band.startswith("bu-"):
+                continue
+            parts = name.split("-")
+            if len(parts) < 3 or parts[0] != "PS":
+                self.error(
+                    rel,
+                    name,
+                    "business-unit set must be PS-<business-unit>-<flow>",
+                )
+                continue
+            token = parts[1]
+            if not allowed:
+                self.error(
+                    rel,
+                    name,
+                    "BusinessUnit allowed_values is empty; cannot join PS-<bu>-*",
+                )
+                continue
+            if token not in allowed:
+                self.error(
+                    rel,
+                    name,
+                    f"business-unit token {token!r} is not in BusinessUnit allowed_values",
+                )
 
     def _check_scope(self, obj: dict[str, Any], rel: str, name: str) -> None:
         scope = obj.get("scope")

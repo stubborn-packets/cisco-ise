@@ -74,7 +74,7 @@ Rank 99 Default is not managed. Do not rename it. Moving a set means editing ran
 
 Name pattern is still `PS-` + kebab-case. A global set is `PS-global-<flow>`. A business-unit set is `PS-<business-unit>-<flow>`. `<business-unit>` is a kebab-case token from the BusinessUnit NDG allow-list. `it`, `PS-<bu>-vpn`, and `PS-<bu>-wireless` are not written.
 
-The Phase 2 linter checks that the name is kebab-case, that rank is packed, and that band is a known label and stays contiguous. It does not yet require the business-unit token to appear in `policy/ndg.yaml` BusinessUnit `allowed_values`. NAD `ndg.business_unit` values *are* checked against that list once it is non-empty. How to add a band or change the packed rule is in `lint/README.md`.
+The Phase 2 linter checks that the name is kebab-case, that rank is packed, and that band is a known label and stays contiguous. A set whose band starts with `bu-` must be `PS-<business-unit>-<flow>`, and the business-unit token must appear in `policy/ndg.yaml` BusinessUnit `allowed_values`. Global and infra bands are not joined. NAD `ndg.business_unit` values are checked against that list once it is non-empty. How to add a band or change the packed rule is in `lint/README.md`.
 
 ## NDG values
 

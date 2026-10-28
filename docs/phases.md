@@ -129,3 +129,17 @@ Closed 2026-10-28. `scripts/export_ise.py` now uses the shared `IseClient` in `s
 - Does not write to ISE. Does not change generated `.tf` files. Sets stay disabled.
 
 Exit: `python scripts/export_ise.py` produces the same CSVs under `exports/` as before. No second HTTP implementation remains in the export script.
+
+## Linter join (cleanup)
+
+Closed 2026-10-28. A policy set whose band starts with `bu-` must be `PS-<business-unit>-<flow>`. The second token must be in `BusinessUnit.allowed_values`. Global and infra bands are not joined. An empty allow-list fails every `bu-*` set.
+
+Exit: `PS-hr-wired` and `PS-guest-wired` pass. A `bu-*` set with a token that is not on the allow-list fails. A global set still passes without a business-unit token.
+
+## Phase 11 — Deferred families
+
+`ISS-` identity source sequences, `CAP-` certificate authentication profiles, and `LP-` logical profiles (once the API is proven). One family at a time. Sets stay disabled.
+
+## Phase 12 — Reporting
+
+`exports/` report-only view. Own flow and process. Not a write path. Sets stay disabled.

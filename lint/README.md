@@ -149,16 +149,17 @@ Leave alone until a later phase says so:
 
 `docs/naming.md` says `<business-unit>` is a token from the BusinessUnit NDG allow-list.
 
-The Phase 2 linter does **not** join those yet. The old rank-band pattern (`PS-<bu>-wired` at 80–89) is retired with `POLICY_SET_RANK_EXACT`. A name is still `PREFIX-` + kebab-case. Rank is the packed index, not a band number.
+The Phase 2 linter joins a `bu-*` policy set to the BusinessUnit allow-list.
 
 | Check | Happens today? |
 | --- | --- |
 | `PS-Lab-wired` fails (token not kebab-case) | Yes |
-| `PS-hr-wired` is a legal name at rank 0 with band `bu-wired` | Yes |
-| `hr` must exist in `policy/ndg.yaml` → BusinessUnit → `allowed_values` | **No** |
+| `PS-hr-wired` is a legal name at rank 0 with band `bu-wired` | Yes, if `hr` is in BusinessUnit `allowed_values` |
+| `hr` must exist in `policy/ndg.yaml` → BusinessUnit → `allowed_values` | Yes, for a set whose band starts with `bu-` |
+| Global and infra bands are not joined | Yes |
 | NAD `ndg.business_unit: lab` must be on that allow-list | Yes, once the list is non-empty |
 
-Allow-lists start empty on purpose (`docs/decisions.md`). Filling `BusinessUnit.allowed_values` before Phase 4 is required before NDG writes. Wiring a `PS-<bu>-*` name to that same list is still a follow-up. Do not turn that on while the list is still `[]`, or every BU-scoped policy set will fail. Do not bring back the 80–89 rank pattern to do it.
+A `bu-*` set must be `PS-<business-unit>-<flow>`. The second token is the business unit. It must appear in `BusinessUnit.allowed_values`. An empty allow-list fails every `bu-*` set. Do not bring back the 80–89 rank pattern.
 
 NAD keys that *are* mapped today (`lint/builtins.yaml` `ndg_nad_keys`):
 

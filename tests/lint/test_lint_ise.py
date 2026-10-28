@@ -319,6 +319,59 @@ class NameTests(unittest.TestCase):
         msgs = self.fx.messages()
         self.assertTrue(any("split" in m for m in msgs), msgs)
 
+    def test_bu_set_token_in_allow_list_passes(self) -> None:
+        self.fx.set_ndg(business_units=["hr", "guest"])
+        self.fx.put_policy(
+            "policy-sets.yaml",
+            {
+                "policy_sets": [
+                    {
+                        "name": "PS-hr-wired",
+                        "rank": 0,
+                        "band": "bu-wired",
+                        "state": "disabled",
+                    }
+                ]
+            },
+        )
+        self.assertEqual(self.fx.messages(), [])
+
+    def test_bu_set_token_missing_from_allow_list_fails(self) -> None:
+        self.fx.set_ndg(business_units=["lab"])
+        self.fx.put_policy(
+            "policy-sets.yaml",
+            {
+                "policy_sets": [
+                    {
+                        "name": "PS-missing-wired",
+                        "rank": 0,
+                        "band": "bu-wired",
+                        "state": "disabled",
+                    }
+                ]
+            },
+        )
+        msgs = self.fx.messages()
+        self.assertTrue(any("not in BusinessUnit allowed_values" in m for m in msgs), msgs)
+        self.assertTrue(any("PS-missing-wired" in m for m in msgs), msgs)
+
+    def test_global_set_does_not_require_bu_token(self) -> None:
+        self.fx.set_ndg(business_units=["hr"])
+        self.fx.put_policy(
+            "policy-sets.yaml",
+            {
+                "policy_sets": [
+                    {
+                        "name": "PS-global-wired-8021x",
+                        "rank": 0,
+                        "band": "global-wired",
+                        "state": "disabled",
+                    }
+                ]
+            },
+        )
+        self.assertEqual(self.fx.messages(), [])
+
 
     def test_wrong_prefix_for_collection_fails(self) -> None:
         self.fx.put_policy(
