@@ -118,3 +118,14 @@ Closed 2026-10-28. GET-only comparison of `policy/` against live ISE, plus Terra
 - Does not write to ISE. Does not run in CI. Sets stay disabled.
 
 Exit: a reader can tell owned drift (plan or script missing/extra/mismatch) from observed extra objects (non-owned list). The script reports name-level differences for every owned family and does not write.
+
+## Phase 10 — Shared client for export
+
+Closed 2026-10-28. `scripts/export_ise.py` now uses the shared `IseClient` in `scripts/ise_client.py`.
+
+- Local `IseClient` class and its pagination helpers removed from `export_ise.py`.
+- `load_settings` calls `load_client`. CLI, CSV layout, resource list, and secret redaction unchanged.
+- One GET path for export, import map, and drift. The client still refuses any method other than GET.
+- Does not write to ISE. Does not change generated `.tf` files. Sets stay disabled.
+
+Exit: `python scripts/export_ise.py` produces the same CSVs under `exports/` as before. No second HTTP implementation remains in the export script.
