@@ -82,7 +82,7 @@ Closed 2026-10-16 on lab ISE. Local and global exception modules exist. Reader e
 - `scripts/read_policy.py` emits `environments/lab/exceptions.tf` and the shared `ex_*` maps. Do not hand-edit.
 - No SGT. No new sets. Enable is a cutover, not this phase.
 
-## Phase 7 — Import (done)
+## Phase 7 — Import (lab)
 
 Closed 2026-10-19. Import map of `name → uuid → terraform address`. Only objects we are ready to own.
 
@@ -107,4 +107,14 @@ Exit: a PR that changes YAML fails CI if the name is bad or Terraform does not v
 
 ## Phase 9 — Drift
 
-Nightly export vs `policy/` + `inventory/`. Terraform plan as drift detector.
+Closed 2026-10-28. GET-only comparison of `policy/` against live ISE, plus Terraform plan as the authoritative detector for owned objects.
+
+- `scripts/drift.py` covers every family `read_policy.py` emits: SGT (name + tag), EIG, DACL, AP, PR, CND, PS, AN, AZ, EX, NDG.
+- Rules and exceptions print as `parent-set | name` (global exceptions as `global | name`).
+- Built-in `Default` rules and the names `Default` / `Default Network Access` are ignored.
+- System exclusions live in `policy/system-exclusions.yaml`. Edit names there; do not hard-code them in the script.
+- Non-owned remainder is printed. It does not fail the owned check, but it does fail the overall “all clean” summary.
+- Terraform plan remains the authoritative detector. It stays local and requires the lab `.env`.
+- Does not write to ISE. Does not run in CI. Sets stay disabled.
+
+Exit: a reader can tell owned drift (plan or script missing/extra/mismatch) from observed extra objects (non-owned list). The script reports name-level differences for every owned family and does not write.

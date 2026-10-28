@@ -91,6 +91,9 @@ Three planes. Do not mix them.
 | `scripts/read_policy.py` | Emits the policy-set shells, rules, conditions, allowed protocols, DACLs, authorization profiles, SGTs, EIGs, NDG, exceptions, and outputs from `policy/`. No ISE. |
 | `scripts/ise_client.py` | Shared GET-only ISE client. Used by `import_map.py`. `export_ise.py` not yet switched. |
 | `scripts/import_map.py` | Phase 7 import map. name → uuid → terraform address for owned families. State recovery and ownership boundary. Not day-to-day apply. UUIDs stay out of `policy/` and `inventory/`. |
+| `scripts/drift.py` | Phase 9 drift. GET-only name (and SGT tag) comparison of `policy/` against live ISE. Covers every family `read_policy.py` emits. Does not write. Does not call Terraform. |
+| `policy/system-exclusions.yaml` | Per-family names to hide from the non-owned report. Not desired state. Terraform does not read it. |
+| `docs/drift.md` | Human checklist. Terraform plan is the detector for owned objects. The script is the wider observed view. Neither runs in CI. |
 
 ## Promotion path
 

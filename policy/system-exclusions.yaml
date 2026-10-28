@@ -1,0 +1,115 @@
+# policy/system-exclusions.yaml
+# Live names that do not start with the family prefix and should not be
+# printed as non-owned by scripts/drift.py.
+# Owned names are never listed here.
+# Edit this file; do not hard-code exclusion names in the script.
+# This file is not desired state. Terraform does not read it.
+
+SGT:
+  - Auditors
+  - BYOD
+  - Contractors
+  - Developers
+  - Development_Servers
+  - Employees
+  - Guests
+  - Network_Services
+  - PCI_Servers
+  - Point_of_Sale_Systems
+  - Production_Servers
+  - Production_Users
+  - Quarantined_Systems
+  - Test_Servers
+  - TrustSec_Devices
+  - Unknown
+
+EIG:
+  - Android
+  - Apple-iDevice
+  - Axis-Device
+  - BlackBerry
+  - Blocked List
+  - Cisco-Collaboration-Device
+  - Cisco-IP-Phone
+  - Cisco-Meraki-Device
+  - Cisco-Room-Device
+  - Cisco-Webex-Board-Device
+  - Cisco-Webex-Codec-Device
+  - Cisco-Webex-Desk-Device
+  - Epson-Device
+  - GuestEndpoints
+  - Juniper-Device
+  - OS_X_BigSur-Workstation
+  - Profiled
+  - RegisteredDevices
+  - Sony-Device
+  - Synology-Device
+  - Trendnet-Device
+  - Unknown
+  - Verifone-Payment-Terminal
+  - Vizio-Device
+  - Windows11-Workstation
+  - Workstation
+  - Xerox-AltaLink-B8245-MFP
+  - Xerox-AltaLink-B8255-MFP
+  - Xerox-AltaLink-B8270-MFP
+  - Xerox-AltaLink-C8230-Color-MFP
+  - Xerox-AltaLink-C8235-Color-MFP
+  - Xerox-AltaLink-C8245-Color-MFP
+  - Xerox-AltaLink-C8255-Color-MFP
+  - Xerox-AltaLink-C8270-Color-MFP
+  - ecobee-Device
+
+DACL:
+  - DENY_ALL_IPV4_TRAFFIC
+  - DENY_ALL_IPV6_TRAFFIC
+  - PERMIT_ALL_IPV4_TRAFFIC
+  - PERMIT_ALL_IPV6_TRAFFIC
+
+AP:
+  - Default Network Access
+  - Default Device Admin
+
+PR:
+  - Block_Wireless_Access
+  - Cisco_IP_Phones
+  - Cisco_Temporal_Onboard
+  - Cisco_WebAuth
+  - DenyAccess
+  - NSP_Onboard
+  - Non_Cisco_IP_Phones
+  - PermitAccess
+  - UDN
+
+CND:
+  - 5G
+  - BYOD_is_Registered
+  - Catalyst_Switch_Local_Web_Authentication
+  - Compliance_Unknown_Devices
+  - Compliant_Devices
+  - EAP-MSCHAPv2
+  - EAP-TLS
+  - Guest_Flow
+  - MAC_in_SAN
+  - Network_Access_Authentication_Passed
+  - Non_Cisco_Profiled_Phones
+  - Non_Compliant_Devices
+  - Switch_Local_Web_Authentication
+  - Switch_Web_Authentication
+  - WLC_Web_Authentication
+  - Wired_802.1X
+  - Wired_MAB
+  - Wireless_802.1X
+  - Wireless_Access
+  - Wireless_MAB
+
+PS:
+  - Default
+
+AN: []
+
+AZ: []
+
+EX: []
+
+NDG: []
