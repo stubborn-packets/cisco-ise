@@ -60,6 +60,7 @@ POLICY_COLLECTIONS: dict[str, list[tuple[str, str | None]]] = {
     "conditions.yaml": [("conditions", "CND")],
     "eig.yaml": [("endpoint_identity_groups", "EIG")],
     "exceptions.yaml": [("exceptions", "EX")],
+    "identity-source-sequences.yaml": [("identity_source_sequences", "ISS")],
     "logical-profiles.yaml": [("logical_profiles", "LP")],
     "policy-sets.yaml": [("policy_sets", "PS")],
     "sgt.yaml": [("sgts", "SGT")],
