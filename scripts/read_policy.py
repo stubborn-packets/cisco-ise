@@ -38,6 +38,7 @@ READS = (
     "policy/eig.yaml",
     "policy/ndg.yaml",
     "policy/exceptions.yaml",
+    "policy/identity-source-sequences.yaml",
 )
 
 # Where the generated calls go. Review surface stays policy/.
@@ -55,6 +56,7 @@ WRITES = (
     "environments/lab/ndg.tf",
     "environments/lab/outputs.tf",
     "environments/lab/exceptions.tf",
+    "environments/lab/identity-source-sequences.tf",
 )
 
 # Name in YAML → module address already in state.
@@ -74,6 +76,7 @@ ADDRESS = {
     "EIG-": "eig_",
     "NDG-": "ndg_",
     "EX-": "ex_",
+    "ISS-": "iss_",
 }
 
 def output_key(name: str) -> str:
@@ -174,6 +177,42 @@ def _hcl_string(value: str) -> str:
     return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
+def _align_assignments(lines: list[str]) -> list[str]:
+    """Align the first '=' in consecutive top-level assignment lines.
+
+    Only lines that start with exactly two spaces and contain ' = ' are
+    aligned. A blank line or a deeper-indented line ends the group so
+    nested blocks and depends_on stay as written. This keeps re-runs
+    from churning spacing in generated files.
+    """
+    result: list[str] = []
+    group: list[str] = []
+
+    def flush() -> None:
+        if not group:
+            return
+        width = max(len(line.split("=", 1)[0].rstrip()) for line in group)
+        for line in group:
+            left, right = line.split("=", 1)
+            result.append(f"{left.rstrip():<{width}} = {right.lstrip()}")
+        group.clear()
+
+    for line in lines:
+        is_assign = (
+            line.startswith("  ")
+            and not line.startswith("   ")
+            and " = " in line
+            and not line.lstrip().startswith("#")
+        )
+        if is_assign:
+            group.append(line)
+        else:
+            flush()
+            result.append(line)
+    flush()
+    return result
+
+
 def load_policy_sets(root: Path) -> list[dict[str, Any]]:
     path = root / READS[0]
     if not path.is_file():
@@ -247,7 +286,7 @@ def render_set(obj: dict[str, Any], previous: str | None) -> str:
         f"  depends_on = [{depends_txt}]",
         "}",
     ]
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render(sets: list[dict[str, Any]]) -> str:
@@ -309,7 +348,7 @@ def render_authn_rule(rule: dict[str, Any], parent: str) -> str:
         f"  depends_on = [module.{parent_label}, module.{condition}]",
         "}",
     ]
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_authn(sets: list[dict[str, Any]]) -> str:
@@ -372,7 +411,7 @@ def render_authz_rule(rule: dict[str, Any], parent: str) -> str:
         f"  depends_on = [module.{parent_label}, module.{condition}, module.{profile}]",
         "}",
     ]
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_authz(sets: list[dict[str, Any]]) -> str:
@@ -487,7 +526,7 @@ def render_condition(obj: dict[str, Any]) -> str:
         lines.append(f"  operator        = {_hcl_string(obj['operator'])}")
         lines.append(f"  attribute_value = {_hcl_string(obj['attribute_value'])}")
     lines.append("}")
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_conditions(conditions: list[dict[str, Any]]) -> str:
@@ -655,7 +694,7 @@ def render_allowed_protocol(obj: dict[str, Any]) -> str:
         for field in AP_TEAP_INNER:
             lines.append(_emit_ap_line(field, obj[field]))
     lines.append("}")
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_allowed_protocols(rows: list[dict[str, Any]]) -> str:
@@ -725,7 +764,7 @@ def render_dacl(obj: dict[str, Any]) -> str:
         f"  dacl_type   = {_hcl_string(dacl_type)}",
         "}",
     ]
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_dacls(rows: list[dict[str, Any]]) -> str:
@@ -862,7 +901,7 @@ def render_profile(obj: dict[str, Any], vlan_map: dict[str, str]) -> str:
         lines.append("")
         lines.append(f"  depends_on = [module.{dacl_label}]")
     lines.append("}")
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_profiles(rows: list[dict[str, Any]], vlan_map: dict[str, str]) -> str:
@@ -938,7 +977,7 @@ def render_sgt(obj: dict[str, Any]) -> str:
     propagate = obj.get("propagate_to_apic", False)
     lines.append(f"  propagate_to_apic = {_hcl_bool(propagate)}")
     lines.append("}")
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_sgts(rows: list[dict[str, Any]]) -> str:
@@ -1023,7 +1062,7 @@ def render_eig(obj: dict[str, Any]) -> str:
     # Parent name stays in YAML. Parent UUID is never emitted.
     # Module default system_defined is false and is not written.
     lines.append("}")
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_eigs(rows: list[dict[str, Any]]) -> str:
@@ -1163,7 +1202,7 @@ def render_ndg(obj: dict[str, Any]) -> str:
         lines.append("")
         lines.append(f"  depends_on = [module.{container_label}]")
     lines.append("}")
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_ndgs(roots: list[dict[str, Any]]) -> str:
@@ -1273,7 +1312,7 @@ def render_exception(obj: dict[str, Any]) -> str:
         f"  depends_on = [{depends_txt}]",
         "}",
     ])
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_exceptions(rows: list[dict[str, Any]]) -> str:
@@ -1293,6 +1332,101 @@ def render_exceptions(rows: list[dict[str, Any]]) -> str:
         validate_exception(obj, index)
     blocks = [render_exception(obj) for obj in ordered]
     return EX_HEADER + "\n" + "\n\n".join(blocks) + "\n"
+
+
+
+ISS_HEADER = """\
+# Generated by scripts/read_policy.py. Do not hand-edit.
+# Source: policy/identity-source-sequences.yaml. Review surface stays that file.
+# break_on_store_fail is always emitted. false continues on store failure.
+# Certificate profile is optional and omitted when empty.
+# No for_each. Ids stay in state, not in policy/.
+"""
+
+
+def load_iss(root: Path) -> list[dict[str, Any]]:
+    path = root / "policy/identity-source-sequences.yaml"
+    if not path.is_file():
+        raise ReaderError("policy/identity-source-sequences.yaml is missing")
+    doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    if not isinstance(doc, dict):
+        raise ReaderError("policy/identity-source-sequences.yaml is not a mapping")
+    rows = doc.get("identity_source_sequences")
+    if not isinstance(rows, list):
+        raise ReaderError("identity_source_sequences must be a list")
+    return rows
+
+
+def validate_iss(obj: dict[str, Any], index: int) -> None:
+    if not isinstance(obj, dict):
+        raise ReaderError(f"iss {index} is not a mapping")
+    name = obj.get("name")
+    if not isinstance(name, str) or not name:
+        raise ReaderError(f"iss {index} needs a name")
+    if not name.startswith("ISS-") or "_" in name:
+        raise ReaderError(f"{name} must be ISS- + kebab-case")
+    description = obj.get("description", "")
+    if not isinstance(description, str):
+        raise ReaderError(f"{name} description must be a string")
+    if "<" in description or ">" in description:
+        raise ReaderError(f"{name} description must not contain < or >")
+    if "break_on_store_fail" not in obj:
+        raise ReaderError(f"{name} break_on_store_fail is required")
+    if not isinstance(obj["break_on_store_fail"], bool):
+        raise ReaderError(f"{name} break_on_store_fail must be a bool")
+    cap = obj.get("certificate_authentication_profile", "")
+    if not isinstance(cap, str):
+        raise ReaderError(f"{name} certificate_authentication_profile must be a string")
+    sources = obj.get("identity_sources")
+    if not isinstance(sources, list) or not sources:
+        raise ReaderError(f"{name} identity_sources must be a non-empty list")
+    for i, src in enumerate(sources):
+        if not isinstance(src, dict):
+            raise ReaderError(f"{name} identity_sources[{i}] is not a mapping")
+        if not isinstance(src.get("name"), str) or not src["name"]:
+            raise ReaderError(f"{name} identity_sources[{i}] needs a name")
+        order = src.get("order")
+        if not isinstance(order, int) or order < 1:
+            raise ReaderError(f"{name} identity_sources[{i}] order must be an int >= 1")
+    for field in ("owner", "state"):
+        if field in obj and not isinstance(obj[field], str):
+            raise ReaderError(f"{name} {field} must be a string when present")
+
+
+def render_iss(obj: dict[str, Any]) -> str:
+    name = obj["name"]
+    label = module_label(name)
+    description = obj.get("description") or ""
+    cap = obj.get("certificate_authentication_profile") or ""
+    lines = [
+        f'module "{label}" {{',
+        '  source = "../../terraform/modules/identity-source-sequence"',
+        "",
+        f"  name                = {_hcl_string(name)}",
+    ]
+    if description:
+        lines.append(f"  description         = {_hcl_string(description)}")
+    lines.append(f"  break_on_store_fail = {str(obj['break_on_store_fail']).lower()}")
+    if cap:
+        lines.append(f"  certificate_authentication_profile = {_hcl_string(cap)}")
+    lines.append("  identity_sources = [")
+    for src in obj["identity_sources"]:
+        lines.append("    {")
+        lines.append(f"      name  = {_hcl_string(src['name'])}")
+        lines.append(f"      order = {src['order']}")
+        lines.append("    },")
+    lines.append("  ]")
+    lines.append("}")
+    return "\n".join(_align_assignments(lines))
+
+
+def render_iss_all(rows: list[dict[str, Any]]) -> str:
+    for index, obj in enumerate(rows):
+        validate_iss(obj, index)
+    blocks = [render_iss(obj) for obj in rows]
+    if not blocks:
+        return ISS_HEADER + "# No identity source sequences yet.\n"
+    return ISS_HEADER + "\n" + "\n\n".join(blocks) + "\n"
 
 
 OUTPUTS_HEADER = """\
@@ -1317,7 +1451,7 @@ def _map_block(title: str, pairs: list[tuple[str, str]], description: str) -> st
     lines.append("  }")
     lines.append(f'  description = "{description}"')
     lines.append("}")
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_outputs(
@@ -1330,6 +1464,7 @@ def render_outputs(
     eigs: list[dict[str, Any]],
     ndg_objects: list[dict[str, Any]],
     exceptions: list[dict[str, Any]],
+    iss: list[dict[str, Any]],
 ) -> str:
     """Name/id maps for every family."""
     parts = [OUTPUTS_HEADER.rstrip()]
@@ -1458,6 +1593,24 @@ def render_outputs(
     parts.append(_map_block(
         "eig_ids",
         [(k, f"{v}.id") for k, v in eig_pairs],
+        "ISE UUIDs. State only. Do not copy into policy/ or inventory/.",
+    ))
+
+    # Identity source sequences. Keys from the YAML name only.
+    iss_pairs = []
+    for obj in iss:
+        key = output_key(obj["name"])
+        label = module_label(obj["name"])
+        iss_pairs.append((key, f"module.{label}"))
+    iss_pairs.sort()
+    parts.append(_map_block(
+        "iss_names",
+        [(k, f"{v}.name") for k, v in iss_pairs],
+        "Identity source sequence names stored on lab ISE.",
+    ))
+    parts.append(_map_block(
+        "iss_ids",
+        [(k, f"{v}.id") for k, v in iss_pairs],
         "ISE UUIDs. State only. Do not copy into policy/ or inventory/.",
     ))
 
@@ -1612,8 +1765,10 @@ def main(argv: list[str] | None = None) -> int:
         ndg_objects = derive_ndg_objects(ndg_roots)
         exceptions = load_exceptions(root)
         ex_text = render_exceptions(exceptions)
+        iss = load_iss(root)
+        iss_text = render_iss_all(iss)
         outputs_text = render_outputs(
-            sets, conditions, protocols, dacls, profiles, sgts, eigs, ndg_objects, exceptions
+            sets, conditions, protocols, dacls, profiles, sgts, eigs, ndg_objects, exceptions, iss
         )
     except ReaderError as exc:
         print(f"read_policy: {exc}", file=sys.stderr)
@@ -1643,6 +1798,8 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.write("\n")
         sys.stdout.write(ex_text)
         sys.stdout.write("\n")
+        sys.stdout.write(iss_text)
+        sys.stdout.write("\n")
         return 0
     written = []
     for rel, text in (
@@ -1658,6 +1815,7 @@ def main(argv: list[str] | None = None) -> int:
         (WRITES[9], ndg_text),
         (WRITES[10], outputs_text),
         (WRITES[11], ex_text),
+        (WRITES[12], iss_text),
     ):
         path = root / rel
         path.write_text(text, encoding="utf-8")

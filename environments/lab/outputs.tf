@@ -201,6 +201,20 @@ output "eig_ids" {
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
 
+output "iss_names" {
+  value = {
+    lab_internal = module.iss_lab_internal.name
+  }
+  description = "Identity source sequence names stored on lab ISE."
+}
+
+output "iss_ids" {
+  value = {
+    lab_internal = module.iss_lab_internal.id
+  }
+  description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
+}
+
 output "ps_names" {
   value = {
     global_vpn            = module.ps_global_vpn.name

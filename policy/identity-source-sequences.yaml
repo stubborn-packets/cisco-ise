@@ -1,0 +1,21 @@
+# policy/identity-source-sequences.yaml
+# Plane: desired state. Terraform may create these from Phase 11a.
+# Names use ISS- plus kebab-case. state is required.
+# identity_sources is an ordered list of existing identity source names.
+# break_on_store_fail is always present. false (continue on store failure)
+# is the lab default; true stops the sequence and sets ProcessError.
+# certificate_authentication_profile is optional (empty string means none).
+# Do not put UUIDs here. Do not manage built-in sequences.
+
+identity_source_sequences:
+  - name: ISS-lab-internal
+    description: Lab sequence that tries Internal Users then Internal Endpoints.
+    owner: lab
+    state: enabled
+    break_on_store_fail: false
+    certificate_authentication_profile: ""
+    identity_sources:
+      - name: Internal Users
+        order: 1
+      - name: Internal Endpoints
+        order: 2
