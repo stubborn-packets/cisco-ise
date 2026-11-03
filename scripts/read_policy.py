@@ -177,6 +177,42 @@ def _hcl_string(value: str) -> str:
     return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
+def _align_assignments(lines: list[str]) -> list[str]:
+    """Align the first '=' in consecutive top-level assignment lines.
+
+    Only lines that start with exactly two spaces and contain ' = ' are
+    aligned. A blank line or a deeper-indented line ends the group so
+    nested blocks and depends_on stay as written. This keeps re-runs
+    from churning spacing in generated files.
+    """
+    result: list[str] = []
+    group: list[str] = []
+
+    def flush() -> None:
+        if not group:
+            return
+        width = max(len(line.split("=", 1)[0].rstrip()) for line in group)
+        for line in group:
+            left, right = line.split("=", 1)
+            result.append(f"{left.rstrip():<{width}} = {right.lstrip()}")
+        group.clear()
+
+    for line in lines:
+        is_assign = (
+            line.startswith("  ")
+            and not line.startswith("   ")
+            and " = " in line
+            and not line.lstrip().startswith("#")
+        )
+        if is_assign:
+            group.append(line)
+        else:
+            flush()
+            result.append(line)
+    flush()
+    return result
+
+
 def load_policy_sets(root: Path) -> list[dict[str, Any]]:
     path = root / READS[0]
     if not path.is_file():
@@ -250,7 +286,7 @@ def render_set(obj: dict[str, Any], previous: str | None) -> str:
         f"  depends_on = [{depends_txt}]",
         "}",
     ]
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render(sets: list[dict[str, Any]]) -> str:
@@ -312,7 +348,7 @@ def render_authn_rule(rule: dict[str, Any], parent: str) -> str:
         f"  depends_on = [module.{parent_label}, module.{condition}]",
         "}",
     ]
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_authn(sets: list[dict[str, Any]]) -> str:
@@ -375,7 +411,7 @@ def render_authz_rule(rule: dict[str, Any], parent: str) -> str:
         f"  depends_on = [module.{parent_label}, module.{condition}, module.{profile}]",
         "}",
     ]
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_authz(sets: list[dict[str, Any]]) -> str:
@@ -490,7 +526,7 @@ def render_condition(obj: dict[str, Any]) -> str:
         lines.append(f"  operator        = {_hcl_string(obj['operator'])}")
         lines.append(f"  attribute_value = {_hcl_string(obj['attribute_value'])}")
     lines.append("}")
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_conditions(conditions: list[dict[str, Any]]) -> str:
@@ -658,7 +694,7 @@ def render_allowed_protocol(obj: dict[str, Any]) -> str:
         for field in AP_TEAP_INNER:
             lines.append(_emit_ap_line(field, obj[field]))
     lines.append("}")
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_allowed_protocols(rows: list[dict[str, Any]]) -> str:
@@ -728,7 +764,7 @@ def render_dacl(obj: dict[str, Any]) -> str:
         f"  dacl_type   = {_hcl_string(dacl_type)}",
         "}",
     ]
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_dacls(rows: list[dict[str, Any]]) -> str:
@@ -865,7 +901,7 @@ def render_profile(obj: dict[str, Any], vlan_map: dict[str, str]) -> str:
         lines.append("")
         lines.append(f"  depends_on = [module.{dacl_label}]")
     lines.append("}")
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_profiles(rows: list[dict[str, Any]], vlan_map: dict[str, str]) -> str:
@@ -941,7 +977,7 @@ def render_sgt(obj: dict[str, Any]) -> str:
     propagate = obj.get("propagate_to_apic", False)
     lines.append(f"  propagate_to_apic = {_hcl_bool(propagate)}")
     lines.append("}")
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_sgts(rows: list[dict[str, Any]]) -> str:
@@ -1026,7 +1062,7 @@ def render_eig(obj: dict[str, Any]) -> str:
     # Parent name stays in YAML. Parent UUID is never emitted.
     # Module default system_defined is false and is not written.
     lines.append("}")
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_eigs(rows: list[dict[str, Any]]) -> str:
@@ -1166,7 +1202,7 @@ def render_ndg(obj: dict[str, Any]) -> str:
         lines.append("")
         lines.append(f"  depends_on = [module.{container_label}]")
     lines.append("}")
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_ndgs(roots: list[dict[str, Any]]) -> str:
@@ -1276,7 +1312,7 @@ def render_exception(obj: dict[str, Any]) -> str:
         f"  depends_on = [{depends_txt}]",
         "}",
     ])
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_exceptions(rows: list[dict[str, Any]]) -> str:
@@ -1381,7 +1417,7 @@ def render_iss(obj: dict[str, Any]) -> str:
         lines.append("    },")
     lines.append("  ]")
     lines.append("}")
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_iss_all(rows: list[dict[str, Any]]) -> str:
@@ -1415,7 +1451,7 @@ def _map_block(title: str, pairs: list[tuple[str, str]], description: str) -> st
     lines.append("  }")
     lines.append(f'  description = "{description}"')
     lines.append("}")
-    return "\n".join(lines)
+    return "\n".join(_align_assignments(lines))
 
 
 def render_outputs(
@@ -1758,11 +1794,11 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.write("\n")
         sys.stdout.write(ndg_text)
         sys.stdout.write("\n")
-        sys.stdout.write(iss_text)
+        sys.stdout.write(outputs_text)
         sys.stdout.write("\n")
         sys.stdout.write(ex_text)
         sys.stdout.write("\n")
-        sys.stdout.write(outputs_text)
+        sys.stdout.write(iss_text)
         sys.stdout.write("\n")
         return 0
     written = []
@@ -1777,9 +1813,9 @@ def main(argv: list[str] | None = None) -> int:
         (WRITES[7], sgt_text),
         (WRITES[8], eig_text),
         (WRITES[9], ndg_text),
-        (WRITES[10], iss_text),
+        (WRITES[10], outputs_text),
         (WRITES[11], ex_text),
-        (WRITES[12], outputs_text),
+        (WRITES[12], iss_text),
     ):
         path = root / rel
         path.write_text(text, encoding="utf-8")
