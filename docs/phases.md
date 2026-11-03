@@ -136,10 +136,26 @@ Closed 2026-10-28. A policy set whose band starts with `bu-` must be `PS-<busine
 
 Exit: `PS-hr-wired` and `PS-guest-wired` pass. A `bu-*` set with a token that is not on the allow-list fails. A global set still passes without a business-unit token.
 
-## Phase 11 — Deferred families
+## Phase 11 — Deferred identity families
 
-`ISS-` identity source sequences, `CAP-` certificate authentication profiles, and `LP-` logical profiles (once the API is proven). One family at a time. Sets stay disabled.
+One family at a time. Sets stay disabled.
+
+- **11a — ISS-** identity source sequences. Closed 2026-11-03. YAML, thin module, reader emission, linter. One lab object: `ISS-lab-internal` (`break_on_store_fail: false`, Internal Users then Internal Endpoints). No certificate profile. Sets stay disabled.
+- **11b — CAP-** certificate authentication profiles. Same pattern. Modules and YAML even with no live clients or internal CA.
+- **LP-** logical profiles. Skipped. Potential future work if needed and the API write path is proven. Not in this phase.
 
 ## Phase 12 — Reporting
 
-`exports/` report-only view. Own flow and process. Not a write path. Sets stay disabled.
+Report-only view of owned policy: policy sets, their conditions, authentication rules, and authorization rules. Own flow and process under `exports/` or a reports tree. Not a write path. Sets stay disabled.
+
+## Phase 13 — External identity sources (LDAP)
+
+New family after ISS and CAP. Thin module and YAML for an LDAP identity source. Prerequisite is a lab LDAP setup. Not a blocker for the public stop.
+
+## Phase 14 — Multi-instance readiness
+
+Scripts accept an environment label (default `lab`). Exports, drift, and import-map output show which environment they ran against. Still one write target (`environments/lab`). Removes the hard “lab” assumption without inventing stage or prod.
+
+## Phase 15 — Operational documentation
+
+Nightly drift example (cron, systemd, or GitHub Actions) and optional notification if non-owned objects appear. Production get-started guide: benefits, what is needed (ISE version, API access, packages, starting small to fully managed), and the cutover pattern. Documentation only. No new Terraform resources.
