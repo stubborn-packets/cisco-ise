@@ -19,7 +19,10 @@ except ImportError:
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 POLICY_SETS_PATH = REPO_ROOT / "policy" / "policy-sets.yaml"
+CONDITIONS_PATH = REPO_ROOT / "policy" / "conditions.yaml"
+PROFILES_PATH = REPO_ROOT / "policy" / "authz-profiles.yaml"
 REPORTS_DIR = REPO_ROOT / "reports"
+
 
 def load_policy_sets(path: Path) -> list[dict]:
     """Load and return the policy_sets list. Fail hard on missing or empty data."""
@@ -33,6 +36,63 @@ def load_policy_sets(path: Path) -> list[dict]:
         print("policy/policy-sets.yaml has no policy_sets list", file=sys.stderr)
         sys.exit(1)
     return sets
+
+
+def load_named(path: Path, key: str) -> dict[str, dict]:
+    """Return a name → object map. Empty dict if the file is missing."""
+    if not path.is_file():
+        return {}
+    with path.open(encoding="utf-8") as fh:
+        data = yaml.safe_load(fh) or {}
+    items = data.get(key) or []
+    return {item["name"]: item for item in items if isinstance(item, dict) and "name" in item}
+
+
+def render_condition(name: str, conditions: dict[str, dict], indent: str = "  ") -> list[str]:
+    """Name plus a short readable form of the condition."""
+    lines = [f"{indent}- **Condition:** `{name}`"]
+    cnd = conditions.get(name)
+    if not cnd:
+        lines.append(f"{indent}  _(not found in conditions.yaml)_")
+        return lines
+    ctype = cnd.get("type", "")
+    if ctype == "LibraryConditionAndBlock":
+        lines[0] += " (AND)"
+        for child in cnd.get("children") or []:
+            if child.get("type") == "ConditionAttributes":
+                lines.append(
+                    f"{indent}  - {child.get('dictionary_name')} "
+                    f"{child.get('attribute_name')} {child.get('operator')} "
+                    f"{child.get('attribute_value')}"
+                )
+    elif ctype == "LibraryConditionAttributes":
+        lines.append(
+            f"{indent}  {cnd.get('dictionary_name')} "
+            f"{cnd.get('attribute_name')} {cnd.get('operator')} "
+            f"{cnd.get('attribute_value')}"
+        )
+    return lines
+
+
+def render_profile(name: str, profiles: dict[str, dict], indent: str = "  ") -> list[str]:
+    """Name plus the result fields that matter."""
+    lines = [f"{indent}- **Profile:** `{name}`"]
+    pr = profiles.get(name)
+    if not pr:
+        lines.append(f"{indent}  _(not found in authz-profiles.yaml)_")
+        return lines
+    parts = [pr.get("access_type", "ACCESS_ACCEPT")]
+    if pr.get("vlan"):
+        parts.append(f"VLAN {pr['vlan']}")
+    if pr.get("dacl"):
+        parts.append(f"DACL {pr['dacl']}")
+    if pr.get("asa_vpn"):
+        parts.append(f"Class `{pr['asa_vpn']}`")
+    if pr.get("reauth_timer"):
+        conn = pr.get("reauth_connectivity", "")
+        parts.append(f"reauth {pr['reauth_timer']} ({conn})")
+    lines.append(f"{indent}  {', '.join(parts)}")
+    return lines
 
 
 def matches_filter(policy_set: dict, keyword: str) -> bool:
@@ -74,7 +134,7 @@ def output_path(args: argparse.Namespace) -> Path:
     return REPORTS_DIR / "policy-evaluation.md"
 
 
-def render_set(policy_set: dict) -> list[str]:
+def render_set(policy_set: dict, conditions: dict[str, dict], profiles: dict[str, dict]) -> list[str]:
     """Return Markdown lines for one policy set."""
     name = policy_set.get("name", "?")
     rank = policy_set.get("rank", "?")
@@ -90,8 +150,8 @@ def render_set(policy_set: dict) -> list[str]:
         f"- **Band:** {band}",
         f"- **State:** {state}",
         f"- **Service:** {service}",
-        f"- **Set condition:** {condition}",
     ]
+    lines.extend(render_condition(condition, conditions, indent=""))
     if description:
         lines.append(f"- **Description:** {description}")
     lines.append("")
@@ -105,10 +165,10 @@ def render_set(policy_set: dict) -> list[str]:
         lines.append("")
     else:
         for rule in an_rules:
+            lines.append(f"#### {rule.get('name', '?')} (rank {rule.get('rank', '?')})")
+            lines.append("")
+            lines.extend(render_condition(rule.get("condition", ""), conditions, indent=""))
             lines.extend([
-                f"#### {rule.get('name', '?')} (rank {rule.get('rank', '?')})",
-                "",
-                f"- Condition: {rule.get('condition', '')}",
                 f"- Identity source: {rule.get('identity_source', '')}",
                 f"- if_auth_fail: {rule.get('if_auth_fail', '')}",
                 f"- if_process_fail: {rule.get('if_process_fail', '')}",
@@ -125,26 +185,24 @@ def render_set(policy_set: dict) -> list[str]:
         lines.append("")
     else:
         for rule in az_rules:
-            lines.extend([
-                f"#### {rule.get('name', '?')} (rank {rule.get('rank', '?')})",
-                "",
-                f"- Condition: {rule.get('condition', '')}",
-                f"- Profile: {rule.get('profile', '')}",
-                "",
-            ])
+            lines.append(f"#### {rule.get('name', '?')} (rank {rule.get('rank', '?')})")
+            lines.append("")
+            lines.extend(render_condition(rule.get("condition", ""), conditions, indent=""))
+            lines.extend(render_profile(rule.get("profile", ""), profiles, indent=""))
+            lines.append("")
 
     lines.append("---")
     lines.append("")
     return lines
 
 
-def render_report(policy_sets: list[dict], keyword: str | None) -> str:
+def render_report(policy_sets: list[dict], keyword: str | None,
+                  conditions: dict[str, dict], profiles: dict[str, dict]) -> str:
     """Build the full Markdown document."""
     header = [
         "# Policy evaluation report",
         "",
         "Report-only view of owned Network Access policy sets.",
-        "Sets stay disabled. Rank 99 Default is not managed.",
         "Generated from `policy/policy-sets.yaml`. No ISE connection.",
         "",
     ]
@@ -161,16 +219,18 @@ def render_report(policy_sets: list[dict], keyword: str | None) -> str:
 
     body: list[str] = []
     for ps in sorted(policy_sets, key=lambda s: s.get("rank", 999)):
-        body.extend(render_set(ps))
+        body.extend(render_set(ps, conditions, profiles))
     return "\n".join(header + body)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     sets = load_policy_sets(POLICY_SETS_PATH)
+    conditions = load_named(CONDITIONS_PATH, "conditions")
+    profiles = load_named(PROFILES_PATH, "authorization_profiles")
     if args.filter:
         sets = [s for s in sets if matches_filter(s, args.filter)]
-    report = render_report(sets, args.filter)
+    report = render_report(sets, args.filter, conditions, profiles)
     out = output_path(args)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(report, encoding="utf-8")
