@@ -1,6 +1,6 @@
 # Naming standard
 
-User-created ISE names, except SGTs:
+User-created ISE names, except SGTs, ISS, and CAP:
 
 {PREFIX}- + kebab-case tokens
 
@@ -33,6 +33,12 @@ Pass: `ISS_lab_internal`
 
 Fail: `ISS-lab-internal`, `ISS_Lab_Internal`
 
+CAP_ + snake_case tokens. Same constraint. Discovered on lab ISE 3.3 during Phase 11b.
+
+Pass: CAP_lab_subject_cn, CAP_lab_subject_san
+
+Fail: CAP-lab-subject-cn, CAP_Lab_Subject_Cn
+
 ## Prefix table
 
 | Prefix | Object | In scope |
@@ -47,7 +53,7 @@ Fail: `ISS-lab-internal`, `ISS_Lab_Internal`
 | SGT_ | Security group tag | Yes (snake_case; ISE rejects hyphen) |
 | CND- | Library condition | Yes |
 | ISS_ | Identity source sequence | Yes (snake_case; ISE rejects hyphen) |
-| CAP- | Certificate authentication profile | Yes |
+| CAP_ | Certificate authentication profile | Yes (snake_case; ISE rejects hyphen) |
 | EIG- | Static endpoint identity group | Yes |
 | LP- | Logical profile | Policy docs until API is proven |
 | VIP- | Load-balanced virtual IP name | Inventory only |
