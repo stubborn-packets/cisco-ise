@@ -1,0 +1,27 @@
+# policy/certificate-authentication-profiles.yaml
+# Plane: desired state. Terraform may create these from Phase 11b.
+# Names use CAP_ plus snake_case. ISE rejects hyphens. YAML name equals the ISE name. No mapper.
+# state is required. description is written to ISE.
+# No live client certificates or internal CA are required for these rows.
+# Do not put UUIDs here. Do not manage built-in profiles.
+
+certificate_authentication_profiles:
+  - name: CAP_lab_subject_cn
+    description: Lab profile that takes the username from the certificate subject common name. No external identity store.
+    owner: lab
+    state: enabled
+    allowed_as_user_name: false
+    external_identity_store_name: "[not applicable]"
+    certificate_attribute_name: SUBJECT_COMMON_NAME
+    match_mode: NEVER
+    username_from: CERTIFICATE
+
+  - name: CAP_lab_subject_san
+    description: Lab profile that takes the username from the certificate subject alternative name. No external identity store.
+    owner: lab
+    state: enabled
+    allowed_as_user_name: false
+    external_identity_store_name: "[not applicable]"
+    certificate_attribute_name: SUBJECT_ALTERNATIVE_NAME
+    match_mode: NEVER
+    username_from: CERTIFICATE

@@ -215,6 +215,22 @@ output "iss_ids" {
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
 
+output "cap_names" {
+  value = {
+    lab_subject_cn  = module.cap_lab_subject_cn.name
+    lab_subject_san = module.cap_lab_subject_san.name
+  }
+  description = "Certificate authentication profile names stored on lab ISE."
+}
+
+output "cap_ids" {
+  value = {
+    lab_subject_cn  = module.cap_lab_subject_cn.id
+    lab_subject_san = module.cap_lab_subject_san.id
+  }
+  description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
+}
+
 output "ps_names" {
   value = {
     global_vpn            = module.ps_global_vpn.name
