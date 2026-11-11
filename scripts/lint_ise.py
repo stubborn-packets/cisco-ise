@@ -38,6 +38,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 NAME_RE = re.compile(r"^([A-Z]+)-([a-z0-9]+(?:-[a-z0-9]+)*)$")
 SGT_RE = re.compile(r"^SGT_([a-z0-9]+(?:_[a-z0-9]+)*)$")
+ISS_RE = re.compile(r"^ISS_([a-z0-9]+(?:_[a-z0-9]+)*)$")
 KEBAB_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 SGT_MAX_LEN = 32
 ISO_ALPHA3_RE = re.compile(r"^[A-Z]{3}$")
@@ -303,6 +304,9 @@ class Linter:
         if expected_prefix == "SGT":
             self._check_sgt_name(name, rel)
             return
+        if expected_prefix == "ISS":
+            self._check_iss_name(name, rel)
+            return
         match = NAME_RE.fullmatch(name)
         if not match:
             self.error(
@@ -352,6 +356,26 @@ class Linter:
             name,
             "SGT name must be SGT_ + snake_case [a-z0-9], max 32 "
             "(e.g. SGT_lab_users). ISE rejects hyphens.",
+        )
+
+    def _check_iss_name(self, name: str, rel: str) -> None:
+        # policy/identity-source-sequences.yaml only.
+        # YAML name must equal the ISE ERS name. Do not map '-' to '_'.
+        if ISS_RE.fullmatch(name):
+            return
+        match = NAME_RE.fullmatch(name)
+        if match and match.group(1) != "ISS":
+            self.error(
+                rel,
+                name,
+                f"expected prefix ISS_ for this object, found {match.group(1)}-",
+            )
+            return
+        self.error(
+            rel,
+            name,
+            "ISS name must be ISS_ + snake_case [a-z0-9] "
+            "(e.g. ISS_lab_internal). ISE rejects hyphens.",
         )
 
     def _prefix_meta(self, prefix: str) -> dict[str, str] | None:
@@ -702,6 +726,8 @@ def _rel(root: Path, path: Path) -> str:
 def _prefix_of(name: str) -> str | None:
     if SGT_RE.fullmatch(name):
         return "SGT"
+    if ISS_RE.fullmatch(name):
+        return "ISS"
     match = NAME_RE.fullmatch(name)
     return match.group(1) if match else None
 

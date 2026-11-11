@@ -40,16 +40,17 @@ Grammar enforced in code:
 ```text
 NAME_RE  = PREFIX- + kebab-case [a-z0-9] tokens
 SGT_RE   = SGT_ + snake_case [a-z0-9] tokens, length <= 32
+ISS_RE   = ISS_ + snake_case [a-z0-9] tokens
 KEBAB_RE = [a-z0-9]+(?:-[a-z0-9]+)*
 SNAKE_RE = [a-z0-9]+(?:_[a-z0-9]+)*
 ```
 
 `NAME_RE` is the default. That is why `PS-global-wired-8021x` passes and `PS-Global-Wired` fails.
 
-SGT is the only exception (`docs/naming.md`). ISE ERS allows `[A-Za-z0-9_]`, max 32; a hyphen returns HTTP 400. YAML name equals the ISE name. There is no hyphen-to-underscore mapper.
+SGT and ISS are the exceptions (`docs/naming.md`). ISE ERS allows `[A-Za-z0-9_]` for both; a hyphen returns HTTP 400. YAML name equals the ISE name. There is no hyphen-to-underscore mapper.
 
-- Pass: `SGT_lab_users`, `SGT_lab_bootstrap`
-- Fail: `SGT-lab-users`, `SGT_Lab_Users`, `SGT_lab-users`
+- Pass: `SGT_lab_users`, `ISS_lab_internal`
+- Fail: `SGT-lab-users`, `ISS-lab-internal`
 
 Policy-set rank is the packed ISE index. Band is a label. Terraform does not send band. Enforced in `_check_policy_set_rank` and `_check_policy_set_order`. `POLICY_SET_RANK_EXACT` is retired.
 

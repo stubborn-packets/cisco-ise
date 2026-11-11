@@ -8,7 +8,7 @@
 # Do not put UUIDs here. Do not manage built-in sequences.
 
 identity_source_sequences:
-  - name: ISS-lab-internal
+  - name: ISS_lab_internal
     description: Lab sequence that tries Internal Users then Internal Endpoints.
     owner: lab
     state: enabled

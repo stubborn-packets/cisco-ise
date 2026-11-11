@@ -27,6 +27,12 @@ Pass: SGT_lab_users, SGT_lab_bootstrap
 
 Fail: SGT-lab-users, SGT_Lab_Users, SGT_lab-users
 
+Identity source sequences are the second exception. ISE ERS rejects hyphens in the name. YAML name equals the ISE name. No mapper.
+
+Pass: `ISS_lab_internal`
+
+Fail: `ISS-lab-internal`, `ISS_Lab_Internal`
+
 ## Prefix table
 
 | Prefix | Object | In scope |
@@ -40,7 +46,7 @@ Fail: SGT-lab-users, SGT_Lab_Users, SGT_lab-users
 | ACL- | Downloadable ACL | Yes |
 | SGT_ | Security group tag | Yes (snake_case; ISE rejects hyphen) |
 | CND- | Library condition | Yes |
-| ISS- | Identity source sequence | Yes |
+| ISS_ | Identity source sequence | Yes (snake_case; ISE rejects hyphen) |
 | CAP- | Certificate authentication profile | Yes |
 | EIG- | Static endpoint identity group | Yes |
 | LP- | Logical profile | Policy docs until API is proven |

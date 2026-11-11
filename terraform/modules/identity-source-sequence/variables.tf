@@ -6,11 +6,11 @@
 
 variable "name" {
   type        = string
-  description = "ISE identity source sequence name. ISS- + kebab-case."
+  description = "ISE identity source sequence name. ISS_ + snake_case. ISE rejects hyphens."
 
   validation {
-    condition     = can(regex("^ISS-[a-z0-9]+(-[a-z0-9]+)*$", var.name))
-    error_message = "Name must be ISS- + kebab-case (e.g. ISS-lab-internal)."
+    condition     = can(regex("^ISS_[a-z0-9]+(_[a-z0-9]+)*$", var.name))
+    error_message = "Name must be ISS_ + snake_case (e.g. ISS_lab_internal). ISE rejects hyphens."
   }
 }
 

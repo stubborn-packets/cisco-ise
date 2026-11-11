@@ -140,7 +140,7 @@ Exit: `PS-hr-wired` and `PS-guest-wired` pass. A `bu-*` set with a token that is
 
 One family at a time. Sets stay disabled.
 
-- **11a — ISS-** identity source sequences. Closed 2026-11-03. YAML, thin module, reader emission, linter. One lab object: `ISS-lab-internal` (`break_on_store_fail: false`, Internal Users then Internal Endpoints). No certificate profile. Sets stay disabled.
+- **11a — ISS-** identity source sequences. Closed 2026-11-03. YAML, thin module, reader emission, linter. One lab object: `ISS_lab_internal` (`break_on_store_fail: false`, Internal Users then Internal Endpoints). No certificate profile. ISE rejects hyphens; name is `ISS_` + snake_case. Sets stay disabled.
 - **11b — CAP-** certificate authentication profiles. Same pattern. Modules and YAML even with no live clients or internal CA.
 - **LP-** logical profiles. Skipped. Potential future work if needed and the API write path is proven. Not in this phase.
 
