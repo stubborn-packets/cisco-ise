@@ -21,6 +21,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 POLICY_SETS_PATH = REPO_ROOT / "policy" / "policy-sets.yaml"
 CONDITIONS_PATH = REPO_ROOT / "policy" / "conditions.yaml"
 PROFILES_PATH = REPO_ROOT / "policy" / "authz-profiles.yaml"
+VLANS_PATH = REPO_ROOT / "inventory" / "vlans.yaml"
 REPORTS_DIR = REPO_ROOT / "reports"
 
 
@@ -46,6 +47,20 @@ def load_named(path: Path, key: str) -> dict[str, dict]:
         data = yaml.safe_load(fh) or {}
     items = data.get(key) or []
     return {item["name"]: item for item in items if isinstance(item, dict) and "name" in item}
+
+
+def load_vlans(path: Path) -> dict[str, int]:
+    """Return name → vlan_id. Empty dict if the file is missing."""
+    if not path.is_file():
+        return {}
+    with path.open(encoding="utf-8") as fh:
+        data = yaml.safe_load(fh) or {}
+    items = data.get("vlans") or []
+    return {
+        item["name"]: item["vlan_id"]
+        for item in items
+        if isinstance(item, dict) and "name" in item and "vlan_id" in item
+    }
 
 
 def render_condition(name: str, conditions: dict[str, dict], indent: str = "  ") -> list[str]:
@@ -74,7 +89,8 @@ def render_condition(name: str, conditions: dict[str, dict], indent: str = "  ")
     return lines
 
 
-def render_profile(name: str, profiles: dict[str, dict], indent: str = "  ") -> list[str]:
+def render_profile(name: str, profiles: dict[str, dict], vlans: dict[str, int],
+                  indent: str = "  ") -> list[str]:
     """Name plus the result fields that matter."""
     lines = [f"{indent}- **Profile:** `{name}`"]
     pr = profiles.get(name)
@@ -83,7 +99,12 @@ def render_profile(name: str, profiles: dict[str, dict], indent: str = "  ") -> 
         return lines
     parts = [pr.get("access_type", "ACCESS_ACCEPT")]
     if pr.get("vlan"):
-        parts.append(f"VLAN {pr['vlan']}")
+        vlan_name = pr["vlan"]
+        vlan_id = vlans.get(vlan_name)
+        if vlan_id is not None:
+            parts.append(f"VLAN {vlan_name} ({vlan_id})")
+        else:
+            parts.append(f"VLAN {vlan_name} (id not in inventory/vlans.yaml)")
     if pr.get("dacl"):
         parts.append(f"DACL {pr['dacl']}")
     if pr.get("asa_vpn"):
@@ -134,7 +155,8 @@ def output_path(args: argparse.Namespace) -> Path:
     return REPORTS_DIR / "policy-evaluation.md"
 
 
-def render_set(policy_set: dict, conditions: dict[str, dict], profiles: dict[str, dict]) -> list[str]:
+def render_set(policy_set: dict, conditions: dict[str, dict], profiles: dict[str, dict],
+               vlans: dict[str, int]) -> list[str]:
     """Return Markdown lines for one policy set."""
     name = policy_set.get("name", "?")
     rank = policy_set.get("rank", "?")
@@ -188,7 +210,7 @@ def render_set(policy_set: dict, conditions: dict[str, dict], profiles: dict[str
             lines.append(f"#### {rule.get('name', '?')} (rank {rule.get('rank', '?')})")
             lines.append("")
             lines.extend(render_condition(rule.get("condition", ""), conditions, indent=""))
-            lines.extend(render_profile(rule.get("profile", ""), profiles, indent=""))
+            lines.extend(render_profile(rule.get("profile", ""), profiles, vlans, indent=""))
             lines.append("")
 
     lines.append("---")
@@ -197,12 +219,14 @@ def render_set(policy_set: dict, conditions: dict[str, dict], profiles: dict[str
 
 
 def render_report(policy_sets: list[dict], keyword: str | None,
-                  conditions: dict[str, dict], profiles: dict[str, dict]) -> str:
+                  conditions: dict[str, dict], profiles: dict[str, dict],
+                  vlans: dict[str, int]) -> str:
     """Build the full Markdown document."""
     header = [
         "# Policy evaluation report",
         "",
         "Report-only view of owned Network Access policy sets.",
+        "Rank 99 Default is not managed.",
         "Generated from `policy/policy-sets.yaml`. No ISE connection.",
         "",
     ]
@@ -219,7 +243,7 @@ def render_report(policy_sets: list[dict], keyword: str | None,
 
     body: list[str] = []
     for ps in sorted(policy_sets, key=lambda s: s.get("rank", 999)):
-        body.extend(render_set(ps, conditions, profiles))
+        body.extend(render_set(ps, conditions, profiles, vlans))
     return "\n".join(header + body)
 
 
@@ -228,9 +252,10 @@ def main(argv: list[str] | None = None) -> int:
     sets = load_policy_sets(POLICY_SETS_PATH)
     conditions = load_named(CONDITIONS_PATH, "conditions")
     profiles = load_named(PROFILES_PATH, "authorization_profiles")
+    vlans = load_vlans(VLANS_PATH)
     if args.filter:
         sets = [s for s in sets if matches_filter(s, args.filter)]
-    report = render_report(sets, args.filter, conditions, profiles)
+    report = render_report(sets, args.filter, conditions, profiles, vlans)
     out = output_path(args)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(report, encoding="utf-8")
