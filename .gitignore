@@ -33,3 +33,7 @@ venv/
 exports/*.csv
 !exports/.gitkeep
 !exports/README.md
+
+# Generated reports (Phase 12)
+reports/*.md
+!reports/README.md
