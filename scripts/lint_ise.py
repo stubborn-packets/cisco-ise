@@ -38,6 +38,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 NAME_RE = re.compile(r"^([A-Z]+)-([a-z0-9]+(?:-[a-z0-9]+)*)$")
 SGT_RE = re.compile(r"^SGT_([a-z0-9]+(?:_[a-z0-9]+)*)$")
+CAP_RE = re.compile(r"^CAP_([a-z0-9]+(?:_[a-z0-9]+)*)$")
 ISS_RE = re.compile(r"^ISS_([a-z0-9]+(?:_[a-z0-9]+)*)$")
 KEBAB_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 SGT_MAX_LEN = 32
@@ -65,6 +66,9 @@ POLICY_COLLECTIONS: dict[str, list[tuple[str, str | None]]] = {
     "logical-profiles.yaml": [("logical_profiles", "LP")],
     "policy-sets.yaml": [("policy_sets", "PS")],
     "sgt.yaml": [("sgts", "SGT")],
+    "certificate-authentication-profiles.yaml": [
+        ("certificate_authentication_profiles", "CAP"),
+    ],
 }
 
 NESTED_RULES = {
@@ -307,6 +311,9 @@ class Linter:
         if expected_prefix == "ISS":
             self._check_iss_name(name, rel)
             return
+        if expected_prefix == "CAP":
+            self._check_cap_name(name, rel)
+            return
         match = NAME_RE.fullmatch(name)
         if not match:
             self.error(
@@ -376,6 +383,26 @@ class Linter:
             name,
             "ISS name must be ISS_ + snake_case [a-z0-9] "
             "(e.g. ISS_lab_internal). ISE rejects hyphens.",
+        )
+
+    def _check_cap_name(self, name: str, rel: str) -> None:
+        # policy/certificate-authentication-profiles.yaml only.
+        # YAML name must equal the ISE ERS name. Do not map '-' to '_'.
+        if CAP_RE.fullmatch(name):
+            return
+        match = NAME_RE.fullmatch(name)
+        if match and match.group(1) != "CAP":
+            self.error(
+                rel,
+                name,
+                f"expected prefix CAP_ for this object, found {match.group(1)}-",
+            )
+            return
+        self.error(
+            rel,
+            name,
+            "CAP name must be CAP_ + snake_case [a-z0-9] "
+            "(e.g. CAP_lab_subject_cn). ISE rejects hyphens.",
         )
 
     def _prefix_meta(self, prefix: str) -> dict[str, str] | None:
