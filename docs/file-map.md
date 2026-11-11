@@ -109,6 +109,15 @@ Three planes. Do not mix them.
 | `.github/workflows/ci.yml` | Secret-free gates on pull requests. Lint, unit tests, `terraform fmt -check`, `terraform validate`. No plan, no apply, no ISE. |
 | `scripts/check.sh` | Local mirror of the same gates. Run from the repo root before a PR. |
 
+## reports/
+
+Report-only views of owned desired state. Not observed state (`exports/`). Not a write path.
+
+| File | Owns |
+| --- | --- |
+| `reports/README.md` | What the report is and how to regenerate it. |
+| `scripts/report_policy.py` | Offline reader. Emits `reports/policy-evaluation.md` (and optional filtered files) from `policy/policy-sets.yaml`, `policy/conditions.yaml`, `policy/authz-profiles.yaml`, and `inventory/vlans.yaml`. No ISE, no UUIDs. Sets stay disabled. |
+
 ## YAML conventions
 
 - kebab-case object names inside the prefix table, except SGTs (`SGT_` + snake_case)

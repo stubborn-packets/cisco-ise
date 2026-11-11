@@ -146,7 +146,15 @@ One family at a time. Sets stay disabled.
 
 ## Phase 12 — Reporting
 
-Report-only view of owned policy: policy sets, their conditions, authentication rules, and authorization rules. Own flow and process under `exports/` or a reports tree. Not a write path. Sets stay disabled.
+Closed. Report-only view of owned policy under reports/.
+
+- `scripts/report_policy.py` reads `policy/policy-sets.yaml`, `policy/conditions.yaml`, `policy/authz-profiles.yaml`, and `inventory/vlans.yaml`.
+- Emits `reports/policy-evaluation.md` (full) and optional filtered files via `--filter`.
+- Shows each set’s rank, band, state, service, expanded condition, authentication rules, and authorization rules (with VLAN ids).
+- No ISE connection, no UUIDs, no writes. Sets stay disabled.
+- Generated `.md` files are gitignored; `reports/README.md` is tracked.
+
+Exit: a reader can regenerate a human-readable evaluation report of the owned policy sets, their conditions, and their rules without talking to ISE.
 
 ## Phase 13 — External identity sources (LDAP)
 
