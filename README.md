@@ -154,3 +154,65 @@ Not part of day-to-day apply. UUIDs stay out of `policy/` and `inventory/`.
 One branch per phase. PR + approval. Merge to `main` when `docs/phases.md` exit criteria are met. `main` is last approved lab desired state, not a remote production ISE.
 
 `docs/promotion.md` is the checklist. Run `bash scripts/check.sh` before a PR. CI runs the same secret-free gates. Plan and apply stay local.
+
+## Phase 8 promotion path
+
+`docs/promotion.md` is the checklist: branch → lint → validate → plan against lab → PR → approve → merge → apply lab.
+`.github/workflows/ci.yml` runs the secret-free gates (lint, unit tests, `terraform fmt -check`, `terraform validate`).
+`scripts/check.sh` is the local mirror. Plan and apply stay local. Sets stay disabled. Enable is a cutover.
+
+## Phase 9 drift
+
+`scripts/drift.py` is the GET-only name (and SGT tag) comparison against live ISE.
+Terraform plan remains the authoritative detector for owned objects. The script is the wider observed view.
+Neither runs in CI. System exclusions live in `policy/system-exclusions.yaml`. Non-owned remainder is expected.
+See `docs/drift.md`.
+
+## Phase 10 shared client
+
+`scripts/export_ise.py` uses the shared GET-only client in `scripts/ise_client.py`.
+One GET path for export, import map, and drift. Does not write.
+
+## Phase 11a ISS-
+
+`ISS_lab_internal` is live. Name is `ISS_` + snake_case. ISE rejects hyphens. YAML name equals the ISE name. No mapper.
+Module `terraform/modules/identity-source-sequence/`. Reader emits `identity-source-sequences.tf` and the `iss_*` maps.
+`break_on_store_fail` false. No certificate profile. Sets stay disabled.
+
+## Phase 11b CAP-
+
+`CAP_lab_subject_cn` (`SUBJECT_COMMON_NAME`) and `CAP_lab_subject_san` (`SUBJECT_ALTERNATIVE_NAME`) are live.
+Name is `CAP_` + snake_case. ISE rejects hyphens. YAML name equals the ISE name. No mapper.
+Module `terraform/modules/certificate-authentication-profile/`. Reader emits `certificate-authentication-profiles.tf` and the `cap_*` maps.
+No live clients or internal CA required. Sets stay disabled. LP- is deferred.
+
+## Phase 12 reporting
+
+`scripts/report_policy.py` emits a report-only evaluation view under `reports/`.
+Reads `policy/policy-sets.yaml`, `policy/conditions.yaml`, `policy/authz-profiles.yaml`, and `inventory/vlans.yaml`.
+No ISE, no UUIDs, no writes. Generated `.md` files are gitignored. Sets stay disabled.
+
+## Phase 13 LDAP skeleton
+
+`LDAP-lab-stubbornpackets-uid` is a skeleton only. The pinned provider has no LDAP resource.
+The object is hand-built in the ISE GUI under the exact YAML name. Bind password stays outside the repo.
+Module `terraform/modules/ldap/` is a placeholder. Reader emits `ldap.tf` and the `ldap_*` maps.
+Hand-build steps: `docs/ldap-hand-build.md`. Sets stay disabled.
+
+## Phase 14 multi-instance readiness
+
+Scripts accept `--environment` / `-e` (`lab`, `stage`, or `prod`; default `lab`).
+Credentials for the scripts are `<ENV>_ISE_URL`, `<ENV>_ISE_USERNAME`, `<ENV>_ISE_PASSWORD`, `<ENV>_ISE_INSECURE`.
+Terraform still reads the plain `ISE_*` names (see the credentials section in `docs/operations.md`).
+Exports write to `exports/<environment>/`. `read_policy.py` emits under `environments/<label>/` only when that directory already exists.
+CI stays on `environments/lab`. Still one write target. No `environments/stage/` or `prod/` created. Sets stay disabled.
+
+## Phase 15 operational documentation
+
+Documentation only. No new Terraform resources.
+
+- `docs/operations.md` — nightly drift example (cron, systemd, or GitHub Actions) and optional notification if non-owned objects appear. Includes the credential mapping that keeps Terraform working.
+- `docs/getting-started.md` — benefits, prerequisites, starting small to fully managed, and the cutover pattern.
+- `docs/ldap-hand-build.md` — GUI steps for `LDAP-lab-stubbornpackets-uid`.
+
+Sets stay disabled. Enable is a cutover. 
