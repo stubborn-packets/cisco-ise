@@ -7,15 +7,17 @@ Does not write to ISE. Does not call Terraform. UUIDs stay out of the report.
 Usage (from the repo root):
 
     python3.12 scripts/drift.py
+    python3.12 scripts/drift.py --environment stage
 
-Requires the same ISE_* environment as scripts/import_map.py.
+Credentials are selected by --environment (default lab):
+LAB_ISE_*, STAGE_ISE_*, or PROD_ISE_*.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
 from typing import Any
-
+import argparse
 import yaml
 
 from ise_client import IseClient, load_client
@@ -312,10 +314,28 @@ def report_family(
     return owned_clean and not non_owned
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--environment",
+        "-e",
+        choices=["lab", "stage", "prod"],
+        default="lab",
+        help="Environment label (default: lab). Selects LAB_ISE_* / STAGE_ISE_* / PROD_ISE_* credentials.",
+    )
+    return parser.parse_args()
+
+
 def main() -> None:
+    args = parse_args()
     root = Path(__file__).resolve().parent.parent
-    client = load_client(root)
+    client = load_client(root, args.environment)
     exclusions = load_exclusions(root)
+
+    print(
+        f"environment {client.environment}  "
+        f"target {client.base}"
+    )
 
     results: list[bool] = []
 
@@ -406,9 +426,9 @@ def main() -> None:
     )
 
     if all(results):
-        print("all clean")
+        print(f"all clean ({client.environment})")
     else:
-        print("owned clean, non-owned present")
+        print(f"owned clean, non-owned present ({client.environment})")
         raise SystemExit(1)
 
 

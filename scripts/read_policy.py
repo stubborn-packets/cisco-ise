@@ -43,25 +43,43 @@ READS = (
     "policy/ldap.yaml",
 )
 
-# Where the generated calls go. Review surface stays policy/.
-# Addresses must match the live lab state or apply orphans the objects.
-WRITES = (
-    "environments/lab/policy-sets.tf",
-    "environments/lab/authn-rules.tf",
-    "environments/lab/authz-rules.tf",
-    "environments/lab/conditions.tf",
-    "environments/lab/allowed-protocols.tf",
-    "environments/lab/dacls.tf",
-    "environments/lab/authz-profiles.tf",
-    "environments/lab/sgts.tf",
-    "environments/lab/eigs.tf",
-    "environments/lab/ndg.tf",
-    "environments/lab/outputs.tf",
-    "environments/lab/exceptions.tf",
-    "environments/lab/identity-source-sequences.tf",
-    "environments/lab/certificate-authentication-profiles.tf",
-    "environments/lab/ldap.tf",
+# Generated file names. The parent directory is environments/<label>/.
+# Addresses must match the live state or apply orphans the objects.
+# Do not create the environment directory; it must already exist.
+GENERATED_FILES = (
+    "policy-sets.tf",
+    "authn-rules.tf",
+    "authz-rules.tf",
+    "conditions.tf",
+    "allowed-protocols.tf",
+    "dacls.tf",
+    "authz-profiles.tf",
+    "sgts.tf",
+    "eigs.tf",
+    "ndg.tf",
+    "outputs.tf",
+    "exceptions.tf",
+    "identity-source-sequences.tf",
+    "certificate-authentication-profiles.tf",
+    "ldap.tf",
 )
+
+ALLOWED_ENVIRONMENTS = {"lab", "stage", "prod"}
+
+
+def output_paths(environment: str) -> tuple[str, ...]:
+    """Return the relative paths for one environment.
+
+    Default caller uses lab. A later environments/stage/ or
+    environments/prod/ is written to only when that directory already
+    exists and the label is passed. We do not mkdir the environment root.
+    """
+    if environment not in ALLOWED_ENVIRONMENTS:
+        raise ReaderError(
+            f"unknown environment {environment!r}. "
+            f"Choose one of: {', '.join(sorted(ALLOWED_ENVIRONMENTS))}"
+        )
+    return tuple(f"environments/{environment}/{name}" for name in GENERATED_FILES)
 
 # Name in YAML → module address already in state.
 # PS-hr-wired → module.ps_hr_wired
@@ -1962,19 +1980,26 @@ def render_outputs(
     return "\n\n".join(parts) + "\n"
 
 
-def write_policy_sets(root: Path) -> Path:
+def write_policy_sets(root: Path, environment: str = "lab") -> Path:
     text = render(load_policy_sets(root))
-    path = root / WRITES[0]
+    path = root / output_paths(environment)[0]
     path.write_text(text, encoding="utf-8")
     return path
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Emit lab policy-set shells, rules, conditions, and allowed protocols from policy/."
+        description="Emit policy-set shells, rules, conditions, and allowed protocols from policy/."
     )
     parser.add_argument("--root", type=Path, default=REPO_ROOT)
     parser.add_argument("--stdout", action="store_true", help="Print the file. Do not write it.")
+    parser.add_argument(
+        "--environment",
+        "-e",
+        choices=["lab", "stage", "prod"],
+        default="lab",
+        help="Environment label (default: lab). Writes under environments/<label>/. Directory must already exist.",
+    )
     return parser.parse_args(argv)
 
 
@@ -2048,28 +2073,37 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.write(ldap_text)
         sys.stdout.write("\n")
         return 0
+    paths = output_paths(args.environment)
+    env_dir = root / "environments" / args.environment
+    if not env_dir.is_dir():
+        print(
+            f"read_policy: environments/{args.environment}/ does not exist. "
+            "Create it only when a second ISE is ready. Not writing.",
+            file=sys.stderr,
+        )
+        return 1
     written = []
     for rel, text in (
-        (WRITES[0], shells),
-        (WRITES[1], authn),
-        (WRITES[2], authz),
-        (WRITES[3], cnd_text),
-        (WRITES[4], ap_text),
-        (WRITES[5], dacl_text),
-        (WRITES[6], profile_text),
-        (WRITES[7], sgt_text),
-        (WRITES[8], eig_text),
-        (WRITES[9], ndg_text),
-        (WRITES[10], outputs_text),
-        (WRITES[11], ex_text),
-        (WRITES[12], iss_text),
-        (WRITES[13], cap_text),
-        (WRITES[14], ldap_text),
+        (paths[0], shells),
+        (paths[1], authn),
+        (paths[2], authz),
+        (paths[3], cnd_text),
+        (paths[4], ap_text),
+        (paths[5], dacl_text),
+        (paths[6], profile_text),
+        (paths[7], sgt_text),
+        (paths[8], eig_text),
+        (paths[9], ndg_text),
+        (paths[10], outputs_text),
+        (paths[11], ex_text),
+        (paths[12], iss_text),
+        (paths[13], cap_text),
+        (paths[14], ldap_text),
     ):
         path = root / rel
         path.write_text(text, encoding="utf-8")
         written.append(rel)
-    print("read_policy: wrote")
+    print(f"read_policy: wrote ({args.environment})")
     for rel in written:
         print(f"- {rel}")
     return 0

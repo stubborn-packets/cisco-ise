@@ -167,7 +167,9 @@ Started 2026-11-13. Thin module and YAML for an LDAP identity source. The pinned
 
 ## Phase 14 — Multi-instance readiness
 
-Scripts accept an environment label (default `lab`). Exports, drift, and import-map output show which environment they ran against. Still one write target (`environments/lab`). Removes the hard “lab” assumption without inventing stage or prod.
+Closed 2026-11-13. Scripts accept an environment label (default `lab`). Credentials are read only as `<ENV>_ISE_*`. Exports write to `exports/<environment>/`. Drift and import-map print the label. `read_policy.py` emits under `environments/<label>/` when that directory already exists. `check.sh` accepts an optional argument. Still one write target (`environments/lab`). No stage or prod directories created. Sets stay disabled.
+
+Exit: a reader can run the GET scripts and the reader against a labeled environment without hard-coded “lab” paths, while the only place the repo may write remains `environments/lab`.
 
 ## Phase 15 — Operational documentation
 

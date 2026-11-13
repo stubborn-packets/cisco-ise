@@ -2,7 +2,7 @@
 
 Branch → lint → validate → plan against lab → PR → approve → merge → apply lab.
 
-Lab ISE is the only write target. Sets stay disabled. Enable is a cutover, not this path. There is no `environments/stage/` or `prod/`.
+Scripts that talk to ISE accept `--environment` / `-e` (default `lab`). Credentials are `<ENV>_ISE_*`. Exports land in `exports/<environment>/`. The promotion path and CI still validate only `environments/lab`.
 
 ## Before the PR
 

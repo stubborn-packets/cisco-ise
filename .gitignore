@@ -37,3 +37,6 @@ exports/*.csv
 # Generated reports (Phase 12)
 reports/*.md
 !reports/README.md
+
+# Updated exports for each environment
+exports/*/*.csv

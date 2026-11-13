@@ -1,7 +1,10 @@
 """Thin GET-only ISE client shared by the Phase 1 export and Phase 7 import map.
 
-Lab URL and basic auth come from the environment. The client refuses any
-method other than GET. No family-specific paths live here.
+Credentials come from the environment. The client refuses any method
+other than GET. No family-specific paths live here. Callers may pass
+an environment label (lab, stage, or prod; default lab). The label is
+recorded on the client. Credentials are read only as <ENV>_ISE_*;
+there is no fallback to the plain ISE_* names.
 """
 
 from __future__ import annotations
@@ -16,10 +19,11 @@ from dotenv import load_dotenv
 from requests.auth import HTTPBasicAuth
 
 PAGE_SIZE = 100
+ALLOWED_ENVIRONMENTS = {"lab", "stage", "prod"}
 
 
 class IseClient:
-    """Thin GET-only client. Lab URL and basic auth come from the environment."""
+    """Thin GET-only client. Credentials come from the environment."""
 
     def __init__(self, base_url: str, username: str, password: str, verify: bool) -> None:
         parsed = urlparse(base_url if "://" in base_url else f"https://{base_url}")
@@ -36,6 +40,7 @@ class IseClient:
             }
         )
         self.timeout = int(os.getenv("ISE_REQUEST_TIMEOUT", "60"))
+        self.environment = "lab"
 
     def get(self, path: str, params: dict[str, Any] | None = None) -> Any:
         url = f"{self.base}{path}"
@@ -95,15 +100,44 @@ class IseClient:
         return items
 
 
-def load_client(root: Path) -> IseClient:
-    """Load ISE_* from <root>/.env and return a GET-only client."""
+def _env_var(environment: str, suffix: str) -> str:
+    """Return the environment-specific variable. No fallback.
+
+    lab   → LAB_ISE_URL
+    stage → STAGE_ISE_URL
+    """
+    return os.getenv(f"{environment.upper()}_ISE_{suffix}", "").strip()
+
+
+def load_client(root: Path, environment: str = "lab") -> IseClient:
+    """Load credentials and return a GET-only client.
+
+    environment is the label the caller asked for (default lab).
+    Only lab, stage, and prod are accepted. Credentials are read only
+    as <ENV>_ISE_URL / <ENV>_ISE_USERNAME / <ENV>_ISE_PASSWORD /
+    <ENV>_ISE_INSECURE. Missing values fail so environments cannot
+    be mixed up. The label is stored on the client so scripts can
+    print which environment they ran against.
+    """
+    if environment not in ALLOWED_ENVIRONMENTS:
+        raise SystemExit(
+            f"unknown environment {environment!r}. "
+            f"Choose one of: {', '.join(sorted(ALLOWED_ENVIRONMENTS))}"
+        )
     load_dotenv(root / ".env")
-    url = os.getenv("ISE_URL", "").strip()
-    user = os.getenv("ISE_USERNAME", "").strip()
-    password = os.getenv("ISE_PASSWORD", "")
-    insecure = os.getenv("ISE_INSECURE", "true").strip().lower() in {"1", "true", "yes"}
+    url = _env_var(environment, "URL")
+    user = _env_var(environment, "USERNAME")
+    password = _env_var(environment, "PASSWORD")
+    insecure_raw = _env_var(environment, "INSECURE") or "true"
+    insecure = insecure_raw.lower() in {"1", "true", "yes"}
     if not url or not user or not password:
-        raise SystemExit("Set ISE_URL, ISE_USERNAME, and ISE_PASSWORD in .env")
+        raise SystemExit(
+            f"Set {environment.upper()}_ISE_URL, "
+            f"{environment.upper()}_ISE_USERNAME, and "
+            f"{environment.upper()}_ISE_PASSWORD in .env"
+        )
     if insecure:
         requests.packages.urllib3.disable_warnings()  # type: ignore[attr-defined]
-    return IseClient(url, user, password, verify=not insecure)
+    client = IseClient(url, user, password, verify=not insecure)
+    client.environment = environment  # type: ignore[attr-defined]
+    return client

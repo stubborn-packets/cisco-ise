@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Phase 1 — GET-only export from lab ISE into exports/*.csv.
+"""Phase 1 — GET-only export from ISE into exports/<environment>/*.csv.
+
+Credentials and output folder are selected by --environment (default lab):
+LAB_ISE_*, STAGE_ISE_*, or PROD_ISE_*. The folder is created on first use.
 
 Why this exists
 ---------------
@@ -50,7 +53,16 @@ import requests
 from ise_client import IseClient, load_client
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-EXPORTS = REPO_ROOT / "exports"
+
+def exports_dir(environment: str) -> Path:
+    """Return exports/<environment>/. Created on demand.
+
+    A lab run cannot overwrite a stage or prod export, and the folder
+    appears only after the first successful export for that label.
+    """
+    path = REPO_ROOT / "exports" / environment
+    path.mkdir(parents=True, exist_ok=True)
+    return path
 
 ERS_RESOURCES = {
     "nads": "/ers/config/networkdevice",
@@ -108,16 +120,26 @@ NDG_SYSTEM_PREFIXES = {
     "ndg_device_type": "All Device Types#",
 }
 
-def load_settings() -> tuple[IseClient, bool]:
-    """Load the shared client. Recompute insecure for the status line."""
-    client = load_client(REPO_ROOT)
-    insecure = os.getenv("ISE_INSECURE", "true").strip().lower() in {"1", "true", "yes"}
+
+def load_settings(environment: str = "lab") -> tuple[IseClient, bool]:
+    """Load the shared client for the given environment.
+
+    Recompute insecure from the client so the status line matches
+    what load_client actually used.
+    """
+    client = load_client(REPO_ROOT, environment)
+    insecure = not client.session.verify
     return client, insecure
 
 
-def write_csv(name: str, rows: list[dict[str, Any]], fieldnames: list[str]) -> Path:
-    EXPORTS.mkdir(exist_ok=True)
-    path = EXPORTS / name
+def write_csv(
+    environment: str,
+    name: str,
+    rows: list[dict[str, Any]],
+    fieldnames: list[str],
+) -> Path:
+    directory = exports_dir(environment)
+    path = directory / name
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames, extrasaction="ignore")
         writer.writeheader()
@@ -454,6 +476,13 @@ def export_conditions(client: IseClient) -> list[dict[str, Any]]:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="GET-only ISE export to exports/")
     parser.add_argument(
+        "--environment",
+        "-e",
+        choices=["lab", "stage", "prod"],
+        default="lab",
+        help="Environment label (default: lab). Selects LAB_ISE_* / STAGE_ISE_* / PROD_ISE_* credentials and writes to exports/<label>/.",
+    )
+    parser.add_argument(
         "--resource",
         choices=[
             "all",
@@ -480,10 +509,15 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    client, insecure = load_settings()
+    client, insecure = load_settings(args.environment)
     details = not args.no_details
     wanted = args.resource
-    print(f"target {client.base}  tls_verify={not insecure}  details={details}")
+    print(
+        f"environment {client.environment}  "
+        f"target {client.base}  "
+        f"tls_verify={not insecure}  "
+        f"details={details}"
+    )
 
     writers: list[tuple[str, list[str], list[dict[str, Any]]]] = []
 
@@ -588,10 +622,14 @@ def main() -> int:
         )
 
     for filename, fields, rows in writers:
-        path = write_csv(filename, rows, fields)
+        path = write_csv(client.environment, filename, rows, fields)
         print(f"wrote {path.relative_to(REPO_ROOT)}  ({len(rows)} rows)")
 
-    print("done. Compare names in exports/ against docs/naming.md. Do not edit the CSVs.")
+    print(
+        f"done ({client.environment}). "
+        f"CSVs are in exports/{client.environment}/. "
+        "Compare names against docs/naming.md. Do not edit the CSVs."
+    )
     return 0
 
 

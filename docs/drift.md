@@ -32,7 +32,9 @@ An export diff can still show unmanaged objects. That is expected. Do not import
 1. Secret-free gates first:
 
    ```bash
-   bash scripts/check.sh
+   python3.12 scripts/drift.py
+   # or
+   python3.12 scripts/drift.py --environment lab
    ```
 
 2. Load lab credentials and plan:

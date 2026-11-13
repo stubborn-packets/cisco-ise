@@ -3,7 +3,7 @@
 
 Read-only. Walks the families scripts/read_policy.py already emits.
 Computes the same Terraform address the reader uses, then looks up the
-live UUID by name on lab ISE. Does not write to ISE. Does not put UUIDs
+live UUID by name. Does not write to ISE. Does not put UUIDs
 into policy/ or inventory/.
 
 Purpose. While state is healthy you do not need this. Terraform already
@@ -23,7 +23,7 @@ Access, and NADs are not mapped.
 Usage (from the repo root):
 
     python3.12 scripts/import_map.py --family sgt
-    python3.12 scripts/import_map.py --family eig
+    python3.12 scripts/import_map.py --family eig --environment stage
     python3.12 scripts/import_map.py --family allowed-protocols
     python3.12 scripts/import_map.py --family dacl
     python3.12 scripts/import_map.py --family authz-profile
@@ -36,7 +36,8 @@ Usage (from the repo root):
 
 Add --dry-run to print addresses only and skip the ISE call.
 
-Requires the same ISE_* environment as scripts/export_ise.py.
+Credentials are selected by --environment (default lab):
+LAB_ISE_*, STAGE_ISE_*, or PROD_ISE_*.
 """
 
 from __future__ import annotations
@@ -332,6 +333,13 @@ SPECS["exception"] = None
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
+        "--environment",
+        "-e",
+        choices=["lab", "stage", "prod"],
+        default="lab",
+        help="Environment label (default: lab). Selects LAB_ISE_* / STAGE_ISE_* / PROD_ISE_* credentials.",
+    )
+    parser.add_argument(
         "--family",
         choices=tuple(LOADERS),
         required=True,
@@ -350,9 +358,11 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    client = None if args.dry_run else load_client(args.root)
+    client = None if args.dry_run else load_client(args.root, args.environment)
     rows = LOADERS[args.family](args.root, client, SPECS[args.family])
 
+    env_label = client.environment if client is not None else args.environment
+    print(f"# environment {env_label}")
     print("# name\tuuid\tterraform_address")
     for name, uid, address in rows:
         print(f"{name}\t{uid}\t{address}")
