@@ -158,7 +158,12 @@ Exit: a reader can regenerate a human-readable evaluation report of the owned po
 
 ## Phase 13 — External identity sources (LDAP)
 
-New family after ISS and CAP. Thin module and YAML for an LDAP identity source. Prerequisite is a lab LDAP setup. Not a blocker for the public stop.
+Started 2026-11-13. Thin module and YAML for an LDAP identity source. The pinned CiscoDevNet/ise 0.4.1 provider has no LDAP resource, so the object is hand-built in the ISE GUI under the exact YAML name. The name is usable from ISS and authentication rules. Phase 15 will document the hand-build steps. Sets stay disabled.
+
+- Prefix: `LDAP-` + kebab-case. First object: `LDAP-lab-stubbornpackets-uid`.
+- `policy/ldap.yaml` holds the lab OpenLDAP settings and the selected groups.
+- `terraform/modules/ldap/` is a skeleton (null_resource placeholder). Reader emits `environments/lab/ldap.tf` and the `ldap_*` maps.
+- Do not hand-edit the generated file. Ids stay out of policy/.
 
 ## Phase 14 — Multi-instance readiness
 

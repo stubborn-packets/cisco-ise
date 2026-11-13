@@ -54,6 +54,7 @@ Fail: CAP-lab-subject-cn, CAP_Lab_Subject_Cn
 | CND- | Library condition | Yes |
 | ISS_ | Identity source sequence | Yes (snake_case; ISE rejects hyphen) |
 | CAP_ | Certificate authentication profile | Yes (snake_case; ISE rejects hyphen) |
+| LDAP- | LDAP identity source | Yes (future provider resource; hand-built until then) |
 | EIG- | Static endpoint identity group | Yes |
 | LP- | Logical profile | Policy docs until API is proven |
 | VIP- | Load-balanced virtual IP name | Inventory only |
