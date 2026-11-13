@@ -1,0 +1,51 @@
+# policy/ldap.yaml
+# Plane: desired state.
+# Names use LDAP- plus kebab-case.
+#
+# FUTURE FEATURE — NOT MANAGED BY TERRAFORM YET
+#
+# The pinned CiscoDevNet/ise 0.4.1 provider has no LDAP identity-source
+# resource. This file documents the intended object so the name can be
+# referenced from identity source sequences and authentication rules.
+# The live object must be created by hand in the ISE GUI (or via a one-off
+# ERS call) under the exact name below until the provider adds support.
+# Phase 15 operational docs will cover the hand-build steps.
+#
+# Do not put UUIDs or the bind password here.
+# Bind password stays outside the repo (env or local secret).
+
+ldap_identity_sources:
+  - name: LDAP-lab-stubbornpackets-uid
+    description: >-
+      Lab OpenLDAP identity source for lab.stubbornpackets.com,
+      matching subjects on uid. Hand-built until the provider supports it.
+    owner: lab
+    state: enabled
+    # Connection (plain LDAP/389 for now; TLS later if needed)
+    host: "lab-ldap-vm1.lab.stubbornpackets.com"
+    port: 389
+    enable_secure_connection: false
+    # Directory
+    base_dn: dc=lab,dc=stubbornpackets,dc=com
+    bind_dn: cn=ise-bind,ou=Services,dc=lab,dc=stubbornpackets,dc=com
+    # Subject (user) search
+    user_search_base: ou=People,dc=lab,dc=stubbornpackets,dc=com
+    subject_object_class: inetOrgPerson
+    subject_name_attribute: uid
+    # Group search
+    group_search_base: ou=Groups,dc=lab,dc=stubbornpackets,dc=com
+    group_object_class: posixGroup
+    group_map_attribute: memberUid
+    # How the member attribute value is interpreted.
+    # For posixGroup + memberUid this must be username (the uid value), not DN.
+    subjects_in_groups_stored_as: username
+    # Groups selected / retrieved into ISE for use in conditions and rules.
+    # These are the groups that have been (or will be) added by hand.
+    groups:
+      - WLAN-Admins
+      - LAN-Admins
+      - Guest-Admins
+      - VPN-Admins
+      - lab-admins
+    # Password is not stored here
+    # bind_password: set via environment or local secret when the provider supports it

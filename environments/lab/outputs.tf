@@ -402,3 +402,17 @@ output "ex_ids" {
   }
   description = "ISE UUIDs. State only. Do not copy into policy/ or inventory/."
 }
+
+output "ldap_names" {
+  value = {
+    lab_stubbornpackets_uid = module.ldap_lab_stubbornpackets_uid.name
+  }
+  description = "LDAP identity source names. Hand-built until the provider supports the resource."
+}
+
+output "ldap_ids" {
+  value = {
+    lab_stubbornpackets_uid = module.ldap_lab_stubbornpackets_uid.id
+  }
+  description = "ISE UUIDs. Empty until the provider supports LDAP. State only."
+}

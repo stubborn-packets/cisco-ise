@@ -18,6 +18,7 @@ prefixes:
   CND: { object: library-condition, scope: network-access }
   ISS: { object: identity-source-sequence, scope: identity }
   CAP: { object: certificate-authentication-profile, scope: identity }
+  LDAP: { object: ldap-identity-source, scope: identity }  # future provider resource; object is hand-built until then
   EIG: { object: endpoint-identity-group, scope: identity }
   LP:  { object: logical-profile, scope: profiler }
   VIP: { object: load-balanced-vip-name, scope: documentation-only }
