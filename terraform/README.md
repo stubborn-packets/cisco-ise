@@ -25,12 +25,11 @@ calls live in `environments/lab/ndg.tf`.
 
 ## Lab apply
 
-Credentials: repo-root `.env` (`ISE_URL`, `ISE_USERNAME`, `ISE_PASSWORD`,
-`ISE_INSECURE`). Terraform does not load `.env` by itself.
+Credentials after Phase 14: environment-specific variables only (`LAB_ISE_URL`, `LAB_ISE_USERNAME`, `LAB_ISE_PASSWORD`, `LAB_ISE_INSECURE`). No fallback to plain `ISE_*`. Terraform does not load `.env` by itself.
 
 ```bash
 cd environments/lab
-set -a && source ../../.env && set +a
+set -a && source ../../.env && set +a   # or export the LAB_ISE_* vars
 terraform init
 terraform plan
 terraform apply
@@ -49,30 +48,17 @@ State file: `environments/lab/terraform.tfstate` (gitignored).
 Provider: `CiscoDevNet/ise` 0.4.1, pinned in
 `environments/lab/versions.tf`.
 
-## First object
+## Bootstrap SGT
 
-| Field | Value |
-| --- | --- |
-| Terraform address | `module.sgt_bootstrap.ise_trustsec_security_group.this` |
-| ISE name | `SGT_lab_bootstrap` |
-| Tag | `1001` |
-| GUI | Work Centers > TrustSec > Components > Security Groups |
-
-Do not import an existing non-standard lab SGT as this address.
-Do not put the UUID from `terraform output sgt_id` into `policy/` or
-`inventory/`.
-
-## Phase 4 SGTs
-
-`policy/sgt.yaml` is the review surface. Bootstrap stays in tfvars.
-Do not manage ISE built-in Unknown (tag 0).
+Moved to `policy/sgt.yaml` in the YAML-conversion increment. Address is `module.sgt_lab_bootstrap`. Map key is `lab_bootstrap`. No scalar outputs. Do not put the UUID into `policy/` or `inventory/`.
 
 | Terraform address | ISE name | Tag |
 | --- | --- | --- |
-| `module.sgt_lab_users.ise_trustsec_security_group.this` | `SGT_lab_users` | 1010 |
-| `module.sgt_lab_devices.ise_trustsec_security_group.this` | `SGT_lab_devices` | 1020 |
+| `module.sgt_lab_bootstrap.ise_trustsec_security_group.this` | `SGT_lab_bootstrap` | 1001 |
 
-Do not put `terraform output sgt_ids` into `policy/` or `inventory/`.
+## SGTs
+
+`policy/sgt.yaml` is the review surface. The reader emits `environments/lab/sgts.tf`. Do not hand-edit it. Bootstrap is included. Do not manage the built-in Unknown (tag 0).
 
 ## NDG objects
 

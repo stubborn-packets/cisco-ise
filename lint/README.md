@@ -7,6 +7,8 @@ python3.12 scripts/lint_ise.py
 python3.12 -m unittest tests.lint.test_lint_ise
 ```
 
+Phase 15 closed 2026-11-13. The linter itself did not change in this phase. It still reads only `policy/` and `inventory/`. It does not talk to ISE. ISS- and CAP- use the same snake_case exception as SGT (ISE rejects hyphens). LDAP- is kebab-case. See `docs/naming.md`.
+
 This folder is the machine-readable half of `docs/naming.md`. Use it when adapting the model to another ISE (different prefixes, extra built-ins, more NDG roots). Do not commit employer hostnames, VIP addresses, NAD names, or ticket-system URLs here.
 
 ## What each file owns

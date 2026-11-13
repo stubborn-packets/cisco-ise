@@ -167,10 +167,22 @@ Started 2026-11-13. Thin module and YAML for an LDAP identity source. The pinned
 
 ## Phase 14 — Multi-instance readiness
 
-Closed 2026-11-13. Scripts accept an environment label (default `lab`). Credentials are read only as `<ENV>_ISE_*`. Exports write to `exports/<environment>/`. Drift and import-map print the label. `read_policy.py` emits under `environments/<label>/` when that directory already exists. `check.sh` accepts an optional argument. Still one write target (`environments/lab`). No stage or prod directories created. Sets stay disabled.
+Closed 2026-11-13. Scripts accept an environment label (default `lab`). Exports, drift, and import-map output show which environment they ran against. Still one write target (`environments/lab`). Removes the hard “lab” assumption without inventing stage or prod.
 
-Exit: a reader can run the GET scripts and the reader against a labeled environment without hard-coded “lab” paths, while the only place the repo may write remains `environments/lab`.
+- Scripts accept `--environment` / `-e` (`lab`, `stage`, or `prod`; default `lab`).
+- Credentials are read only as `<ENV>_ISE_URL`, `<ENV>_ISE_USERNAME`, `<ENV>_ISE_PASSWORD`, `<ENV>_ISE_INSECURE`. No fallback to plain `ISE_*`.
+- Exports write to `exports/<environment>/` (created on first use).
+- Drift, import-map, and the reader print or target the label.
+- `read_policy.py` emits under `environments/<label>/` only when that directory already exists.
+- `check.sh` accepts an optional environment argument (default `lab`). CI stays on `environments/lab`.
+- No `environments/stage/` or `prod/` created. Sets stay disabled.
 
 ## Phase 15 — Operational documentation
 
-Nightly drift example (cron, systemd, or GitHub Actions) and optional notification if non-owned objects appear. Production get-started guide: benefits, what is needed (ISE version, API access, packages, starting small to fully managed), and the cutover pattern. Documentation only. No new Terraform resources.
+Closed 2026-11-13. Documentation only. No new Terraform resources.
+
+- `docs/operations.md` — nightly drift example (cron, systemd, or GitHub Actions) and optional notification if non-owned objects appear.
+- `docs/getting-started.md` — benefits, what is needed (ISE version, API access, packages), starting small to fully managed, and the cutover pattern.
+- `docs/ldap-hand-build.md` — GUI steps for `LDAP-lab-stubbornpackets-uid` (provider has no LDAP resource; object is hand-built under the exact YAML name).
+
+Sets stay disabled. Enable is a cutover. 

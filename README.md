@@ -16,9 +16,16 @@ Git-reviewed Network Access policy for Cisco ISE 3.3 patch 1. YAML is the review
 | YAML reader (all families + outputs) | Done |
 | 7 — Import map | Done |
 | 8 — Git promotion path | Done |
-| 9 — Drift | Later |
+| 9 — Drift | Done |
+| 10 — Shared client for export | Done |
+| 11a — ISS- | Done |
+| 11b — CAP- | Done |
+| 12 — Reporting | Done |
+| 13 — LDAP skeleton | Done |
+| 14 — Multi-instance readiness | Done |
+| 15 — Operational documentation | Done |
 
-Phase 3 exit met 2026-09-21: `SGT_lab_bootstrap` / 1001 created and destroyed on lab ISE. Provider `CiscoDevNet/ise` 0.4.1, local state under `environments/lab/`. `policy/sgt.yaml` stays empty until Phase 4. SGT names use `SGT_` + snake_case because ISE ERS rejects hyphens. There is no `prod/` folder.
+Phase 15 closed 2026-11-13. Documentation only. Public-repo stopping point reached (11a/11b done, LP deferred). Sets stay disabled. Enable is a cutover. There is no `prod/` folder. `environments/stage/` is added only if a second eval ISE exists.
 
 ## Planes
 
@@ -66,10 +73,10 @@ python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r scripts/requirements.txt
 cp .env.example .env    # set ISE_URL, ISE_USERNAME, ISE_PASSWORD
-python scripts/export_ise.py
+python scripts/export_ise.py --environment lab
 ```
 
-The exporter is GET-only (`requests`, not `ciscoisesdk`). CSVs land in `exports/` and are gitignored. Compare `name` columns to `docs/naming.md`. Do not edit the CSVs.
+The exporter is GET-only. CSVs land in `exports/lab/` and are gitignored. Compare name columns to `docs/naming.md`. Do not edit the CSVs.
 
 Single family:
 

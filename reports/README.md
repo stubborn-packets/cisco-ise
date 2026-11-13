@@ -1,6 +1,6 @@
 # reports/
 
-Report-only views of owned desired state. Not observed state (`exports/`). Not a write path.
+Report-only views of owned desired state. Not observed state (`exports/`). Not a write path. Phase 12 closed 2026-11-11. Report-only evaluation view of owned policy. No ISE, no UUIDs, no writes. Generated `.md` files are gitignored. Sets stay disabled.
 
 ## policy-evaluation.md
 
